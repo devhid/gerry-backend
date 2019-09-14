@@ -67,6 +67,33 @@ The generation process of the system should combine precincts so that the result
   * Your system will also summarize data indicating whether the minority group is politically cohesive. 
   * Using precinct demographic data and precinct voting data, summarize the voting patterns of each minority group.
   
+## System Requirements
+
+### Server
+ * Server-side code should be written in **Java**.
+ * Should handle concurrent users.
+ 
+### Database
+ 1. Must be on a remote machine.
+ 2. Must be SQL-based.
+
+### GUI
+ * Should implement at least **40 use cases**.
+ * Can use any web technologies and frameworks to develop the GUI and abstract the interactions.
+ 
+### GUI / Server Interaction
+ * If you use **Spring**, you are responsible for **understanding how that automation is performed during your design and code reviews**.
+ 
+### Object to Relational Mapping
+ * You should implement a clear separation between your server code and your DB. 
+ * You may develop the mapping code yourself, and use **JDBC** for the interface to the DB or you can use a standard mapping approach (e.g., **JPA / Hibernate**).
+ 
+### Data Gathering / DB Loading
+ * You can use any language or library that is appropriate for the extraction of data. 
+ * This largely depends on the data you locate. 
+ * If you find available downloads in XML or JSON format, there are libraries that will automate much of the work. 
+ * In past projects, Python has proven to be useful.
+
 ## Due Dates for Deliverables
 
 <table>
