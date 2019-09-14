@@ -151,17 +151,18 @@ The generation process of the system should combine precincts so that the result
       - This build should include all your GUI pages and the majority of your domain objects, although all the methods in your classes can be stubbed.<br>
       - This code should work to the extent that your pages will transition properly.
      </td>
-     <td>Video (5 minutes) showing GUI and code in Dropbox sub-folder named <strong>Nov24</strong>.
+     <td>
+      Video (5 minutes) showing GUI and code in Dropbox sub-folder named <strong>Nov24</strong>.
      </td>
     </tr>
     <tr>
      <td>11/24</td>
      <td>
       <strong>Test Plan Document</strong><br><br>
-      - This document should describe your high level testing plan for your system. 
-      - Describe how you will change initial conditions to run various test scenarios. 
-      - Describe how you intend to compare results of various tests.
-      - Describe how you expect to gather data to improve your algorithms. 
+      - This document should describe your high level testing plan for your system.<br> 
+      - Describe how you will change initial conditions to run various test scenarios.<br> 
+      - Describe how you intend to compare results of various tests.<br>
+      - Describe how you expect to gather data to improve your algorithms.<br> 
       - <strong>The test plan should be 1-2 pages.</strong>
      </td>
      <td>Dropbox sub-folder named <strong>Nov24</strong>.</td>
@@ -183,17 +184,28 @@ The generation process of the system should combine precincts so that the result
     </tr>
     <tr>
       <td>12/1</td>
-      <td></td>
-      <td></td>
+      <td>
+       <strong>Build (with DB)</strong><br><br>
+       - This build should have a minimum of half of your use cases.
+      </td>
+      <td>
+        Video (5 minutes) showing GUI (2 minutes) and code in Dropbox sub-folder named <strong>Dec1</strong>.
+      </td>
     </tr>
     <tr>
       <td>12/5-12/17</td>
-      <td></td>
-      <td></td>
+     <td>
+      1. <strong>Formal Demonstration of Project</strong><br> 
+      - This part of your project will be graded as a component of your final project grade.<br><br>
+      2. <strong>Final Specification Document, Design Document, Test Plan, and Source Code</strong><br> 
+      - Provide any updates you have made to material previously submitted.</td>
+      <td>Bring mapping of our use cases to numbered use cases in master list.</td>
     </tr>
     <tr>
-      <td>?</td>
-      <td></td>
+      <td>Demo</td>
+     <td><strong>Final Build</strong><br><br>
+      - This build should contain working code for all the use cases presented in your project demonstration.
+      </td>
       <td></td>
     </tr>
   </tbody>
