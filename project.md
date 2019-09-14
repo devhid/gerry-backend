@@ -1,13 +1,14 @@
 <h1 align=center>Project Specification</h1>
 <p align=center><strong>Team Name</strong>: Jazz</p>
 <p align=center><strong>Team Members</strong>: Mankirat Gulati, Andy Liang, Stanley Lim, Johnny So</p>
+<p align=center>States: <strong>California</strong>, <strong>Virginia</strong>, and <strong>Utah</strong></p>
 
 ## Background
 * A Gerrymander is a voting district that is designed to serve some political purpose. The name refers to both a salamander and Eldridge Gerry, whose newly created voting district about 200 years ago was said to resemble a salamander. 
 
 * Within the past 10 years, databases for voter characterization as well as tools for precise map generation have made it possible to create congressional districts that favor the party responsible for the creation of the districts. Redistricting is done in states where census data requires a change in the number of delegates in the state, and the 2010 census triggered redistricting in a number of states. Many of these redistricting efforts resulted in a shift in the political representation in the states. 
 
-* As the realization of the impact of these changes has grown, various technical approaches to the issue have been proposed, some as quantitative measures of the presence of Gerrymandering, others as legal challenges to redistricting, and yet others as draft bills in Congress to minimize the effect of future redistricting. Many of the redistricting changes following the 2010 census used provisions of the Voting Rights Act (VRA) in way not intended by the people responsible for the VRA. For example, the VRA provided for majority-minority districts, which were intended as a means to ensure representation of minority groups in Congress. However, the VRA was used to "pack" districts, which promoted Gerrymandered districts, and also fewer majority-minority district than might otherwise have been possible.
+* As the realization of the impact of these changes has grown, various technical approaches to the issue have been proposed, some as quantitative measures of the presence of Gerrymandering, others as legal challenges to redistricting, and yet others as draft bills in Congress to minimize the effect of future redistricting. Many of the redistricting changes following the 2010 census used provisions of the Voting Rights Act (VRA) in way not intended by the people responsible for the VRA. For example, the VRA provided for majority-minority districts, which were intended as a means to ensure representation of minority groups in Congress. However, the VRA was used to "pack" districts, which promoted Gerrymandered districts, and also fewer majority-minority districts than might otherwise have been possible.
 
 * The system to be developed in this project will allow for the generation of congressional district boundaries without political influence but with the maximum number of majority-minority districts. This system relates to, but is different from, systems developed in previous sections of CSE308. Those systems gathered data associated with this topic, analyzed the data using many of the proposed measures of Gerrymandering, presented the data in a way that highlighted the effects of gerrymandering, and explored various algorithms for automatic redistricting.
 
@@ -80,42 +81,104 @@ The generation process of the system should combine precincts so that the result
     <tr>
       <td>9/29</td>
       <td>
-        1. Use Cases (<strong>title</strong> and <strong>description</strong>) - <strong>PDF</strong><br>
-        2. GUI State Page (electronically generated or hand-drawn) - <strong>PNG / JPEG</strong><br>
-        3. README (<strong>optional</strong>) - <strong>PDF</strong>
+        1. <strong>Use Cases</strong> (title and description) - <strong>PDF</strong><br>
+        2. <strong>GUI State Page</strong> (electronically generated or hand-drawn) - <strong>PNG or JPEG</strong><br>
+        3. <strong>README</strong> (optional) - <strong>PDF</strong>
       </td>
       <td>
-        Dropbox sub-folder named <strong>Sep29</strong>.<br>
+        Dropbox sub-folder named <strong>Sep29</strong>.
       </td>
     </tr>
     <tr>
       <td>10/13</td>
-      <td></td>
-      <td></td>
+     <td>
+       <strong>A user interface that will demonstrate your proposed GUI.</strong><br><br>
+       - This is not a complete working interface, just a sequence of pages to demonstrate the functionality (but the page-to-page links should work).<br>
+       - Each page should be consistent in design and all forms, GUI components and sample text should be included.</td>
+      <td>
+       Dropbox sub-folder named <strong>Oct13</strong>.
+      </td>
     </tr>
     <tr>
       <td>10/20</td>
-      <td></td>
-      <td></td>
+      <td>
+       1. <strong>Object Design</strong> (initial class diagram) - <strong>PDF, JPEG, PNG</strong><br>
+          - The initial class diagram should contain most of your classes (you may not be able to identify all the non-domain classes yet), and each of these classes should contain all the instance variables and many of the methods.<br><br>
+       2. <strong>Representative Sequence Diagram</strong> - <strong>PDF, JPEG, PNG</strong><br>
+          - The purpose of this item is for you to obtain feedback on your approach to sequence diagrams.<br>
+          - The feedback should be helpful when you prepare for your design review.</td>
+      <td>
+       Dropbox sub-folder named <strong>Oct20</strong>.
+      </td>
     </tr>
     <tr>
       <td>10/17-11/5</td>
-      <td></td>
-      <td></td>
+      <td>
+       <strong>Design Review</strong><br><br>
+       - You will conduct a brief design review of your design.<br> 
+       - Many of these reviews will be conducted in class, while the remainder will be conducted outside of the class during the later part of the time period.<br> 
+       - You should be prepared to <strong>present your overall design</strong>, primarily <strong>through</strong> your <strong>GUI, use cases, sequence diagrams, class diagram, and preliminary DB design</strong>.<br> 
+       - You should either have your material on a flash memory (preferred) or on your own laptop, which we will connect to the projector.<br>
+       - You should have all your sequence diagrams, class diagrams, and use cases available to respond to questions. <br>
+       - Your design grade will be based primarily on this review.<br>
+       - The review will also contribute to your oral communications grade, although you have more potential for credits if you present in class (instead of the separate session).<br>
+       - The grading criteria for your design is primarily the completeness and quality of the material. <br>
+       - Remember, maintainability is considered an important part of quality. You may use the suggestions in your design review to modify your final design.<br>
+       - All members should be active in the design review.
+      </td>
+      <td>Grading Rubric</td>
     </tr>
     <tr>
       <td>11/17</td>
-      <td></td>
-      <td></td>
+     <td>
+      <strong>Final Design Document</strong><br><br>
+      - This completes your design document, includes the database design, and all non-domain objects.<br> 
+      - <strong>Note</strong>: The preferred documentation of your DB design is a <strong>Relational Data Model (RDM)</strong>, not an ER diagram.<br>
+      - You should be sure that your DB is <strong>properly normalized</strong> (up to <strong>3rd normal form</strong>).<br>
+      - The final design can include any changes to your preliminary design, especially changes resulting from your design review.
+      </td>
+      <td>
+        Dropbox sub-folder named <strong>Nov17</strong>.
+      </td>
     </tr>
     <tr>
-      <td>11/24</td>
-      <td></td>
-      <td></td>
+     <td>11/24</td>
+     <td>
+      <strong>Complete Initial Build</strong><br><br>
+      - This initial build should include enough functioning use cases for minimal user access.<br> 
+      - Typically this will include login, logout, and a few data display use cases.<br> 
+      - Integration with your database is not required at this time, so you can stub your persistence layer with hard-coded values.<br>
+      - This build should include all your GUI pages and the majority of your domain objects, although all the methods in your classes can be stubbed.<br>
+      - This code should work to the extent that your pages will transition properly.
+     </td>
+     <td>Video (5 minutes) showing GUI and code in Dropbox sub-folder named <strong>Nov24</strong>.
+     </td>
+    </tr>
+    <tr>
+     <td>11/24</td>
+     <td>
+      <strong>Test Plan Document</strong><br><br>
+      - This document should describe your high level testing plan for your system. 
+      - Describe how you will change initial conditions to run various test scenarios. 
+      - Describe how you intend to compare results of various tests.
+      - Describe how you expect to gather data to improve your algorithms. 
+      - <strong>The test plan should be 1-2 pages.</strong>
+     </td>
+     <td>Dropbox sub-folder named <strong>Nov24</strong>.</td>
     </tr>
     <tr>
       <td>11/18-11/26</td>
-      <td></td>
+      <td>
+       <strong>Code Review</strong><br><br>
+       - Some code walk-throughs will be held in class, but most will be held outside of class.<br> 
+       - You are expected to start your session with the code associated with a typical use case, including controller classes, domain classes, utility classes, database, persistence layer, and client-side GUI code.<br> 
+       - Be prepared with all your code since you will likely be asked to show code modules other than the one you prepared.<br>
+       - The code should adhere to the coding conventions, be written in a way that enables the reviewer to understand the code, and should also be formatted to enhance readability.<br> 
+       - The code will not only include use case code, but also testing code, especially code used to monitor system performance.<br> 
+       - You should also have your design material and user interface available to respond to questions.<br> 
+       - This part of your project will be graded as a component of your final project grade.<br>
+       - You can refer to a <a href="https://www3.cs.stonybrook.edu/~cse308/Section01/CodeReviewCategories.html">typical checklist of code issues</a> to be addressed.
+      </td>
       <td></td>
     </tr>
     <tr>
