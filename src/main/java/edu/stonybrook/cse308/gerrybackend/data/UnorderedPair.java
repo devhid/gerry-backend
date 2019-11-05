@@ -1,13 +1,25 @@
 package edu.stonybrook.cse308.gerrybackend.data;
 
 import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class UnorderedPair<T> {
 
+    @Setter
     @Getter
     private T item1;
+
+    @Setter
     @Getter
     private T item2;
+
+    public UnorderedPair(){
+        this.item1 = null;
+        this.item2 = null;
+    }
 
     public UnorderedPair(T item1, T item2){
         this.item1 = item1;

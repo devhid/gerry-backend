@@ -3,37 +3,78 @@ package edu.stonybrook.cse308.gerrybackend.graph;
 import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
-import edu.stonybrook.cse308.gerrybackend.enums.ElectionType;
+import edu.stonybrook.cse308.gerrybackend.enums.converters.ElectionTypeConverter;
+import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import lombok.Getter;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class GerryGeoNode {
 
-    protected final UUID id;
     @Getter
-    protected final String name;
-    protected DemographicData demographicData;
-    protected ElectionData[] electionDataArr;
-    protected Set<GerryEdge> adjacentEdges;
-    @Getter
-    protected final String geography;
+    @Id
+    @Column(name = "id")
+    protected String id;
 
-    protected GerryGeoNode(UUID id, String name, DemographicData demographicData,
-                           ElectionData[] electionDataArr, Set<GerryEdge> adjacentEdges, String geography) {
-        this.id = id;
-        this.name = name;
-        this.demographicData = demographicData;
-        this.electionDataArr = electionDataArr;
-        this.adjacentEdges = adjacentEdges;
-        this.geography = geography;
+    @Getter
+    @NotNull
+    @Column(name = "name")
+    protected String name;
+
+    @Getter
+    @NotNull
+    @Convert(converter = ElectionTypeConverter.class)
+    @Column(name = "election_id")
+    protected ElectionType electionId;
+
+    @Getter
+    @NotNull
+    @Column(name="demographic")
+    protected DemographicData demographicData;
+
+    @Getter
+    @NotNull
+    @Column(name="election")
+    protected ElectionData electionData;
+
+    @NotNull
+    @ManyToMany     // one node has many edges, and one edge has 2 nodes
+    protected Set<GerryEdge> adjacentEdges;
+
+    @Getter
+    @ManyToOne
+    @JoinColumn(name="id")
+    protected ClusterNode parent;
+
+    @Getter
+    @Column(name="geography")
+    protected String geography;
+
+    protected GerryGeoNode(){
+        this.id = UUID.randomUUID().toString();
+        this.name = "";
+        this.electionId = ElectionType.getDefault();
+        this.demographicData = new DemographicData();
+        this.electionData = new ElectionData();
+        this.adjacentEdges = new HashSet<>();
+        this.geography = null;
     }
 
-    public String getId(){
-        return this.id.toString();
+    protected GerryGeoNode(UUID id, String name, ElectionType electionId,
+                           DemographicData demographicData, ElectionData electionData,
+                           Set<GerryEdge> adjacentEdges, String geography) {
+        this.id = id.toString();
+        this.name = name;
+        this.electionId = electionId;
+        this.demographicData = demographicData;
+        this.electionData = electionData;
+        this.adjacentEdges = adjacentEdges;
+        this.geography = geography;
     }
 
     public Set<GerryGeoNode> getAdjacentNodes() {
@@ -44,10 +85,6 @@ public abstract class GerryGeoNode {
             adjNodes.add(adjNode);
         }
         return adjNodes;
-    }
-
-    public ElectionData getElectionData(ElectionType electionId){
-        return this.electionDataArr[electionId.value];
     }
 
     public void addEdge(GerryEdge edge) throws InvalidEdgeException {

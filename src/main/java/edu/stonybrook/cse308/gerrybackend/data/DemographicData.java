@@ -1,57 +1,83 @@
 package edu.stonybrook.cse308.gerrybackend.data;
 
-import edu.stonybrook.cse308.gerrybackend.enums.DemographicType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
+import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 
-import java.util.stream.Stream;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
+@Entity(name="demographic")
 public class DemographicData {
 
-    private final int[] population;
-    private final int[] votingAgePopulation;
+    @Id
+    @Column(name="id")
+    private String id;
 
-    public DemographicData(int[] population, int[] votingAgePopulation){
+    @NotNull
+    @ElementCollection
+    @Column(name="population")
+    private Map<DemographicType, Integer> population;
+
+    @NotNull
+    @ElementCollection
+    @Column(name="voting_age_population")
+    private Map<DemographicType, Integer> votingAgePopulation;
+
+    public DemographicData(){
+        this.id = UUID.randomUUID().toString();
+        this.population = new EnumMap<>(DemographicType.class);
+        this.votingAgePopulation = new EnumMap<>(DemographicType.class);
+        MapUtils.initMap(this.population, 0);
+        MapUtils.initMap(this.votingAgePopulation, 0);
+    }
+
+    public DemographicData(UUID id, Map<DemographicType, Integer> population,
+                           Map<DemographicType, Integer> votingAgePopulation){
+        this.id = id.toString();
         this.population = population;
         this.votingAgePopulation = votingAgePopulation;
     }
 
     public int getPopulation(DemographicType demo){
-        return this.population[demo.value];
+        return this.population.get(demo);
     }
 
     public int getPopulation(boolean canVote, DemographicType demo){
         if (!canVote){
-            return this.getPopulation(demo) - this.votingAgePopulation[demo.value];
+            return this.population.get(demo) - this.votingAgePopulation.get(demo);
         }
-        return this.votingAgePopulation[demo.value];
+        return this.votingAgePopulation.get(demo);
     }
 
-    public int[] getPopulationCopy() {
-        int[] pop = new int[this.population.length];
-        System.arraycopy(this.population, 0, pop, 0, this.population.length);
-        return pop;
+    public Map<DemographicType, Integer> getPopulationCopy() {
+        return new EnumMap<>(this.population);
     }
 
-    public int[] getVotingAgePopulationCopy(){
-        int[] votingAgePop = new int[this.votingAgePopulation.length];
-        System.arraycopy(this.votingAgePopulation, 0, votingAgePop, 0, this.votingAgePopulation.length);
-        return votingAgePop;
+    public Map<DemographicType, Integer> getVotingAgePopulationCopy() {
+        return new EnumMap<>(this.votingAgePopulation);
     }
 
     public static DemographicData combine(DemographicData d1, DemographicData d2){
-        int[] d1Pop = d1.getPopulationCopy();
-        int[] d1VotingAgePop = d1.getVotingAgePopulationCopy();
-        int[] d2Pop = d2.getPopulationCopy();
-        int[] d2VotingAgePop = d2.getVotingAgePopulationCopy();
+        Map<DemographicType, Integer> d1Pop = d1.getPopulationCopy();
+        Map<DemographicType, Integer> d1VotingAgePop = d1.getVotingAgePopulationCopy();
+        Map<DemographicType, Integer> d2Pop = d2.getPopulationCopy();
+        Map<DemographicType, Integer> d2VotingAgePop = d2.getVotingAgePopulationCopy();
 
-        DemographicType[] demoTypes = DemographicType.values();
-        int[] combinedPop = new int[demoTypes.length];
-        int[] combinedVotingAgePop = new int[demoTypes.length];
-        Stream.of(demoTypes).forEach(val -> {
-            int index = val.value;
-            combinedPop[index] = d1Pop[index] + d2Pop[index];
-            combinedVotingAgePop[index] = d1VotingAgePop[index] + d2VotingAgePop[index];
-        });
-        return new DemographicData(combinedPop, combinedVotingAgePop);
+        Set<DemographicType> demoTypes = d1Pop.keySet();
+        Map<DemographicType, Integer> combinedPop = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> combinedVotingAgePop = new EnumMap<>(DemographicType.class);
+        for (DemographicType demoType : demoTypes){
+           combinedPop.put(demoType, d1Pop.get(demoType) + d2Pop.get(demoType));
+           combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
+        }
+        return new DemographicData(UUID.randomUUID(), combinedPop, combinedVotingAgePop);
     }
 
 }

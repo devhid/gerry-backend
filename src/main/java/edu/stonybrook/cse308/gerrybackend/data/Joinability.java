@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.data;
 
-import edu.stonybrook.cse308.gerrybackend.enums.DemographicType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.graph.GerryGeoNode;
 
 import java.util.Set;
