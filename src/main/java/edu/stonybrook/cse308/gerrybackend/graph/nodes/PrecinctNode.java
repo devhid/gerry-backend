@@ -1,8 +1,8 @@
-package edu.stonybrook.cse308.gerrybackend.graph;
+package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
-import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-public class PrecinctNode extends GerryGeoNode {
+public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
 
     @Getter
     @Column(name="county")
@@ -22,10 +22,10 @@ public class PrecinctNode extends GerryGeoNode {
         this.parent = new DistrictNode();
     }
 
-    public PrecinctNode(UUID id, String name, ElectionType electionId,
+    public PrecinctNode(UUID id, String name,
                         DemographicData demographicData, ElectionData electionData,
-                        Set<GerryEdge> adjacentEdges, String geography, String county, DistrictNode originalCD){
-        super(id, name, electionId, demographicData, electionData, adjacentEdges, geography);
+                        Set<PrecinctEdge> adjacentEdges, String geography, String county, DistrictNode originalCD){
+        super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.county = county;
         this.parent = originalCD;
     }

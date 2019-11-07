@@ -1,7 +1,5 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-
 public enum DemographicType implements IntEnumInterface {
     NH_WHITE(0),
     H_WHITE(1),
@@ -32,13 +30,4 @@ public enum DemographicType implements IntEnumInterface {
         return null;
     }
 
-    public static int getMaxValue(){
-        int max = 0;
-        for (DemographicType type : DemographicType.values()){
-            if (type != DemographicType.getDefault() && type.getValue() > max){
-                max = type.getValue();
-            }
-        }
-        return max;
-    }
 }

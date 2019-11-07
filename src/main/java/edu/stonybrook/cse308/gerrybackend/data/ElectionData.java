@@ -12,8 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-@Entity
-@Table(name="election")
+@Entity(name="election")
 public class ElectionData {
 
     @Getter

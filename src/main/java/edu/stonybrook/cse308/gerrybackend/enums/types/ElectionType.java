@@ -20,13 +20,4 @@ public enum ElectionType implements IntEnumInterface {
         return ElectionType.NOT_SET;
     }
 
-    public static int getMaxValue(){
-        int max = 0;
-        for (ElectionType type : ElectionType.values()){
-            if (type != ElectionType.getDefault() && type.getValue() > max){
-                max = type.getValue();
-            }
-        }
-        return max;
-    }
 }

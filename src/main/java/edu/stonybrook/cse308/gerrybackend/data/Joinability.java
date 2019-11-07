@@ -1,7 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.data;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
-import edu.stonybrook.cse308.gerrybackend.graph.GerryGeoNode;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 
 import java.util.Set;
 
@@ -12,7 +12,7 @@ public class Joinability {
     private double[] minority;
     private double compactness;
 
-    public Joinability(GerryGeoNode node1, GerryGeoNode node2){
+    public Joinability(GerryNode node1, GerryNode node2){
         computeJoinabilityValues(node1, node2);
     }
 
@@ -23,7 +23,7 @@ public class Joinability {
         this.compactness = compactness;
     }
 
-    public void computeJoinabilityValues(GerryGeoNode node1, GerryGeoNode node2){
+    public void computeJoinabilityValues(GerryNode node1, GerryNode node2){
         // TODO: fill in later.
         this.political = new double[DemographicType.values().length];
         this.population = -1.0;

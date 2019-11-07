@@ -21,14 +21,4 @@ public enum PoliticalParty implements IntEnumInterface {
     public static PoliticalParty getDefault(){
         return PoliticalParty.NOT_SET;
     }
-
-    public static int getMaxValue(){
-        int max = 0;
-        for (PoliticalParty type : PoliticalParty.values()){
-            if (type != PoliticalParty.getDefault() && type.getValue() > max){
-                max = type.getValue();
-            }
-        }
-        return max;
-    }
 }

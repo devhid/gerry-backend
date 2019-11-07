@@ -1,28 +1,27 @@
-package edu.stonybrook.cse308.gerrybackend.graph;
+package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
-import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
-@AttributeOverride(name="nodes", column=@Column(name="clusters"))
-public class StateNode extends ClusterNode<DistrictNode, StateNode> {
+public class StateNode extends ClusterNode<DistrictEdge, DistrictNode> {
 
     public StateNode(){
         super();
+        this.adjacentEdges = null;
         this.parent = null;
     }
 
-    public StateNode(UUID id, String name, ElectionType electionId, DemographicData demographicData,
-                       ElectionData electionData, Set<GerryEdge> adjacentEdges, String geography,
-                       Set<DistrictNode> districts){
-        super(id, name, electionId, demographicData, electionData, adjacentEdges, geography, districts, new HashSet<>(), null);
+    public StateNode(UUID id, String name, NodeType type, DemographicData demographicData,
+                     ElectionData electionData, String geography, Set<DistrictNode> districts){
+        super(id, name, type, demographicData, electionData, null, geography, districts, new HashSet<>(), null);
         this.loadAllCounties();
     }
 
