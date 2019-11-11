@@ -38,7 +38,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.type = obj.type;
         this.nodes = new HashSet<>(obj.nodes);
         this.counties = new HashSet<>(obj.counties);
-        this.setState((StateNode) obj.parent);
+        this.setState(obj.parent);
     }
 
     private void setPrecincts(Set<PrecinctNode> precincts){

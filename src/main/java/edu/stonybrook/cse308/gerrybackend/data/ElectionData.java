@@ -27,6 +27,7 @@ public class ElectionData {
     private ElectionType electionId;
 
     @NotNull
+    @ElementCollection
     @Column(name="votes")
     private Map<PoliticalParty, Integer> votes;
 

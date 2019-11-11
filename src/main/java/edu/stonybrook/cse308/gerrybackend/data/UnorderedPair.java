@@ -3,9 +3,7 @@ package edu.stonybrook.cse308.gerrybackend.data;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -14,11 +12,11 @@ import java.util.Set;
 public abstract class UnorderedPair<E> implements Set<E> {
 
     @Getter
-    @Column(name = "item1")
+    @ManyToOne
     protected E item1;
 
     @Getter
-    @Column(name = "item2")
+    @ManyToOne
     protected E item2;
 
     @Transient
