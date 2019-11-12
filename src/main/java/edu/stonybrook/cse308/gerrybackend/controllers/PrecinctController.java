@@ -21,13 +21,13 @@ public class PrecinctController {
     PrecinctService precinctService;
 
     @GetMapping
-    public ResponseEntity<List<PrecinctNode>> getAllEmployees() {
+    public ResponseEntity<List<PrecinctNode>> getAllPrecincts() {
         List<PrecinctNode> list = precinctService.getAllPrecincts();
         return new ResponseEntity<>(list, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PrecinctNode> getEmployeeById(@PathVariable("id") String id) {
+    public ResponseEntity<PrecinctNode> getPrecinctById(@PathVariable("id") String id) {
         PrecinctNode precinct = precinctService.getPrecinctById(id);
         return new ResponseEntity<>(precinct, new HttpHeaders(), HttpStatus.OK);
     }
