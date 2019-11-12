@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="gerry-backend:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>gerry-backend</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="gerry.war">
+      <element id="artifact" artifact-name="gerry-backend:war exploded" />
+    </root>
+  </artifact>
+</component>
