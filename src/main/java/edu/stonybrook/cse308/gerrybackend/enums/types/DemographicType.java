@@ -1,5 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+
 public enum DemographicType implements IntEnumInterface {
     NH_WHITE(0),
     H_WHITE(1),

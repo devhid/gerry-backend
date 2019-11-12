@@ -1,5 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+
 public enum NodeType implements IntEnumInterface {
     ORIGINAL(0),
     USER(1),

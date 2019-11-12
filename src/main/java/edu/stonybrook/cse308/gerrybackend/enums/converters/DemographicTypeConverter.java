@@ -1,7 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.enums.converters;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
-import edu.stonybrook.cse308.gerrybackend.enums.types.IntEnumInterface;
+import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 
 import java.util.stream.Stream;
 
