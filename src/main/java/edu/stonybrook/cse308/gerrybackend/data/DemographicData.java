@@ -1,7 +1,10 @@
 package edu.stonybrook.cse308.gerrybackend.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
+import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -14,8 +17,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity(name="demographic")
+@JsonIgnoreProperties({"populationCopy", "votingAgePopulationCopy"})
 public class DemographicData {
 
+    @Getter
     @Id
     @Column(name="id")
     private String id;
@@ -23,11 +28,13 @@ public class DemographicData {
     @NotNull
     @ElementCollection
     @Column(name="population")
+    @JsonProperty("population")
     private Map<DemographicType, Integer> population;
 
     @NotNull
     @ElementCollection
     @Column(name="voting_age_population")
+    @JsonProperty("voting_age_population")
     private Map<DemographicType, Integer> votingAgePopulation;
 
     public DemographicData(){
@@ -38,22 +45,30 @@ public class DemographicData {
         MapUtils.initMap(this.votingAgePopulation, 0);
     }
 
-    public DemographicData(UUID id, Map<DemographicType, Integer> population,
+    public DemographicData(String id, Map<DemographicType, Integer> population,
                            Map<DemographicType, Integer> votingAgePopulation){
         this.id = id.toString();
         this.population = population;
         this.votingAgePopulation = votingAgePopulation;
     }
 
-    public int getPopulation(DemographicType demo){
+    public int getDemoPopulation(DemographicType demo){
         return this.population.get(demo);
     }
 
-    public int getPopulation(boolean canVote, DemographicType demo){
+    public int getDemoPopulation(boolean canVote, DemographicType demo){
         if (!canVote){
             return this.population.get(demo) - this.votingAgePopulation.get(demo);
         }
         return this.votingAgePopulation.get(demo);
+    }
+
+    public void setDemoPopulation(DemographicType demo, int demoPop){
+        this.population.put(demo, demoPop);
+    }
+
+    public void setVotingAgeDemoPopulation(DemographicType demo, int demoPop){
+        this.votingAgePopulation.put(demo, demoPop);
     }
 
     public Map<DemographicType, Integer> getPopulationCopy() {
@@ -65,10 +80,10 @@ public class DemographicData {
     }
 
     public static DemographicData combine(DemographicData d1, DemographicData d2){
-        Map<DemographicType, Integer> d1Pop = d1.getPopulationCopy();
-        Map<DemographicType, Integer> d1VotingAgePop = d1.getVotingAgePopulationCopy();
-        Map<DemographicType, Integer> d2Pop = d2.getPopulationCopy();
-        Map<DemographicType, Integer> d2VotingAgePop = d2.getVotingAgePopulationCopy();
+        Map<DemographicType, Integer> d1Pop = d1.population;
+        Map<DemographicType, Integer> d1VotingAgePop = d1.votingAgePopulation;
+        Map<DemographicType, Integer> d2Pop = d2.population;
+        Map<DemographicType, Integer> d2VotingAgePop = d2.votingAgePopulation;
 
         Set<DemographicType> demoTypes = d1Pop.keySet();
         Map<DemographicType, Integer> combinedPop = new EnumMap<>(DemographicType.class);
@@ -77,7 +92,7 @@ public class DemographicData {
            combinedPop.put(demoType, d1Pop.get(demoType) + d2Pop.get(demoType));
            combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
         }
-        return new DemographicData(UUID.randomUUID(), combinedPop, combinedVotingAgePop);
+        return new DemographicData(UUID.randomUUID().toString(), combinedPop, combinedVotingAgePop);
     }
 
 }

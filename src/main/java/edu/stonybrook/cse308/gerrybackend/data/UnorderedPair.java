@@ -9,14 +9,14 @@ import java.util.Iterator;
 import java.util.Set;
 
 @MappedSuperclass
-public abstract class UnorderedPair<E> implements Set<E> {
+public class UnorderedPair<E> implements Set<E> {
 
     @Getter
-    @ManyToOne
+    @Transient
     protected E item1;
 
     @Getter
-    @ManyToOne
+    @Transient
     protected E item2;
 
     @Transient
@@ -249,7 +249,7 @@ public abstract class UnorderedPair<E> implements Set<E> {
         if (!(obj instanceof UnorderedPair)){
             return false;
         }
-        UnorderedPair otherPair = GenericUtils.convertInstanceOfObject(obj, UnorderedPair.class);
+        UnorderedPair otherPair = GenericUtils.castInstanceOfObject(obj, UnorderedPair.class);
         if (otherPair == null || otherPair.size() != this.size()){
             return false;
         }

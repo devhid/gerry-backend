@@ -1,21 +1,28 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+import lombok.Getter;
 
 public enum ElectionType implements IntEnumInterface {
-    PRESIDENTIAL_2016(0),
-    CONGRESSIONAL_2016(1),
-    CONGRESSIONAL_2018(2),
-    NOT_SET(3);
+    PRESIDENTIAL_2016(0, "presidential_2016"),
+    CONGRESSIONAL_2016(1, "congressional_2016"),
+    CONGRESSIONAL_2018(2, "congressional_2018"),
+    NOT_SET(3, "not_set");
 
-    public final int value;
+    @Getter
+    private final int value;
 
-    ElectionType(int value){
+    private final String name;
+
+    ElectionType(int value, String name){
         this.value = value;
+        this.name = name;
     }
 
-    public int getValue(){
-        return this.value;
+    @JsonValue
+    public String getName(){
+        return this.name;
     }
 
     public static ElectionType getDefault(){

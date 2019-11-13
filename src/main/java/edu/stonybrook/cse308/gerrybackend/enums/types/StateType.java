@@ -1,21 +1,28 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+import lombok.Getter;
 
 public enum StateType implements IntEnumInterface {
-    CALIFORNIA(0),
-    UTAH(1),
-    VIRGINIA(2),
-    NOT_SET(3);
+    CALIFORNIA(0, "CA"),
+    UTAH(1, "UT"),
+    VIRGINIA(2, "VA"),
+    NOT_SET(3, "not_set");
 
-    public final int value;
+    @Getter
+    private final int value;
 
-    StateType(int value){
+    private final String name;
+
+    StateType(int value, String name){
         this.value = value;
+        this.name = name;
     }
 
-    public int getValue(){
-        return this.value;
+    @JsonValue
+    public String getName(){
+        return this.name;
     }
 
     public static StateType getDefault(){
