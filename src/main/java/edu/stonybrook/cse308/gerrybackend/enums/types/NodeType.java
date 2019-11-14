@@ -1,20 +1,26 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+import lombok.Getter;
 
 public enum NodeType implements IntEnumInterface {
-    ORIGINAL(0),
-    USER(1),
-    NOT_SET(2);
+    ORIGINAL(0, "original"),
+    USER(1, "user"),
+    NOT_SET(2, "not_set");
 
-    public final int value;
+    @Getter
+    private final int value;
+    private final String name;
 
-    NodeType(int value){
+    NodeType(int value, String name){
         this.value = value;
+        this.name = name;
     }
 
-    public int getValue(){
-        return this.value;
+    @JsonValue
+    public String getName(){
+        return this.name;
     }
 
     public static NodeType getDefault(){

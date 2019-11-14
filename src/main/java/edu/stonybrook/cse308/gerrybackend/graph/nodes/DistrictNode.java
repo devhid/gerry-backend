@@ -1,10 +1,11 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
+import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 
 import javax.persistence.*;
 import java.util.*;
@@ -14,28 +15,35 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     public DistrictNode(){
         super();
-        this.setState(new StateNode());
+        this.setState(new StateNode(this));
     }
 
-    public DistrictNode(UUID id, String name, NodeType type, DemographicData demographicData,
+    public DistrictNode(PrecinctNode defaultPrecinct){
+        this();
+        Set<PrecinctNode> precincts = new HashSet<>();
+        precincts.add(defaultPrecinct);
+        this.setPrecincts(precincts);
+    }
+
+    public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography){
-        super(id, name, type, demographicData, electionData, adjacentEdges, geography);
+        super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography);
     }
 
-    public DistrictNode(UUID id, String name, NodeType type, DemographicData demographicData,
+    public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography,
                         Set<PrecinctNode> precincts, Set<String> counties, StateNode state){
-        super(id, name, type, demographicData, electionData, adjacentEdges, geography, precincts, counties, state);
+        super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography, precincts, counties, state);
     }
 
-    public DistrictNode(UUID id, DistrictNode obj){
-        this(id, obj.getName(), obj.type,
-                new DemographicData(UUID.randomUUID(), obj.demographicData.getPopulationCopy(),
+    public DistrictNode(String id, DistrictNode obj){
+        this(id, obj.getName(), obj.nodeType,
+                new DemographicData(UUID.randomUUID().toString(), obj.demographicData.getPopulationCopy(),
                         obj.demographicData.getVotingAgePopulationCopy()),
-                new ElectionData(UUID.randomUUID(), obj.electionData.getElectionId(), obj.electionData.getVotesCopy(),
-                        obj.electionData.getWinner()),
+                new ElectionData(UUID.randomUUID().toString(), obj.electionData.getElectionType(),
+                        obj.electionData.getVotesCopy(), obj.electionData.getWinner()),
                 new HashSet<>(obj.adjacentEdges), obj.geography);
-        this.type = obj.type;
+        this.nodeType = obj.nodeType;
         this.nodes = new HashSet<>(obj.nodes);
         this.counties = new HashSet<>(obj.counties);
         this.setState(obj.parent);
@@ -45,23 +53,15 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.nodes = precincts;
     }
 
-    public Set<PrecinctNode> getPrecincts(){
-        return this.getNodes();
-    }
-
     private void setState(StateNode state){
         this.parent = state;
-    }
-
-    public StateNode getState(){
-        return (StateNode) this.parent;
     }
 
 //    /**
 //     * Adds a set of PrecinctNodes to an empty DistrictNode.
 //     *
 //     * This assumes there is no intersection in any of the geographical locations represented by the nodes.
-//     * Mainly used when constructing the GerryGraph object, not for Phase 1 or Phase 2 execution.
+//     * Mainly used when constructing the StateNode object, not for Phase 1 or Phase 2 execution.
 //     *
 //     * @param precincts set of disjoint PrecinctNode objects to add
 //     * @throws MismatchedElectionException if there is an ElectionData object with a different election identifier
@@ -152,7 +152,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         if (!c1.getAdjacentNodes().contains(c2) || !c2.getAdjacentNodes().contains(c1)){
             throw new IllegalArgumentException("Replace this string later!");
         }
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
         DistrictNode mergedCluster = (c1.getSize() > c2.getSize()) ? new DistrictNode(id, c1) : new DistrictNode(id, c2);
 
         // Add all nodes.
@@ -166,10 +166,10 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         mergedCluster.electionData = ElectionData.combine(mergedCluster.electionData, c2.electionData);
 
         // Get all adjacent nodes.
-        Set<DistrictNode> allAdjNodes = c1.getCastedAdjacentNodes(DistrictNode.class);
-        allAdjNodes.addAll(c2.getCastedAdjacentNodes(DistrictNode.class));    // adjNodes1 = (adjNodes1 U adjNodes2)
-        allAdjNodes.remove(c1);
-        allAdjNodes.remove(c2);     // from c2.getAdjacentNodes()
+        Set<DistrictNode> allAdjNodes = GenericUtils.castSetOfObjects(c1.getAdjacentNodes(), DistrictNode.class);
+        allAdjNodes.addAll(GenericUtils.castSetOfObjects(c2.getAdjacentNodes(), DistrictNode.class));
+        allAdjNodes.remove(c1);     // from c2.getAdjacentNodes()
+        allAdjNodes.remove(c2);     // from c1.getAdjacentNodes()
 
         // Get all adjacent edges (makes this easier to update external node edge references)
         Set<DistrictEdge> connectingEdge = new HashSet<>(c1.adjacentEdges);
@@ -182,7 +182,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         Map<DistrictNode, DistrictEdge> adjNodesEdgeMap = new HashMap<>();
         for (DistrictNode adjNode : allAdjNodes){
             // recompute joinability on edge creation
-            adjNodesEdgeMap.put(adjNode, new DistrictEdge(UUID.randomUUID(), mergedCluster, adjNode));
+            adjNodesEdgeMap.put(adjNode, new DistrictEdge(UUID.randomUUID().toString(), mergedCluster, adjNode));
         }
 
         // Fix each of the external, adjacent nodes' edges.

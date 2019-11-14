@@ -1,7 +1,8 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import com.fasterxml.jackson.annotation.*;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
@@ -12,6 +13,20 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @MappedSuperclass
+@JsonIgnoreProperties({"adjacentNodes"})
+@JsonTypeInfo(
+        use=JsonTypeInfo.Id.NAME,
+        include=JsonTypeInfo.As.PROPERTY,
+        property="type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value=PrecinctNode.class, name="precinct"),
+        @JsonSubTypes.Type(value=ClusterNode.class, name="cluster")
+})
+@JsonIdentityInfo(
+        generator=ObjectIdGenerators.PropertyGenerator.class,
+        property="id"
+)
 public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     @Getter
@@ -26,27 +41,28 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     @Getter
     @NotNull
-    @OneToOne(optional=false)
+    @OneToOne(optional=false, cascade=CascadeType.ALL)
     @JoinColumn(name="node_demo_id")
     protected DemographicData demographicData;
 
     @Getter
     @NotNull
-    @OneToOne(optional=false)
+    @OneToOne(optional=false, cascade=CascadeType.ALL)
     @JoinColumn(name="node_election_id")
     protected ElectionData electionData;
 
-    @ManyToMany     // one node has many edges, and one edge has 2 nodes
-    @JoinTable(name="node_edges")
+    @Getter
+    @OneToMany(cascade=CascadeType.ALL)     // one node has many edges
     protected Set<E> adjacentEdges;
 
     @Getter
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="parent_id")
     protected P parent;
 
     @Getter
     @Column(name="geography")
+    @JsonRawValue
     protected String geography;
 
     protected GerryNode(){
@@ -58,7 +74,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.geography = null;
     }
 
-    protected GerryNode(UUID id, String name,
+    protected GerryNode(String id, String name,
                         DemographicData demographicData, ElectionData electionData,
                         Set<E> adjacentEdges, String geography) {
         this.id = id.toString();
@@ -78,24 +94,14 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         return adjNodes;
     }
 
-    public <T> Set<T> getCastedAdjacentNodes(Class<T> clazz){
-        Set<T> castedAdjNodes = new HashSet<>();
-        for (E edge : adjacentEdges){
-            @SuppressWarnings("unchecked")
-            T castedAdjNode = (T) ((edge.getItem1() == this) ? edge.getItem1() : edge.getItem2());
-            castedAdjNodes.add(castedAdjNode);
-        }
-        return castedAdjNodes;
-    }
-
     public void addEdge(E edge) throws InvalidEdgeException {
-        if (!edge.contains(this)){
+        if (this.adjacentEdges.contains(edge)){
             throw new InvalidEdgeException("Replace this string later!");
         }
         this.adjacentEdges.add(edge);
     }
 
-    public ElectionType getElectionId(){
-        return this.electionData.getElectionId();
+    public ElectionType getElectionType(){
+        return this.electionData.getElectionType();
     }
 }

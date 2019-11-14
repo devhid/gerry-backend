@@ -1,17 +1,28 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.NodeTypeConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
-import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
 
 import javax.persistence.*;
 import java.util.*;
 
 @MappedSuperclass
-public abstract class ClusterNode<E extends DistrictEdge, C extends GerryNode> extends GerryNode<E,StateNode> {
+@JsonTypeInfo(
+        use=JsonTypeInfo.Id.NAME,
+        include=JsonTypeInfo.As.PROPERTY,
+        property="type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value=DistrictNode.class, name="district"),
+        @JsonSubTypes.Type(value=StateNode.class, name="state")
+})
+public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> extends GerryNode<E,StateNode> {
 
     @Getter
     @OneToMany(cascade=CascadeType.ALL, mappedBy="parent")
@@ -23,28 +34,28 @@ public abstract class ClusterNode<E extends DistrictEdge, C extends GerryNode> e
 
     @Getter
     @Convert(converter=NodeTypeConverter.class)
-    protected NodeType type;
+    protected NodeType nodeType;
 
     protected ClusterNode(){
         super();
         this.nodes = null;
         this.counties = new HashSet<>();
-        this.type = NodeType.NOT_SET;
+        this.nodeType = NodeType.NOT_SET;
     }
 
-    protected ClusterNode(UUID id, String name, NodeType type, DemographicData demographicData,
+    protected ClusterNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                           ElectionData electionData, Set<E> adjacentEdges, String geography) {
         super(id, name, demographicData, electionData, adjacentEdges, geography);
-        this.type = type;
+        this.nodeType = nodeType;
         this.nodes = null;
         this.counties = new HashSet<>();
     }
 
-    protected ClusterNode(UUID id, String name, NodeType type, DemographicData demographicData,
+    protected ClusterNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                           ElectionData electionData, Set<E> adjacentEdges, String geography,
                           Set<C> nodes, Set<String> counties, StateNode parent) {
         super(id, name, demographicData, electionData, adjacentEdges, geography);
-        this.type = type;
+        this.nodeType = nodeType;
         this.nodes = nodes;
         this.counties = counties;
         this.parent = parent;

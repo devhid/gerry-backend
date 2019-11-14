@@ -1,5 +1,7 @@
-package edu.stonybrook.cse308.gerrybackend.data;
+package edu.stonybrook.cse308.gerrybackend.data.graph;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.ElectionTypeConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.PoliticalPartyConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Entity(name="election")
+@JsonIgnoreProperties({"votesCopy"})
 public class ElectionData {
 
     @Getter
@@ -23,12 +26,13 @@ public class ElectionData {
     @Getter
     @NotNull
     @Convert(converter = ElectionTypeConverter.class)
-    @Column(name="election_id")
-    private ElectionType electionId;
+    @Column(name="election_type")
+    private ElectionType electionType;
 
     @NotNull
     @ElementCollection
     @Column(name="votes")
+    @JsonProperty("votes")
     private Map<PoliticalParty, Integer> votes;
 
     @Getter
@@ -39,24 +43,28 @@ public class ElectionData {
 
     public ElectionData(){
         this.id = UUID.randomUUID().toString();
-        this.electionId = ElectionType.getDefault();
+        this.electionType = ElectionType.getDefault();
         this.votes = new EnumMap<>(PoliticalParty.class);
         this.winner = PoliticalParty.getDefault();
         MapUtils.initMap(this.votes, 0);
     }
 
-    public ElectionData(UUID id, ElectionType electionId, Map<PoliticalParty, Integer> votes, PoliticalParty winner){
+    public ElectionData(String id, ElectionType electionType, Map<PoliticalParty, Integer> votes, PoliticalParty winner){
         this.id = id.toString();
-        this.electionId = electionId;
+        this.electionType = electionType;
         this.votes = votes;
         this.winner = winner;
     }
 
-    public int getVotesByParty(PoliticalParty party){
+    public int getPartyVotes(PoliticalParty party){
         if (party == PoliticalParty.NOT_SET){
             throw new IllegalArgumentException("Replace this string later!");
         }
         return this.votes.get(party);
+    }
+
+    public void setPartyVotes(PoliticalParty party, int partyVotes){
+        this.votes.put(party, partyVotes);
     }
 
     public int getTotalVotes(){
@@ -68,44 +76,13 @@ public class ElectionData {
         return new EnumMap<>(this.votes);
     }
 
-    public static ElectionData[] combineElectionDataArr(ElectionData[] e1, ElectionData[] e2)
-            throws MismatchedElectionException {
-        ElectionType[] electionTypes = ElectionType.values();
-        ElectionData[] newElectionDataArr = new ElectionData[electionTypes.length];
-        for (ElectionType electionId : electionTypes){
-            int index = electionId.value;
-            newElectionDataArr[index] = ElectionData.combine(e1[index], e2[index]);
-        }
-        return newElectionDataArr;
-    }
-
-    public static Map<ElectionType, ElectionData> combineElectionDataMaps(Map<ElectionType, ElectionData> e1,
-                                                                          Map<ElectionType, ElectionData> e2)
-            throws MismatchedElectionException {
-        Set<ElectionType> electionIds = e1.keySet();
-        if (!electionIds.equals(e2.keySet())){
-            throw new IllegalArgumentException("Replace this string later!");
-        }
-        Map<ElectionType, ElectionData> combinedMap = new EnumMap<>(ElectionType.class);
-        for (ElectionType electionId : electionIds){
-            ElectionData e1Data = e1.get(electionId);
-            ElectionData e2Data = e2.get(electionId);
-            // Check if either map explicitly mapped this to null.
-            if ((e1Data == null) || (e2Data == null)){
-                throw new IllegalArgumentException("Replace this string later!");
-            }
-            combinedMap.put(electionId, ElectionData.combine(e1.get(electionId), e2.get(electionId)));
-        }
-        return combinedMap;
-    }
-
     public static ElectionData combine(ElectionData e1, ElectionData e2) throws MismatchedElectionException {
-        if (e1.electionId != e2.electionId){
+        if (e1.electionType != e2.electionType){
             throw new MismatchedElectionException("Replace this string later.");
         }
 
-        Map<PoliticalParty, Integer> e1Votes = e1.getVotesCopy();
-        Map<PoliticalParty, Integer> e2Votes = e2.getVotesCopy();
+        Map<PoliticalParty, Integer> e1Votes = e1.votes;
+        Map<PoliticalParty, Integer> e2Votes = e2.votes;
         Set<PoliticalParty> partyTypes = e1Votes.keySet();
         if (!partyTypes.equals(e2Votes.keySet())){
             throw new IllegalArgumentException("Replace this string later!");
@@ -131,6 +108,6 @@ public class ElectionData {
                     .map(Map.Entry::getKey)
                     .findFirst().get();
         }
-        return new ElectionData(UUID.randomUUID(), e1.electionId, combinedVotes, winner);
+        return new ElectionData(UUID.randomUUID().toString(), e1.electionType, combinedVotes, winner);
     }
 }

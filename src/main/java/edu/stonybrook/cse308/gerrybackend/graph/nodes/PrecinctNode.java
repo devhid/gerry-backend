@@ -1,13 +1,12 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import lombok.Getter;
 
 import javax.persistence.*;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
@@ -19,14 +18,15 @@ public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
     public PrecinctNode(){
         super();
         this.county = "";
-        this.parent = new DistrictNode();
+        this.parent = new DistrictNode(this);
     }
 
-    public PrecinctNode(UUID id, String name,
+    public PrecinctNode(String id, String name,
                         DemographicData demographicData, ElectionData electionData,
                         Set<PrecinctEdge> adjacentEdges, String geography, String county, DistrictNode originalCD){
         super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.county = county;
+        this.setOriginalDistrict(originalCD);
         this.parent = originalCD;
     }
 
@@ -35,7 +35,7 @@ public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
     }
 
     public DistrictNode getOriginalDistrict(){
-        return (DistrictNode) this.parent;
+        return this.parent;
     }
 
 }

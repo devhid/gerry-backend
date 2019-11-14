@@ -1,23 +1,29 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+import lombok.Getter;
 
 public enum PoliticalParty implements IntEnumInterface {
-    DEMOCRATIC(0),
-    REPUBLICAN(1),
-    INDEPENDENT(2),
-    OTHER(3),
-    TIE(4),
-    NOT_SET(5);
+    DEMOCRATIC(0, "democratic"),
+    REPUBLICAN(1, "republican"),
+    INDEPENDENT(2, "independent"),
+    OTHER(3, "other"),
+    TIE(4, "tie"),
+    NOT_SET(5, "not_set");
 
-    public final int value;
+    @Getter
+    private final int value;
+    private final String name;
 
-    PoliticalParty(int value){
+    PoliticalParty(int value, String name){
         this.value = value;
+        this.name = name;
     }
 
-    public int getValue(){
-        return this.value;
+    @JsonValue
+    public String getName(){
+        return this.name;
     }
 
     public static PoliticalParty getDefault(){

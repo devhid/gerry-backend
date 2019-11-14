@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.data;
+package edu.stonybrook.cse308.gerrybackend.data.graph;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
@@ -45,28 +45,28 @@ public class Joinability {
     }
 
     private void computeJoinability(GerryNode node1, GerryNode node2){
-        this.political = this.computePoliticalJoinability(node1, node2);
-        this.population = this.computePopulationJoinability(node1, node2);
-        this.minority = this.computeMinorityJoinability(node1, node2);
-        this.compactness = this.computeCompactnessJoinability(node1, node2);
+        this.political = Joinability.computePoliticalJoinability(node1, node2);
+        this.population = Joinability.computePopulationJoinability(node1, node2);
+        this.minority = Joinability.computeMinorityJoinability(node1, node2);
+        this.compactness = Joinability.computeCompactnessJoinability(node1, node2);
     }
 
-    private Map<PoliticalParty, Double> computePoliticalJoinability(GerryNode node1, GerryNode node2){
+    private static double computePopulationJoinability(GerryNode node1, GerryNode node2){
+        return -1.0;
+    }
+
+    private static double computeCompactnessJoinability(GerryNode node1, GerryNode node2){
+        return -1.0;
+    }
+
+    private static Map<PoliticalParty, Double> computePoliticalJoinability(GerryNode node1, GerryNode node2){
         Map<PoliticalParty, Double> politicalJoinability = new EnumMap<>(PoliticalParty.class);
         return politicalJoinability;
     }
 
-    private double computePopulationJoinability(GerryNode node1, GerryNode node2){
-        return -1.0;
-    }
-
-    private Map<DemographicType, Double> computeMinorityJoinability(GerryNode node1, GerryNode node2){
+    private static Map<DemographicType, Double> computeMinorityJoinability(GerryNode node1, GerryNode node2){
         Map<DemographicType, Double> minorityJoinability = new EnumMap<>(DemographicType.class);
         return minorityJoinability;
-    }
-
-    private double computeCompactnessJoinability(GerryNode node1, GerryNode node2){
-        return -1.0;
     }
 
     public double getValue(Set<PoliticalParty> partyTypes, Set<DemographicType> demoTypes){

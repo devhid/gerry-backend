@@ -1,31 +1,37 @@
 package edu.stonybrook.cse308.gerrybackend.enums.types;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
+import lombok.Getter;
 
 public enum DemographicType implements IntEnumInterface {
-    NH_WHITE(0),
-    H_WHITE(1),
-    NH_BLACK(2),
-    H_BLACK(3),
-    NH_ASIAN(4),
-    H_ASIAN(5),
-    HISPANIC(6),
-    NH_PACIFIC_ISLANDER(7),
-    H_PACIFIC_ISLANDER(8),
-    NH_NATIVE_AMERICAN(9),
-    H_NATIVE_AMERICAN(10),
-    BIRACIAL(11),
-    OTHER(12),
-    ALL(13);
+    NH_WHITE(0, "nonhispanic_white"),
+    H_WHITE(1, "hispanic_white"),
+    NH_BLACK(2, "nonhispanic_black"),
+    H_BLACK(3, "hispanic_black"),
+    NH_ASIAN(4, "nonhispanic_asian"),
+    H_ASIAN(5, "hispanic_asian"),
+    HISPANIC(6, "hispanic"),
+    NH_PACIFIC_ISLANDER(7, "nonhispanic_pacific_islander"),
+    H_PACIFIC_ISLANDER(8, "hispanic_pacific_islander"),
+    NH_NATIVE_AMERICAN(9, "nonhispanic_native_american"),
+    H_NATIVE_AMERICAN(10, "hispanic_native_american"),
+    BIRACIAL(11, "biracial"),
+    OTHER(12, "other"),
+    ALL(13, "all");
 
-    public final int value;
+    @Getter
+    private final int value;
+    private final String name;
 
-    DemographicType(int value){
+    DemographicType(int value, String name){
         this.value = value;
+        this.name = name;
     }
 
-    public int getValue(){
-        return this.value;
+    @JsonValue
+    public String getName(){
+        return this.name;
     }
 
     public static DemographicType getDefault(){
