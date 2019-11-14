@@ -14,7 +14,6 @@ public enum PoliticalParty implements IntEnumInterface {
 
     @Getter
     private final int value;
-
     private final String name;
 
     PoliticalParty(int value, String name){

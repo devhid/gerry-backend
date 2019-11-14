@@ -1,20 +1,19 @@
-package edu.stonybrook.cse308.gerrybackend.enums.types;
+package edu.stonybrook.cse308.gerrybackend.enums.measures;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum StateType implements IntEnumInterface {
-    CALIFORNIA(0, "CA"),
-    UTAH(1, "UT"),
-    VIRGINIA(2, "VA"),
-    NOT_SET(3, "not_set");
+public enum CompactnessEnum implements IntEnumInterface, MeasureEnumInterface {
+    GRAPH_THEORETICAL(0, "graph_theoretical"),
+    POLSBY_POPPER(1, "polsby_popper"),
+    SCHWARTZBERG(2, "schwartzberg");
 
     @Getter
     private final int value;
     private final String name;
 
-    StateType(int value, String name){
+    CompactnessEnum(int value, String name){
         this.value = value;
         this.name = name;
     }
@@ -22,9 +21,5 @@ public enum StateType implements IntEnumInterface {
     @JsonValue
     public String getName(){
         return this.name;
-    }
-
-    public static StateType getDefault(){
-        return NOT_SET;
     }
 }

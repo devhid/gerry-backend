@@ -1,10 +1,8 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;

@@ -4,17 +4,15 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum StateType implements IntEnumInterface {
-    CALIFORNIA(0, "CA"),
-    UTAH(1, "UT"),
-    VIRGINIA(2, "VA"),
-    NOT_SET(3, "not_set");
+public enum PhaseOneType implements IntEnumInterface {
+    STANDARD(0, "standard"),
+    ALT_ONE(1, "alt_one");
 
     @Getter
     private final int value;
     private final String name;
 
-    StateType(int value, String name){
+    PhaseOneType(int value, String name){
         this.value = value;
         this.name = name;
     }
@@ -24,7 +22,4 @@ public enum StateType implements IntEnumInterface {
         return this.name;
     }
 
-    public static StateType getDefault(){
-        return NOT_SET;
-    }
 }

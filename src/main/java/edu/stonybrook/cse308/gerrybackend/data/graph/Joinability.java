@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.data;
+package edu.stonybrook.cse308.gerrybackend.data.graph;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;

@@ -12,7 +12,6 @@ public enum ElectionType implements IntEnumInterface {
 
     @Getter
     private final int value;
-
     private final String name;
 
     ElectionType(int value, String name){

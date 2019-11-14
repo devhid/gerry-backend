@@ -1,9 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import lombok.Getter;
 

@@ -22,7 +22,6 @@ public enum DemographicType implements IntEnumInterface {
 
     @Getter
     private final int value;
-
     private final String name;
 
     DemographicType(int value, String name){

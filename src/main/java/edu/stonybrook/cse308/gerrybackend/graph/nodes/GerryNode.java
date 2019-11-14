@@ -1,8 +1,8 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import com.fasterxml.jackson.annotation.*;
-import edu.stonybrook.cse308.gerrybackend.data.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.data.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;

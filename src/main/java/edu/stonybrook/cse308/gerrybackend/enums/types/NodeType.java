@@ -11,7 +11,6 @@ public enum NodeType implements IntEnumInterface {
 
     @Getter
     private final int value;
-
     private final String name;
 
     NodeType(int value, String name){

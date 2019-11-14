@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.data;
+package edu.stonybrook.cse308.gerrybackend.data.graph;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
