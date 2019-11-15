@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 
-import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.HeuristicsMapper;
+import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTwoPrecinctMoveHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
@@ -19,7 +19,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs,PhaseTwoReport
     }
 
     private PrecinctMove selectPrecinctMove(PhaseTwoPrecinctMove heuristic, StateNode state){
-        return HeuristicsMapper.selectPrecinct(heuristic, state);
+        return PhaseTwoPrecinctMoveHeuristic.selectPrecinct(heuristic, state);
     }
 
     private boolean shouldStop(StateNode state, PhaseTwoPrecinctMove heuristic){

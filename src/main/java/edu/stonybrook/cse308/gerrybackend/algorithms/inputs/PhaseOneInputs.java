@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.inputs;
 
+import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneOtherPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneMajMinPairs;
@@ -22,9 +23,12 @@ public class PhaseOneInputs extends AlgPhaseInputs {
     private double lowerBound;
 
     @Getter
-    private PhaseOneStop stopHeuristic;
+    private PhaseOneMajMinPairs phaseOneMajMinPairsHeuristic;
 
     @Getter
-    private PhaseOneMajMinPairs phaseOneMajMinPairs;
+    private PhaseOneOtherPairs phaseOneOtherPairsHeuristic;
+
+    @Getter
+    private PhaseOneStop stopHeuristic;
 
 }

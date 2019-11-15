@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 
+import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneStopHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
@@ -35,8 +36,8 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         return state.getNodes().size() - pairs.size() <= numDistricts;
     }
 
-    private void filterLastIterationPairs(CandidatePairs pairs, PhaseOneStop heuristic){
-        // TODO: fill in
+    private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges){
+        PhaseOneStopHeuristic.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
     private PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration){
@@ -54,7 +55,8 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             CandidatePairs pairs = determineCandidatePairs();
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
             if (lastIteration){
-                filterLastIterationPairs(pairs, inputs.getStopHeuristic());
+                int numAllowedMerges = state.getNodes().size() - numDistricts;
+                filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }
             PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration);
             deltas.add(iterationDelta);
