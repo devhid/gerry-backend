@@ -25,7 +25,7 @@ public class ElectionData {
 
     @Getter
     @NotNull
-    @Convert(converter = ElectionTypeConverter.class)
+    @Convert(converter=ElectionTypeConverter.class)
     @Column(name="election_type")
     private ElectionType electionType;
 
@@ -37,7 +37,7 @@ public class ElectionData {
 
     @Getter
     @NotNull
-    @Convert(converter = PoliticalPartyConverter.class)
+    @Convert(converter=PoliticalPartyConverter.class)
     @Column(name="winner")
     private PoliticalParty winner;
 

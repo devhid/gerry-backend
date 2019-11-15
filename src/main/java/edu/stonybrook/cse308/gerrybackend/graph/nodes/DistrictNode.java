@@ -2,6 +2,7 @@ package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
@@ -12,6 +13,9 @@ import java.util.*;
 
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
+
+    @ElementCollection
+    private Set<Incumbent> incumbents;
 
     public DistrictNode(){
         super();
