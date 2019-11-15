@@ -8,4 +8,7 @@ public class PhaseOneReport extends AlgPhaseReport {
 
     private List<PhaseOneMergeDelta> deltas;
 
+    public PhaseOneReport(List<PhaseOneMergeDelta> deltas) {
+        this.deltas = deltas;
+    }
 }

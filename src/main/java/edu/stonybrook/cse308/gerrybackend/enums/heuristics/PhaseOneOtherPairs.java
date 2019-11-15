@@ -1,18 +1,17 @@
-package edu.stonybrook.cse308.gerrybackend.enums.types;
+package edu.stonybrook.cse308.gerrybackend.enums.heuristics;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum PhaseOneType implements IntEnumInterface {
-    STANDARD(0, "standard"),
-    ALT_ONE(1, "alt_one");
+public enum PhaseOneOtherPairs implements IntEnumInterface {
+    STANDARD(0, "standard");
 
     @Getter
     private final int value;
     private final String name;
 
-    PhaseOneType(int value, String name){
+    PhaseOneOtherPairs(int value, String name){
         this.value = value;
         this.name = name;
     }

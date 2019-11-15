@@ -1,26 +1,28 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 
-import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.AlgPhaseInputs;
+import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneStopHeuristic;
+import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
-import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStopEnum;
-import edu.stonybrook.cse308.gerrybackend.enums.types.PhaseOneType;
+import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneReport> {
-
-    // TODO: remove
-    private PhaseOneType phaseOneType;
+public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneReport> {
 
     private Set<UnorderedPair<DistrictNode>> determineMajorityMinorityPairs(){
+        // TODO: fill in
         return null;
     }
 
     private Set<UnorderedPair<DistrictNode>> determineOtherPairs(){
+        // TODO: fill in
         return null;
     }
 
@@ -30,22 +32,36 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneReport> {
         return new CandidatePairs(majMinPairs, otherPairs);
     }
 
-    private boolean isLastIteration(CandidatePairs pairs){
-        // TODO: fill in
-        return false;
+    private boolean isLastIteration(StateNode state, CandidatePairs pairs, int numDistricts){
+        return state.getNodes().size() - pairs.size() <= numDistricts;
     }
 
-    private void filterLastIterationPairs(boolean lastIteration, CandidatePairs pairs, PhaseOneStopEnum heuristic){
-        // TODO: fill in
+    private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges){
+        PhaseOneStopHeuristic.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
-    private PhaseOneMergeDelta joinCandidatePairs(CandidatePairs pairs){
+    private PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration){
         // TODO: fill in
         return null;
     }
 
     @Override
-    public PhaseOneReport run(AlgPhaseInputs inputs) {
-        return null;
+    public PhaseOneReport run(PhaseOneInputs inputs) {
+        List<PhaseOneMergeDelta> deltas = new ArrayList<>();
+        StateNode state = inputs.getState();
+        int numDistricts = inputs.getNumDistricts();
+        int iteration = 0;
+        while (state.getNodes().size() != numDistricts){
+            CandidatePairs pairs = determineCandidatePairs();
+            boolean lastIteration = isLastIteration(state, pairs, numDistricts);
+            if (lastIteration){
+                int numAllowedMerges = state.getNodes().size() - numDistricts;
+                filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
+            }
+            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration);
+            deltas.add(iterationDelta);
+            iteration++;
+        }
+        return new PhaseOneReport(deltas);
     }
 }

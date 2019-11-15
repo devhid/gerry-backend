@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum PhaseOneStopEnum implements IntEnumInterface {
+public enum PhaseOneStop implements IntEnumInterface {
     JOIN_SMALLEST(0, "join_smallest");
 
     @Getter
     private final int value;
     private final String name;
 
-    PhaseOneStopEnum(int value, String name){
+    PhaseOneStop(int value, String name){
         this.value = value;
         this.name = name;
     }

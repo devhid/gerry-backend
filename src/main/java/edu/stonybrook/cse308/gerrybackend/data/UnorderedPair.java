@@ -2,25 +2,28 @@ package edu.stonybrook.cse308.gerrybackend.data;
 
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-@MappedSuperclass
 public class UnorderedPair<E> implements Set<E> {
 
     @Getter
-    @Transient
     protected E item1;
 
     @Getter
-    @Transient
     protected E item2;
 
-    @Transient
     private int size;
+
+    @Value("${gerry.hashcode.initial}")
+    private int hashCodeInitial;
+
+    @Value("${gerry.hashcode.multiplier}")
+    private int hashCodeMultiplier;
 
     public UnorderedPair(){
         this.item1 = null;
@@ -266,12 +269,12 @@ public class UnorderedPair<E> implements Set<E> {
 
     @Override
     public int hashCode(){
-        int result = 17;
+        int result = hashCodeInitial;
         if (this.item1 != null){
-            result = 31 * result + this.item1.hashCode();
+            result = hashCodeMultiplier * result + this.item1.hashCode();
         }
         if (this.item2 != null){
-            result = 31 * result + this.item2.hashCode();
+            result = hashCodeMultiplier * result + this.item2.hashCode();
         }
         return result;
     }

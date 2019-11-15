@@ -61,7 +61,8 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected P parent;
 
     @Getter
-    @Column(name="geography")
+    @Lob
+    @Column(name="geography", columnDefinition="CLOB")
     @JsonRawValue
     protected String geography;
 

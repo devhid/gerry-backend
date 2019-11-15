@@ -1,19 +1,19 @@
-package edu.stonybrook.cse308.gerrybackend.enums.types;
+package edu.stonybrook.cse308.gerrybackend.enums.heuristics;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum PhaseTwoType implements IntEnumInterface {
+public enum PhaseTwoDepth implements IntEnumInterface {
     STANDARD(0, "standard"),
-    ALT_ONE(1, "alt_one"),
-    ALT_TWO(2, "alt_two");
+    LEVEL(1, "level"),
+    TREE(2, "tree");
 
     @Getter
     private final int value;
     private final String name;
 
-    PhaseTwoType(int value, String name){
+    PhaseTwoDepth(int value, String name){
         this.value = value;
         this.name = name;
     }

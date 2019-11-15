@@ -155,10 +155,8 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         String id = UUID.randomUUID().toString();
         DistrictNode mergedCluster = (c1.getSize() > c2.getSize()) ? new DistrictNode(id, c1) : new DistrictNode(id, c2);
 
-        // Add all nodes.
+        // Add all nodes and update counties.
         mergedCluster.nodes.addAll(c2.nodes);
-
-        // Update counties.
         mergedCluster.counties.addAll(c2.counties);
 
         // Merge DemographicData and ElectionData.
@@ -181,7 +179,6 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         // Create new GerryEdge references to update internal references and joinability values.
         Map<DistrictNode, DistrictEdge> adjNodesEdgeMap = new HashMap<>();
         for (DistrictNode adjNode : allAdjNodes){
-            // recompute joinability on edge creation
             adjNodesEdgeMap.put(adjNode, new DistrictEdge(UUID.randomUUID().toString(), mergedCluster, adjNode));
         }
 

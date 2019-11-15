@@ -7,7 +7,12 @@ import java.util.Map;
 
 public class PhaseZeroReport extends AlgPhaseReport {
 
-    private Map<String, DemoBloc> demoBlocs;
-    private Map<String, VoteBloc> voteBlocs;
+    private Map<String,DemoBloc> precinctDemoBlocs;
+    private Map<String,VoteBloc> precinctVoteBlocs;
+
+    public PhaseZeroReport(Map<String,DemoBloc> precinctDemoBlocs, Map<String,VoteBloc> precinctVoteBlocs) {
+        this.precinctDemoBlocs = precinctDemoBlocs;
+        this.precinctVoteBlocs = precinctVoteBlocs;
+    }
 
 }
