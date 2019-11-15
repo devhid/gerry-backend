@@ -3,7 +3,7 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.*;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
-public interface InputMeasures {
+public abstract class InputMeasures {
 
     static double computeScore(MeasureEnumInterface measure, StateNode state){
         if (measure instanceof CompactnessEnum){
