@@ -16,7 +16,7 @@ public class CandidatePairs {
         this.otherPairs = otherPairs;
     }
 
-    public int getSize(){
+    public int size(){
         return this.majorityMinorityPairs.size() + this.otherPairs.size();
     }
 

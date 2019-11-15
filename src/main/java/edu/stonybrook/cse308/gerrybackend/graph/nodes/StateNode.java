@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"adjacentEdges", "adjacentNodes", "parent"})
+@JsonIgnoreProperties({"adjacentEdges", "adjacentNodes", "parent", "allPrecincts"})
 public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     @Getter
@@ -58,6 +58,12 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     private void setDistricts(Set<DistrictNode> districts){
         this.nodes = districts;
+    }
+
+    public Set<PrecinctNode> getAllPrecincts(){
+        Set<PrecinctNode> allPrecincts = new HashSet<>();
+        this.nodes.forEach(d -> allPrecincts.addAll(d.getNodes()));
+        return allPrecincts;
     }
 
     /**

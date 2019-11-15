@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum PrecinctMoveEnum implements IntEnumInterface {
-    RANDOM(0, "random");
+public enum PhaseOneMajMinPairs implements IntEnumInterface {
+    STANDARD(0, "standard");
 
     @Getter
     private final int value;
     private final String name;
 
-    PrecinctMoveEnum(int value, String name){
+    PhaseOneMajMinPairs(int value, String name){
         this.value = value;
         this.name = name;
     }
@@ -20,4 +20,5 @@ public enum PrecinctMoveEnum implements IntEnumInterface {
     public String getName(){
         return this.name;
     }
+
 }
