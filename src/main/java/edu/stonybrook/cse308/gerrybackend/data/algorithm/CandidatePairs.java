@@ -21,7 +21,8 @@ public class CandidatePairs {
     }
 
     public void filterPairs(Set<UnorderedPair<DistrictNode>> filteredPairs){
-        // TODO: fill in
+        this.majorityMinorityPairs.retainAll(filteredPairs);
+        this.otherPairs.retainAll(filteredPairs);
     }
 
 }

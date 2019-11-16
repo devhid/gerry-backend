@@ -4,6 +4,7 @@ import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -15,10 +16,15 @@ public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
     @Column(name="county")
     private String county;
 
+    @Getter
+    @Setter
+    @Transient
+    private DistrictNode userDistrict;
+
     public PrecinctNode(){
         super();
         this.county = "";
-        this.parent = new DistrictNode(this);
+        this.parent = new DistrictNode(this);   // TODO: remove chaining creation after initial testing
     }
 
     public PrecinctNode(String id, String name,
@@ -26,16 +32,7 @@ public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
                         Set<PrecinctEdge> adjacentEdges, String geography, String county, DistrictNode originalCD){
         super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.county = county;
-        this.setOriginalDistrict(originalCD);
         this.parent = originalCD;
-    }
-
-    private void setOriginalDistrict(DistrictNode cluster){
-        this.parent = cluster;
-    }
-
-    public DistrictNode getOriginalDistrict(){
-        return this.parent;
     }
 
 }

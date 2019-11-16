@@ -2,6 +2,7 @@ package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
@@ -13,40 +14,51 @@ import java.util.*;
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
+    @ElementCollection
+    private Set<Incumbent> incumbents;
+
     public DistrictNode(){
         super();
-        this.setState(new StateNode(this));
+        this.setState(new StateNode(this)); // TODO: remove chaining creation after initial testing
+        this.incumbents = new HashSet<>();
     }
 
-    public DistrictNode(PrecinctNode defaultPrecinct){
+    public DistrictNode(PrecinctNode child){
         this();
         Set<PrecinctNode> precincts = new HashSet<>();
-        precincts.add(defaultPrecinct);
+        precincts.add(child);
         this.setPrecincts(precincts);
+        this.demographicData = new DemographicData(child.demographicData);
+        this.electionData = new ElectionData(child.electionData);
+        this.counties.add(child.getCounty());
+    }
+
+    public DistrictNode(PrecinctNode child, StateNode state){
+        super();
+        this.setState(state);
+        Set<PrecinctNode> precincts = new HashSet<>();
+        precincts.add(child);
+        this.setPrecincts(precincts);
+        this.incumbents = new HashSet<>();
     }
 
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography){
         super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography);
+        this.incumbents = new HashSet<>();
     }
 
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography,
-                        Set<PrecinctNode> precincts, Set<String> counties, StateNode state){
+                        Set<PrecinctNode> precincts, Set<String> counties, StateNode state, Set<Incumbent> incumbents){
         super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography, precincts, counties, state);
+        this.incumbents = incumbents;
     }
 
-    public DistrictNode(String id, DistrictNode obj){
-        this(id, obj.getName(), obj.nodeType,
-                new DemographicData(UUID.randomUUID().toString(), obj.demographicData.getPopulationCopy(),
-                        obj.demographicData.getVotingAgePopulationCopy()),
-                new ElectionData(UUID.randomUUID().toString(), obj.electionData.getElectionType(),
-                        obj.electionData.getVotesCopy(), obj.electionData.getWinner()),
-                new HashSet<>(obj.adjacentEdges), obj.geography);
-        this.nodeType = obj.nodeType;
-        this.nodes = new HashSet<>(obj.nodes);
-        this.counties = new HashSet<>(obj.counties);
-        this.setState(obj.parent);
+    public DistrictNode(DistrictNode obj){
+        this(UUID.randomUUID().toString(), obj.getName(), obj.nodeType, new DemographicData(obj.demographicData),
+                new ElectionData(obj.electionData), new HashSet<>(obj.adjacentEdges), null, new HashSet<>(obj.nodes),
+                new HashSet<>(obj.counties), obj.parent, new HashSet<>(obj.incumbents));
     }
 
     private void setPrecincts(Set<PrecinctNode> precincts){
@@ -152,8 +164,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         if (!c1.getAdjacentNodes().contains(c2) || !c2.getAdjacentNodes().contains(c1)){
             throw new IllegalArgumentException("Replace this string later!");
         }
-        String id = UUID.randomUUID().toString();
-        DistrictNode mergedCluster = (c1.getSize() > c2.getSize()) ? new DistrictNode(id, c1) : new DistrictNode(id, c2);
+        DistrictNode mergedCluster = (c1.getSize() > c2.getSize()) ? new DistrictNode(c1) : new DistrictNode(c2);
 
         // Add all nodes and update counties.
         mergedCluster.nodes.addAll(c2.nodes);
