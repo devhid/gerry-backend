@@ -47,9 +47,13 @@ public class DemographicData {
 
     public DemographicData(String id, Map<DemographicType, Integer> population,
                            Map<DemographicType, Integer> votingAgePopulation){
-        this.id = id.toString();
+        this.id = id;
         this.population = population;
         this.votingAgePopulation = votingAgePopulation;
+    }
+
+    public DemographicData(DemographicData obj){
+        this(UUID.randomUUID().toString(), obj.getPopulationCopy(), obj.getVotingAgePopulationCopy());
     }
 
     public int getDemoPopulation(DemographicType demo){

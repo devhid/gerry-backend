@@ -35,7 +35,6 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected String id;
 
     @Getter
-    @NotNull
     @Column(name="name")
     protected String name;
 
@@ -78,7 +77,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected GerryNode(String id, String name,
                         DemographicData demographicData, ElectionData electionData,
                         Set<E> adjacentEdges, String geography) {
-        this.id = id.toString();
+        this.id = id;
         this.name = name;
         this.demographicData = demographicData;
         this.electionData = electionData;

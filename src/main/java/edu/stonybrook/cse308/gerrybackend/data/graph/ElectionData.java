@@ -50,10 +50,14 @@ public class ElectionData {
     }
 
     public ElectionData(String id, ElectionType electionType, Map<PoliticalParty, Integer> votes, PoliticalParty winner){
-        this.id = id.toString();
+        this.id = id;
         this.electionType = electionType;
         this.votes = votes;
         this.winner = winner;
+    }
+
+    public ElectionData(ElectionData obj){
+        this(UUID.randomUUID().toString(), obj.electionType, obj.getVotesCopy(), obj.winner);
     }
 
     public int getPartyVotes(PoliticalParty party){
