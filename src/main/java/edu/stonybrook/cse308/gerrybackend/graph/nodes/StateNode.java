@@ -55,7 +55,8 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     public StateNode(StateNode obj, Map<DistrictNode,DistrictNode> changedDistricts){
         this(UUID.randomUUID().toString(), obj.name, NodeType.USER, new DemographicData(obj.demographicData),
-                new ElectionData(obj.electionData), null, new HashSet<>(obj.nodes), obj.counties, obj.stateType);
+                new ElectionData(obj.electionData), null, new HashSet<>(obj.nodes),
+                new HashSet<>(obj.counties), obj.stateType);
         this.nodes = this.nodes.stream()
                 .map(d -> changedDistricts.getOrDefault(d, new DistrictNode(d)))
                 .collect(Collectors.toSet());
@@ -143,9 +144,9 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     }
 
     public Set<PrecinctNode> getAllPrecincts(){
-        Set<PrecinctNode> allPrecincts = new HashSet<>();
-        this.nodes.forEach(d -> allPrecincts.addAll(d.getNodes()));
-        return allPrecincts;
+        return this.nodes.stream()
+                .flatMap(d -> d.getNodes().stream())
+                .collect(Collectors.toSet());
     }
 
     /**
