@@ -1,7 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.config;
 
-import edu.stonybrook.cse308.gerrybackend.controllers.AlgorithmSocketHandler;
-import edu.stonybrook.cse308.gerrybackend.controllers.PrecinctSocketHandler;
+import edu.stonybrook.cse308.gerrybackend.controllers.sockets.AlgorithmSocketHandler;
+import edu.stonybrook.cse308.gerrybackend.controllers.sockets.PrecinctSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

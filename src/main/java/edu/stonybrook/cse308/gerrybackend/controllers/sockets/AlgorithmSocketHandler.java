@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.controllers;
+package edu.stonybrook.cse308.gerrybackend.controllers.sockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
