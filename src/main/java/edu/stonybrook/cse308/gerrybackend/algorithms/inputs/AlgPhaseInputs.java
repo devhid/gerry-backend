@@ -17,7 +17,4 @@ public abstract class AlgPhaseInputs {
     @Getter
     protected StateNode state;
 
-    @Getter
-    protected AlgRunType algRunType;
-
 }
