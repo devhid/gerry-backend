@@ -75,7 +75,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     }
 
     private void loadAllCounties(){
-        this.nodes.forEach(d -> this.counties.addAll(d.getCounties()));
+        this.counties = this.nodes.stream().flatMap(d -> d.getCounties().stream()).collect(Collectors.toSet());
     }
 
     /**

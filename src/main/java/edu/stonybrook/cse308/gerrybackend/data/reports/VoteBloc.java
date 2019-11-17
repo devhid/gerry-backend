@@ -7,8 +7,10 @@ public class VoteBloc {
 
     @Getter
     private PoliticalParty winningParty;
+
     @Getter
     private int winningVotes;
+
     @Getter
     private int totalVotes;
 
