@@ -1,17 +1,22 @@
 package edu.stonybrook.cse308.gerrybackend.data.algorithm;
 
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
-
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class CandidatePairs {
 
-    private Set<UnorderedPair<DistrictNode>> majorityMinorityPairs;
-    private Set<UnorderedPair<DistrictNode>> otherPairs;
+    private SortedSet<LikelyCandidatePair> majorityMinorityPairs;
+    private SortedSet<LikelyCandidatePair> otherPairs;
 
-    public CandidatePairs(Set<UnorderedPair<DistrictNode>> majorityMinorityPairs,
-                          Set<UnorderedPair<DistrictNode>> otherPairs){
+    public CandidatePairs(Set<LikelyCandidatePair> majorityMinorityPairs,
+                          Set<LikelyCandidatePair> otherPairs){
+        this.majorityMinorityPairs = new TreeSet<>(majorityMinorityPairs);
+        this.otherPairs = new TreeSet<>(otherPairs);
+    }
+
+    public CandidatePairs(SortedSet<LikelyCandidatePair> majorityMinorityPairs,
+                          SortedSet<LikelyCandidatePair> otherPairs){
         this.majorityMinorityPairs = majorityMinorityPairs;
         this.otherPairs = otherPairs;
     }
@@ -20,7 +25,7 @@ public class CandidatePairs {
         return this.majorityMinorityPairs.size() + this.otherPairs.size();
     }
 
-    public void filterPairs(Set<UnorderedPair<DistrictNode>> filteredPairs){
+    public void filterPairs(Set<LikelyCandidatePair> filteredPairs){
         this.majorityMinorityPairs.retainAll(filteredPairs);
         this.otherPairs.retainAll(filteredPairs);
     }

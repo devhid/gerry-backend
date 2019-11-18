@@ -1,18 +1,19 @@
-package edu.stonybrook.cse308.gerrybackend.enums.measures;
+package edu.stonybrook.cse308.gerrybackend.enums.types;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum PopulationEqualityEnum implements IntEnumInterface, MeasureEnumInterface {
-    MOST_TO_LEAST(0, "most_to_least"),
-    IDEAL(1, "ideal");
+public enum LikelyType implements IntEnumInterface {
+    NOT(0, "not_likely"),
+    KIND_OF(1, "kind_of_likely"),
+    VERY(2, "very_likely");
 
     @Getter
     private final int value;
     private final String name;
 
-    PopulationEqualityEnum(int value, String name){
+    LikelyType(int value, String name){
         this.value = value;
         this.name = name;
     }
@@ -21,4 +22,5 @@ public enum PopulationEqualityEnum implements IntEnumInterface, MeasureEnumInter
     public String getName(){
         return this.name;
     }
+
 }
