@@ -40,7 +40,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         this();
         Set<DistrictNode> districts = new HashSet<>();
         districts.add(child);
-        this.setDistricts(districts);
+        this.nodes = districts;
     }
 
     public StateNode(NodeType nodeType, StateType stateType, Set<DistrictNode> nodes){
@@ -70,12 +70,14 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         this.stateType = stateType;
     }
 
-    private void setDistricts(Set<DistrictNode> districts){
-        this.nodes = districts;
-    }
-
     private void loadAllCounties(){
         this.counties = this.nodes.stream().flatMap(d -> d.getCounties().stream()).collect(Collectors.toSet());
+    }
+
+    public void remapDistrictReferences(Map<DistrictNode,DistrictNode> changedDistricts){
+        this.nodes = this.nodes.stream()
+                .map(d -> changedDistricts.getOrDefault(d, d))
+                .collect(Collectors.toSet());
     }
 
     /**

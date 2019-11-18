@@ -12,4 +12,9 @@ public class PhaseOneMergeDelta {
     private Map<UnorderedPair<String>, DistrictNode> mergedDistricts;
     private Set<DistrictNode> newDistricts;
 
+    public PhaseOneMergeDelta(int iteration, Map<UnorderedPair<String>, DistrictNode> mergedDistricts, Set<DistrictNode> newDistricts) {
+        this.iteration = iteration;
+        this.mergedDistricts = mergedDistricts;
+        this.newDistricts = newDistricts;
+    }
 }

@@ -11,12 +11,12 @@ import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneMajMinPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneOtherPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
+import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneReport> {
 
@@ -46,8 +46,23 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     }
 
     private PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration){
-        // TODO: fill in
-        return null;
+        Map<DistrictNode, DistrictNode> mergedDistricts = new HashMap<>();
+        Map<UnorderedPair<String>, DistrictNode> mergedDistrictsById = new HashMap<>();
+        for (LikelyCandidatePair pair : pairs.getAllPairs()){
+            try {
+                DistrictNode d1 = pair.getItem1();
+                DistrictNode d2 = pair.getItem2();
+                DistrictNode newDistrict = DistrictNode.combine(d1, d2);
+                mergedDistricts.put(d1, newDistrict);
+                mergedDistricts.put(d2, newDistrict);
+                mergedDistrictsById.put(new UnorderedPair<>(d1.getId(), d2.getId()), newDistrict);
+            } catch (MismatchedElectionException e) {
+                // should never happen
+                e.printStackTrace();
+            }
+        }
+        state.remapDistrictReferences(mergedDistricts);
+        return new PhaseOneMergeDelta(iteration, mergedDistrictsById, new HashSet<>(mergedDistricts.values()));
     }
 
     @Override
