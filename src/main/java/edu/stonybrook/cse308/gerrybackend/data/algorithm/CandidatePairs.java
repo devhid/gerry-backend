@@ -1,17 +1,14 @@
 package edu.stonybrook.cse308.gerrybackend.data.algorithm;
 
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
-
 import java.util.Set;
 
 public class CandidatePairs {
 
-    private Set<UnorderedPair<DistrictNode>> majorityMinorityPairs;
-    private Set<UnorderedPair<DistrictNode>> otherPairs;
+    private Set<LikelyCandidatePair> majorityMinorityPairs;
+    private Set<LikelyCandidatePair> otherPairs;
 
-    public CandidatePairs(Set<UnorderedPair<DistrictNode>> majorityMinorityPairs,
-                          Set<UnorderedPair<DistrictNode>> otherPairs){
+    public CandidatePairs(Set<LikelyCandidatePair> majorityMinorityPairs,
+                          Set<LikelyCandidatePair> otherPairs){
         this.majorityMinorityPairs = majorityMinorityPairs;
         this.otherPairs = otherPairs;
     }
@@ -20,7 +17,7 @@ public class CandidatePairs {
         return this.majorityMinorityPairs.size() + this.otherPairs.size();
     }
 
-    public void filterPairs(Set<UnorderedPair<DistrictNode>> filteredPairs){
+    public void filterPairs(Set<LikelyCandidatePair> filteredPairs){
         this.majorityMinorityPairs.retainAll(filteredPairs);
         this.otherPairs.retainAll(filteredPairs);
     }

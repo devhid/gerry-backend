@@ -6,8 +6,8 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
 
 public abstract class AlgPhaseWorker<I extends AlgPhaseInputs, R extends AlgPhaseReport> {
 
-    private String id;
-    private AlgPhaseType algPhaseType;
+    protected String id;
+    protected AlgPhaseType algPhaseType;
 
     public abstract R run(I inputs);
 

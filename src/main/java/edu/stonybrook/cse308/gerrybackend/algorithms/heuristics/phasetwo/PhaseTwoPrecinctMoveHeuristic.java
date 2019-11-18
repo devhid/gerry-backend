@@ -7,7 +7,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 public interface PhaseTwoPrecinctMoveHeuristic {
 
     class Random {
-        public static PrecinctMove selectPrecinct(StateNode state) {
+        public static PrecinctMove selectPrecinct(StateNode state){
             // TODO: fill in
             return null;
         }

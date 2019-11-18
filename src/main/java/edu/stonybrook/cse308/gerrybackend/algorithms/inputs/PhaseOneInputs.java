@@ -24,7 +24,7 @@ public class PhaseOneInputs extends AlgPhaseInputs {
     private double lowerBound;
 
     @Getter
-    protected AlgRunType algRunType;
+    private AlgRunType algRunType;
 
     @Getter
     private PhaseOneMajMinPairs phaseOneMajMinPairsHeuristic;
