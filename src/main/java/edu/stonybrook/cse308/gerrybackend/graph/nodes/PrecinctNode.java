@@ -16,11 +16,6 @@ public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
     @Column(name="county")
     private String county;
 
-    @Getter
-    @Setter
-    @Transient
-    private DistrictNode userDistrict;
-
     public PrecinctNode(){
         super();
         this.county = "";

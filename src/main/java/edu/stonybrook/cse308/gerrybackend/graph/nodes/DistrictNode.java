@@ -1,6 +1,5 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
@@ -28,7 +27,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this();
         Set<PrecinctNode> precincts = new HashSet<>();
         precincts.add(child);
-        this.nodes = precincts;
+        this.children = precincts;
         this.demographicData = new DemographicData(child.demographicData);
         this.electionData = new ElectionData(child.electionData);
         this.counties.add(child.getCounty());
@@ -39,7 +38,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.setState(state);
         Set<PrecinctNode> precincts = new HashSet<>();
         precincts.add(child);
-        this.nodes = precincts;
+        this.children = precincts;
         this.demographicData = new DemographicData(child.demographicData);
         this.electionData = new ElectionData(child.electionData);
     }
@@ -66,17 +65,17 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     public DistrictNode(DistrictNode obj){
         this(UUID.randomUUID().toString(), obj.getName(), obj.nodeType, new DemographicData(obj.demographicData),
-                new ElectionData(obj.electionData), new HashSet<>(obj.adjacentEdges), null, new HashSet<>(obj.nodes),
+                new ElectionData(obj.electionData), new HashSet<>(obj.adjacentEdges), null, new HashSet<>(obj.children),
                 new HashSet<>(obj.counties), obj.parent, new HashSet<>(obj.incumbents));
     }
 
     @Override
     protected void loadAllCounties() {
-        this.counties = this.nodes.stream().map(PrecinctNode::getCounty).collect(Collectors.toSet());
+        this.counties = this.children.stream().map(PrecinctNode::getCounty).collect(Collectors.toSet());
     }
 
     private void setPrecincts(Set<PrecinctNode> precincts) throws MismatchedElectionException {
-        this.nodes = precincts;
+        this.children = precincts;
         ElectionData districtElection = null;
         DemographicData districtDemographics = null;
         for (PrecinctNode p : precincts){
@@ -88,7 +87,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
                 districtElection = ElectionData.combine(districtElection, p.getElectionData());
                 districtDemographics = DemographicData.combine(districtDemographics, p.getDemographicData());
             }
-            p.setUserDistrict(this);
+            p.setParent(this);
         }
         this.electionData = districtElection;
         this.demographicData = districtDemographics;
@@ -111,12 +110,12 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         if (!d1.getAdjacentNodes().contains(d2) || !d2.getAdjacentNodes().contains(d1)){
             throw new IllegalArgumentException("Replace this string later!");
         }
-        DistrictNode biggerDistrict = (d1.getSize() > d2.getSize()) ? d1 : d2;
+        DistrictNode biggerDistrict = (d1.size() > d2.size()) ? d1 : d2;
         DistrictNode smallerDistrict = (biggerDistrict == d1) ? d2 : d1;
         DistrictNode mergedDistrict = new DistrictNode(biggerDistrict);
 
         // Add all nodes and update counties.
-        mergedDistrict.nodes.addAll(smallerDistrict.nodes);
+        mergedDistrict.children.addAll(smallerDistrict.children);
         mergedDistrict.counties.addAll(smallerDistrict.counties);
 
         // Merge DemographicData and ElectionData.

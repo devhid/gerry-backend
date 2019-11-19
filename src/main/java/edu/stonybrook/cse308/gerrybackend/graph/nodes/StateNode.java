@@ -12,7 +12,6 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
-import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.StateEdge;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
@@ -43,18 +42,18 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         this.parent = null;
         this.nodeType = nodeType;
         this.stateType = stateType;
-        this.nodes = nodes;
+        this.children = nodes;
         this.loadAllCounties();
     }
 
     public StateNode(StateNode obj, Map<DistrictNode,DistrictNode> changedDistricts){
         this(UUID.randomUUID().toString(), obj.name, NodeType.USER, new DemographicData(obj.demographicData),
-                new ElectionData(obj.electionData), null, new HashSet<>(obj.nodes),
+                new ElectionData(obj.electionData), null, new HashSet<>(obj.children),
                 new HashSet<>(obj.counties), obj.stateType);
-        this.nodes = this.nodes.stream()
+        this.children = this.children.stream()
                 .map(d -> changedDistricts.getOrDefault(d, new DistrictNode(d)))
                 .collect(Collectors.toSet());
-        this.nodes.forEach(d -> d.parent = this);
+        this.children.forEach(d -> d.parent = this);
     }
 
     // TODO: remove later, for testing insertion of data
@@ -72,7 +71,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     }
 
     private void setDistricts(Set<DistrictNode> districts) throws MismatchedElectionException {
-        this.nodes = districts;
+        this.children = districts;
         ElectionData districtElection = null;
         DemographicData districtDemographics = null;
         for (DistrictNode d : districts){
@@ -93,11 +92,11 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     @Override
     protected void loadAllCounties(){
-        this.counties = this.nodes.stream().flatMap(d -> d.getCounties().stream()).collect(Collectors.toSet());
+        this.counties = this.children.stream().flatMap(d -> d.getCounties().stream()).collect(Collectors.toSet());
     }
 
     public void remapDistrictReferences(Map<DistrictNode,DistrictNode> changedDistricts){
-        this.nodes = this.nodes.stream()
+        this.children = this.children.stream()
                 .map(d -> changedDistricts.getOrDefault(d, d))
                 .collect(Collectors.toSet());
     }
@@ -109,24 +108,25 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * - fillInEdgeNodeReferences
      */
     public void fillInTransientProperties(){
-        this.fillInPrecinctUserDistrictReferences();
+        this.fillInParentReferences();
         this.fillInEdgeNodeReferences();
     }
 
     /**
-     * Fills in all precincts' userDistrict references after the StateNode has been deserialized.
+     * Fills in all nodes' parent references after the StateNode has been deserialized.
      *
-     * As userDistrict references are not stored in the DB, these wil have to be populated afterwards.
+     * As parent references are not stored in the DB, these wil have to be populated afterwards.
      * Make sure to call this method after deserialization of a StateNode.
      */
-    private void fillInPrecinctUserDistrictReferences(){
+    private void fillInParentReferences(){
         if (this.nodeType != NodeType.USER){
             return;
         }
-        Set<DistrictNode> districts = this.getNodes();
+        Set<DistrictNode> districts = this.getChildren();
         districts.forEach(d -> {
-            d.getNodes().forEach(p -> {
-                p.setUserDistrict(d);
+            d.setParent(this);
+            d.getChildren().forEach(p -> {
+                p.setParent(d);
             });
         });
     }
@@ -141,9 +141,9 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         Map<String, UnorderedPair<GerryNode>> edgeMap = new HashMap<>();
 
         // Load all districts & precincts.
-        Set<DistrictNode> districts = this.nodes;
+        Set<DistrictNode> districts = this.children;
         Set<PrecinctNode> precincts = new HashSet<>();
-        districts.forEach(d -> precincts.addAll(d.getNodes()));
+        districts.forEach(d -> precincts.addAll(d.getChildren()));
 
         // Load all edges.
         MapUtils.populateEdgeNodeReferences(edgeMap, districts);
@@ -182,26 +182,18 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     }
 
     public Set<PrecinctNode> getAllPrecincts(){
-        return this.nodes.stream()
-                .flatMap(d -> d.getNodes().stream())
+        return this.children.stream()
+                .flatMap(d -> d.getChildren().stream())
                 .collect(Collectors.toSet());
     }
 
     /**
      * Return a Map whose keys are precincts and values are districts.
-     * Depending on the boolean flag, the values can be either the original districts or the user districts.
-     * @param userDistrict determine if the caller wants the user districts or original district
      * @return a Map that maps precincts to the desired parents
      * @throws IllegalArgumentException if userDistrict is set to true but the StateNode is an original node
      */
-    public Map<PrecinctNode,DistrictNode> getPrecinctToDistrictMap(boolean userDistrict){
+    public Map<PrecinctNode,DistrictNode> getPrecinctToDistrictMap(){
         Set<PrecinctNode> allPrecincts = this.getAllPrecincts();
-        if (userDistrict){
-            if (this.nodeType == NodeType.ORIGINAL){
-                throw new IllegalArgumentException("Replace this string later!");
-            }
-            return allPrecincts.stream().collect(Collectors.toMap(Function.identity(), PrecinctNode::getUserDistrict));
-        }
         return allPrecincts.stream().collect(Collectors.toMap(Function.identity(), GerryNode::getParent));
     }
 

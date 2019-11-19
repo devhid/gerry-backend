@@ -25,8 +25,8 @@ import java.util.*;
 public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> extends GerryNode<E,StateNode> {
 
     @Getter
-    @OneToMany(cascade=CascadeType.ALL, mappedBy="parent")
-    protected Set<C> nodes;
+    @ManyToMany(cascade=CascadeType.ALL)
+    protected Set<C> children;
 
     @Getter
     @ElementCollection
@@ -38,7 +38,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
 
     protected ClusterNode(){
         super();
-        this.nodes = null;
+        this.children = null;
         this.counties = new HashSet<>();
         this.nodeType = NodeType.NOT_SET;
     }
@@ -47,22 +47,22 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
                           ElectionData electionData, Set<E> adjacentEdges, String geography) {
         super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.nodeType = nodeType;
-        this.nodes = null;
+        this.children = null;
         this.counties = new HashSet<>();
     }
 
     protected ClusterNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                           ElectionData electionData, Set<E> adjacentEdges, String geography,
-                          Set<C> nodes, Set<String> counties, StateNode parent) {
+                          Set<C> children, Set<String> counties, StateNode parent) {
         super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.nodeType = nodeType;
-        this.nodes = nodes;
+        this.children = children;
         this.counties = counties;
         this.parent = parent;
     }
 
-    int getSize(){
-        return this.nodes.size();
+    int size(){
+        return this.children.size();
     }
 
     protected abstract void loadAllCounties();

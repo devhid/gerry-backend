@@ -33,7 +33,7 @@ public interface PopulationEqualityMeasure {
     class Ideal {
         public static double computePopulationEqualityScore(DistrictNode district){
             StateNode state = district.getParent();
-            double idealPopulation = (double)state.getDemographicData().getDemoPopulation(DemographicType.ALL) / state.getNodes().size();
+            double idealPopulation = (double)state.getDemographicData().getDemoPopulation(DemographicType.ALL) / state.getChildren().size();
             int truePopulation = district.getDemographicData().getDemoPopulation(DemographicType.ALL);
             if (idealPopulation >= truePopulation){
                 return ((double) truePopulation) / idealPopulation;

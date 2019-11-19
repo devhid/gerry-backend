@@ -8,6 +8,7 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -56,8 +57,8 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected Set<E> adjacentEdges;
 
     @Getter
-    @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="parent_id")
+    @Setter
+    @Transient
     protected P parent;
 
     @Lob

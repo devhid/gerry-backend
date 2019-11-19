@@ -2,7 +2,6 @@ package edu.stonybrook.cse308.gerrybackend.controllers;
 
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
-import edu.stonybrook.cse308.gerrybackend.db.repositories.StateRepository;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import edu.stonybrook.cse308.gerrybackend.enums.types.*;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
@@ -37,6 +36,7 @@ public class StateController {
     @GetMapping("/original/{stateType}")
     public ResponseEntity<StateNode> getOriginalState(@PathVariable StateType stateType){
         StateNode originalState = stateService.findOriginalStateByStateType(stateType);
+        originalState.fillInTransientProperties();
         return new ResponseEntity<>(originalState, new HttpHeaders(), HttpStatus.OK);
     }
 
@@ -44,7 +44,7 @@ public class StateController {
     public ResponseEntity<StateNode> echoState(@RequestBody StateNode state){
         System.out.println("in echoState");
         state.fillInTransientProperties();
-        Set<DistrictNode> districts = state.getNodes();
+        Set<DistrictNode> districts = state.getChildren();
         districts.forEach(d -> {
             Set<GerryNode> adjNodes = d.getAdjacentNodes();
             adjNodes.forEach(n -> {

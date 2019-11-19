@@ -1,7 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.Heuristics;
-import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneStopHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
@@ -16,7 +15,6 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneReport> {
 
@@ -38,7 +36,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     }
 
     private boolean isLastIteration(StateNode state, CandidatePairs pairs, int numDistricts){
-        return state.getNodes().size() - pairs.size() <= numDistricts;
+        return state.getChildren().size() - pairs.size() <= numDistricts;
     }
 
     private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges){
@@ -71,12 +69,12 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         StateNode state = inputs.getState();
         int numDistricts = inputs.getNumDistricts();
         int iteration = 0;
-        while (state.getNodes().size() != numDistricts){
+        while (state.getChildren().size() != numDistricts){
             CandidatePairs pairs = determineCandidatePairs(inputs.getPhaseOneMajMinPairsHeuristic(),
                     inputs.getPhaseOneOtherPairsHeuristic(), inputs.getState());
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
             if (lastIteration){
-                int numAllowedMerges = state.getNodes().size() - numDistricts;
+                int numAllowedMerges = state.getChildren().size() - numDistricts;
                 filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }
             PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration);
