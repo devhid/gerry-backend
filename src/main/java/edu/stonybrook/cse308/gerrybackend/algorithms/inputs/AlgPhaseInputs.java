@@ -5,6 +5,7 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import lombok.Getter;
+import lombok.Setter;
 
 public abstract class AlgPhaseInputs {
 
@@ -15,6 +16,7 @@ public abstract class AlgPhaseInputs {
     protected ElectionType electionType;
 
     @Getter
+    @Setter
     protected StateNode state;
 
 }

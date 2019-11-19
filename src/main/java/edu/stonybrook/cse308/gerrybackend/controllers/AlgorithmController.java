@@ -10,6 +10,8 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseZeroReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.*;
 import edu.stonybrook.cse308.gerrybackend.controllers.mappings.PhaseZeroResult;
+import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,9 @@ import java.util.Set;
 @RestController
 @RequestMapping("/algorithm")
 public class AlgorithmController {
+
+    @Autowired
+    private StateService stateService;
 
     private AlgPhaseReport handle(AlgPhaseInputs inputs){
         AlgPhaseWorker worker = null;
@@ -53,6 +58,7 @@ public class AlgorithmController {
 
     @PostMapping("/phase0")
     public ResponseEntity<Set<PhaseZeroResult>> handlePhaseZero(@RequestBody PhaseZeroInputs inputs) {
+        inputs.setState(stateService.findOriginalStateByStateType(inputs.getStateType()));
         final PhaseZeroReport report = (PhaseZeroReport) handle(inputs);
         final Set<PhaseZeroResult> results = report.getPhaseZeroResults();
         return new ResponseEntity<>(results, new HttpHeaders(), HttpStatus.OK);
@@ -60,12 +66,14 @@ public class AlgorithmController {
 
     @PostMapping("/phase1")
     public ResponseEntity<PhaseOneReport> handlePhaseOne(@RequestBody PhaseOneInputs inputs) {
+        inputs.setState(stateService.findOriginalStateByStateType(inputs.getStateType()));
         PhaseOneReport report = (PhaseOneReport) handle(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }
 
     @PostMapping("/phase2")
     public ResponseEntity<PhaseTwoReport> handlePhaseTwo(@RequestBody PhaseTwoInputs inputs) {
+        inputs.setState(stateService.getStateById(inputs.getStateId()));
         PhaseTwoReport report = (PhaseTwoReport) handle(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

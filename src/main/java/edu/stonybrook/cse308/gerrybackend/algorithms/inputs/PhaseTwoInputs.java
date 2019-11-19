@@ -13,6 +13,9 @@ import java.util.Set;
 public class PhaseTwoInputs extends AlgPhaseInputs {
 
     @Getter
+    private String stateId;
+
+    @Getter
     private Set<DemographicType> demographicTypes;
 
     @Getter
