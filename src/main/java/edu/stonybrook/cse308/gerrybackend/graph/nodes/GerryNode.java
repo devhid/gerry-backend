@@ -52,7 +52,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected ElectionData electionData;
 
     @Getter
-    @OneToMany(cascade=CascadeType.ALL)     // one node has many edges
+    @ManyToMany(cascade=CascadeType.ALL)     // one node has many edges, an edge has 2 (many) nodes
     protected Set<E> adjacentEdges;
 
     @Getter

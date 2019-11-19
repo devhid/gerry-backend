@@ -34,8 +34,8 @@ public class StateController {
         return new ResponseEntity<>(list, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PostMapping("/original")
-    public ResponseEntity<StateNode> getOriginalState(@RequestBody StateType stateType){
+    @GetMapping("/original/{stateType}")
+    public ResponseEntity<StateNode> getOriginalState(@PathVariable StateType stateType){
         StateNode originalState = stateService.findOriginalStateByStateType(stateType);
         return new ResponseEntity<>(originalState, new HttpHeaders(), HttpStatus.OK);
     }
@@ -145,7 +145,7 @@ public class StateController {
         counties.add(p3.getCounty());
 
         StateNode state = new StateNode(UUID.randomUUID().toString(), "state", NodeType.ORIGINAL, districts, "{}", counties, StateType.CALIFORNIA);
-//        stateService.createState(state);
+        stateService.createState(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
 
