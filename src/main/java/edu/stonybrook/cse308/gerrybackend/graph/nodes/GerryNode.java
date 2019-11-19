@@ -1,6 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
@@ -13,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @MappedSuperclass
-@JsonIgnoreProperties({"adjacentNodes"})
+@JsonIgnoreProperties({"adjacentNodes", "electionType"})
 @JsonTypeInfo(
         use=JsonTypeInfo.Id.NAME,
         include=JsonTypeInfo.As.PROPERTY,
@@ -59,10 +60,8 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     @JoinColumn(name="parent_id")
     protected P parent;
 
-    @Getter
     @Lob
     @Column(name="geography", columnDefinition="CLOB")
-    @JsonRawValue
     protected String geography;
 
     protected GerryNode(){
@@ -88,7 +87,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     public Set<GerryNode> getAdjacentNodes() {
         Set<GerryNode> adjNodes = new HashSet<>();
         for (E edge : adjacentEdges){
-            GerryNode adjNode = (GerryNode) ((edge.getItem1() == this) ? edge.getItem1() : edge.getItem2());
+            GerryNode adjNode = (GerryNode) ((edge.getItem1() == this) ? edge.getItem2() : edge.getItem1());
             adjNodes.add(adjNode);
         }
         return adjNodes;
@@ -101,7 +100,20 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.adjacentEdges.add(edge);
     }
 
+    public void clearEdges() {
+        this.adjacentEdges.clear();
+    }
+
     public ElectionType getElectionType(){
         return this.electionData.getElectionType();
+    }
+
+    @JsonRawValue
+    public String getGeography(){
+        return this.geography;
+    }
+
+    public void setGeography(JsonNode node){
+        this.geography = node.toString();
     }
 }

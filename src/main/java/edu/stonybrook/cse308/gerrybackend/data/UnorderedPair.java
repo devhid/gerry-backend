@@ -4,7 +4,6 @@ import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;

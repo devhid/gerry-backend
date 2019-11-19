@@ -15,17 +15,17 @@ public class MapUtils {
         }
     }
 
-    public static void populateEdgeNodeReferences(Map<GerryEdge, UnorderedPair<GerryNode>> edgeMap, Set<? extends GerryNode> nodes){
+    public static void populateEdgeNodeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap, Set<? extends GerryNode> nodes){
         for (GerryNode node : nodes){
             Set<GerryEdge> nodeEdges = node.getAdjacentEdges();
             for (GerryEdge nodeEdge : nodeEdges){
-                if (!edgeMap.containsKey(nodeEdge)){
+                if (!edgeMap.containsKey(nodeEdge.getId())){
                     UnorderedPair<GerryNode> edgeNodes = new UnorderedPair<>();
                     edgeNodes.add(node);
-                    edgeMap.put(nodeEdge, edgeNodes);
+                    edgeMap.put(nodeEdge.getId(), edgeNodes);
                 }
                 else {
-                    edgeMap.get(nodeEdge).add(node);
+                    edgeMap.get(nodeEdge.getId()).add(node);
                 }
             }
         }

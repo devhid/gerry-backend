@@ -65,4 +65,6 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         return this.nodes.size();
     }
 
+    protected abstract void loadAllCounties();
+
 }

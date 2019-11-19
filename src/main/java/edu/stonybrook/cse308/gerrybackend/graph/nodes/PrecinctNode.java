@@ -24,7 +24,6 @@ public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
     public PrecinctNode(){
         super();
         this.county = "";
-        this.parent = new DistrictNode(this);   // TODO: remove chaining creation after initial testing
     }
 
     public PrecinctNode(String id, String name,

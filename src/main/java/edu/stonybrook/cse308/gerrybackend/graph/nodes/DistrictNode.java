@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
@@ -10,6 +11,7 @@ import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
@@ -19,27 +21,34 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     public DistrictNode(){
         super();
-        this.setState(new StateNode(this)); // TODO: remove chaining creation after initial testing
         this.incumbents = new HashSet<>();
     }
 
-    public DistrictNode(PrecinctNode child){
+    public DistrictNode(PrecinctNode child) {
         this();
         Set<PrecinctNode> precincts = new HashSet<>();
         precincts.add(child);
-        this.setPrecincts(precincts);
+        this.nodes = precincts;
         this.demographicData = new DemographicData(child.demographicData);
         this.electionData = new ElectionData(child.electionData);
         this.counties.add(child.getCounty());
     }
 
-    public DistrictNode(PrecinctNode child, StateNode state){
-        super();
+    public DistrictNode(PrecinctNode child, StateNode state) {
+        this();
         this.setState(state);
         Set<PrecinctNode> precincts = new HashSet<>();
         precincts.add(child);
+        this.nodes = precincts;
+        this.demographicData = new DemographicData(child.demographicData);
+        this.electionData = new ElectionData(child.electionData);
+    }
+
+    // TODO: remove later, for testing inserting data
+    public DistrictNode(String id, String name, NodeType nodeType, Set<PrecinctNode> precincts, String geography)
+            throws MismatchedElectionException {
+        this(id, name, nodeType, null, null, new HashSet<>(), geography);
         this.setPrecincts(precincts);
-        this.incumbents = new HashSet<>();
     }
 
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
@@ -61,11 +70,32 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
                 new HashSet<>(obj.counties), obj.parent, new HashSet<>(obj.incumbents));
     }
 
-    private void setPrecincts(Set<PrecinctNode> precincts){
-        this.nodes = precincts;
+    @Override
+    protected void loadAllCounties() {
+        this.counties = this.nodes.stream().map(PrecinctNode::getCounty).collect(Collectors.toSet());
     }
 
-    private void setState(StateNode state){
+    private void setPrecincts(Set<PrecinctNode> precincts) throws MismatchedElectionException {
+        this.nodes = precincts;
+        ElectionData districtElection = null;
+        DemographicData districtDemographics = null;
+        for (PrecinctNode p : precincts){
+            if (districtElection == null || districtDemographics == null){
+                districtElection = p.getElectionData();
+                districtDemographics = p.getDemographicData();
+            }
+            else {
+                districtElection = ElectionData.combine(districtElection, p.getElectionData());
+                districtDemographics = DemographicData.combine(districtDemographics, p.getDemographicData());
+            }
+            p.setUserDistrict(this);
+        }
+        this.electionData = districtElection;
+        this.demographicData = districtDemographics;
+        this.loadAllCounties();
+    }
+
+    public void setState(StateNode state){
         this.parent = state;
     }
 
