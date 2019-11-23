@@ -4,35 +4,24 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PhaseZeroResult {
 
     @Getter
-    private String precinctId;
-    @Getter
-    private DemographicType demographicType;
-    @Getter
-    private int demographicPopulation;
-    @Getter
-    private int totalPopulation;
-    @Getter
-    private PoliticalParty party;
-    @Getter
-    private int partyVoteCount;
-    @Getter
-    private int totalVote;
+    private final Map<PoliticalParty, List<PrecinctBlocSummary>> precinctBlocs;
 
-    public PhaseZeroResult(final String precinctId, final Map.Entry<DemographicType, Integer> demographicEntry,
-                           final int totalPopulation, final PoliticalParty politicalParty, final int partyVote,
-                           final int totalVote) {
-        this.precinctId = precinctId;
-        this.demographicType = demographicEntry.getKey();
-        this.demographicPopulation = demographicEntry.getValue();
-        this.totalPopulation = totalPopulation;
-        this.party = politicalParty;
-        this.partyVoteCount = partyVote;
-        this.totalVote = totalVote;
+    public PhaseZeroResult(final Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> voteBlocSummaries) {
+        this.precinctBlocs = this.transformResult(voteBlocSummaries);
+    }
+
+    private Map<PoliticalParty, List<PrecinctBlocSummary>> transformResult(final Map<PoliticalParty,
+            Map<DemographicType, PrecinctBlocSummary>> voteBlocSummaries) {
+        return voteBlocSummaries.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue().values())));
     }
 
 }

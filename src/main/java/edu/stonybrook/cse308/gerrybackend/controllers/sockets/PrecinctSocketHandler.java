@@ -1,9 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.controllers.sockets;
 
-import edu.stonybrook.cse308.gerrybackend.db.repositories.PrecinctRepository;
 import edu.stonybrook.cse308.gerrybackend.db.repositories.StateRepository;
-import edu.stonybrook.cse308.gerrybackend.db.services.PrecinctService;
-import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.utils.PrecinctSocketBuffer;
@@ -17,6 +14,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,28 +33,20 @@ public class PrecinctSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
         LOGGER.info(String.format("Connected to session %s.", session.getId()));
-        final String state = UriUtils.getLastPath(session.getUri());
-        Set<PrecinctNode> precincts = null;
-        if (state.equals(StateType.CALIFORNIA.getName())) {
-            LOGGER.info("CA");
-            StateNode stateNode = stateRepository.findById(StateType.CALIFORNIA.getName()).get();
-            precincts = stateNode.getAllPrecincts();
-        } else if (state.equals(StateType.UTAH.getName())) {
-            LOGGER.info("UT");
-            StateNode stateNode = stateRepository.findById(StateType.UTAH.getName()).get();
-            precincts = stateNode.getAllPrecincts();
-        } else if (state.equals(StateType.VIRGINIA.getName())) {
-            LOGGER.info("VA");
-            StateNode stateNode = stateRepository.findById(StateType.VIRGINIA.getName()).get();
-            precincts = stateNode.getAllPrecincts();
-        } else {
-            LOGGER.error("Invalid state selected.");
+        final String state = UriUtils.getStatePath(session.getUri());
+        final Optional<StateNode> stateNode = stateRepository.findById(state);
+        CloseStatus closeStatus = new CloseStatus(CloseStatus.NORMAL.getCode(), "Completed fetching precincts.");
+
+        if (stateNode.isEmpty()) {
+            closeStatus = new CloseStatus(CloseStatus.SERVER_ERROR.getCode(), "Invalid state selected.");
+            session.close(closeStatus);
+            return;
         }
 
+        final Set<PrecinctNode> precincts = stateNode.get().getAllPrecincts();
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         Future<?> future = executorService.submit(new PrecinctSocketBuffer(session, precincts, BATCH_SIZE));
 
-        CloseStatus closeStatus = new CloseStatus(CloseStatus.NORMAL.getCode(), "Completed fetching precincts.");
         try {
             future.get();
         } catch (final ExecutionException e) {
