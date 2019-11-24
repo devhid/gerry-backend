@@ -2,13 +2,12 @@ package edu.stonybrook.cse308.gerrybackend.graph.edges;
 
 import com.fasterxml.jackson.annotation.*;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Joinability;
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;

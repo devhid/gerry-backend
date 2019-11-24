@@ -3,7 +3,7 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.Heuristics;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedStringPair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
@@ -12,55 +12,59 @@ import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneOtherPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneReport> {
 
-    private Set<LikelyCandidatePair> determineMajorityMinorityPairs(PhaseOneMajMinPairs majMinPairsHeuristic, StateNode state){
+    private Set<LikelyCandidatePair> determineMajorityMinorityPairs(PhaseOneMajMinPairs majMinPairsHeuristic, StateNode state) {
         return Heuristics.determineMajMinPairs(majMinPairsHeuristic, state);
     }
 
-    private Set<LikelyCandidatePair> determineOtherPairs(PhaseOneOtherPairs otherPairsHeuristic,
-                                                                 StateNode state,
-                                                                 Set<LikelyCandidatePair> majMinPairs){
+    private Set<LikelyCandidatePair> determineOtherPairs(PhaseOneOtherPairs otherPairsHeuristic, StateNode state,
+                                                         Set<LikelyCandidatePair> majMinPairs) {
         return Heuristics.determineOtherPairs(otherPairsHeuristic, state, majMinPairs);
     }
 
     private CandidatePairs determineCandidatePairs(PhaseOneMajMinPairs majMinPairsHeuristic,
-                                                   PhaseOneOtherPairs otherPairsHeuristic, StateNode state){
+                                                   PhaseOneOtherPairs otherPairsHeuristic, StateNode state) {
         Set<LikelyCandidatePair> majMinPairs = this.determineMajorityMinorityPairs(majMinPairsHeuristic, state);
         Set<LikelyCandidatePair> otherPairs = this.determineOtherPairs(otherPairsHeuristic, state, majMinPairs);
         return new CandidatePairs(majMinPairs, otherPairs);
     }
 
-    private boolean isLastIteration(StateNode state, CandidatePairs pairs, int numDistricts){
+    private boolean isLastIteration(StateNode state, CandidatePairs pairs, int numDistricts) {
         return state.getChildren().size() - pairs.size() <= numDistricts;
     }
 
-    private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges){
+    private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges) {
         Heuristics.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
-    private PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration){
+    private PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration) {
         Map<DistrictNode, DistrictNode> mergedDistricts = new HashMap<>();
-        Map<UnorderedPair<String>, DistrictNode> mergedDistrictsById = new HashMap<>();
-        for (LikelyCandidatePair pair : pairs.getAllPairs()){
+        Map<UnorderedStringPair, String> mergedDistrictsById = new HashMap<>();
+        for (LikelyCandidatePair pair : pairs.getAllPairs()) {
             try {
                 DistrictNode d1 = pair.getItem1();
                 DistrictNode d2 = pair.getItem2();
                 DistrictNode newDistrict = DistrictNode.combine(d1, d2);
                 mergedDistricts.put(d1, newDistrict);
                 mergedDistricts.put(d2, newDistrict);
-                mergedDistrictsById.put(new UnorderedPair<>(d1.getId(), d2.getId()), newDistrict);
+                mergedDistrictsById.put(new UnorderedStringPair(d1.getId(), d2.getId()), newDistrict.getId());
             } catch (MismatchedElectionException e) {
                 // should never happen
                 e.printStackTrace();
             }
         }
         state.remapDistrictReferences(mergedDistricts);
-        return new PhaseOneMergeDelta(iteration, mergedDistrictsById, new HashSet<>(mergedDistricts.values()));
+        Map<String, DistrictNode> newDistricts = mergedDistricts.values().stream()
+                .collect(Collectors.toMap(GerryNode::getId, Function.identity()));
+        return new PhaseOneMergeDelta(iteration, mergedDistrictsById, newDistricts);
     }
 
     @Override
@@ -69,11 +73,11 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         StateNode state = inputs.getState();
         int numDistricts = inputs.getNumDistricts();
         int iteration = 0;
-        while (state.getChildren().size() != numDistricts){
+        while (state.getChildren().size() != numDistricts) {
             CandidatePairs pairs = determineCandidatePairs(inputs.getPhaseOneMajMinPairsHeuristic(),
                     inputs.getPhaseOneOtherPairsHeuristic(), inputs.getState());
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
-            if (lastIteration){
+            if (lastIteration) {
                 int numAllowedMerges = state.getChildren().size() - numDistricts;
                 filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }

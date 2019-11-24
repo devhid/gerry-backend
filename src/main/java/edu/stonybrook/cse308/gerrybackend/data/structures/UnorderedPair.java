@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.data;
+package edu.stonybrook.cse308.gerrybackend.data.structures;
 
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;

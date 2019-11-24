@@ -1,9 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone;
 
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneMajMinPairs;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 import java.util.Set;

@@ -4,7 +4,6 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOn
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneOtherPairsHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneStopHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTwoPrecinctMoveHeuristic;
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
@@ -12,7 +11,6 @@ import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneMajMinPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneOtherPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 import java.util.Set;

@@ -1,12 +1,11 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
-import edu.stonybrook.cse308.gerrybackend.data.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
