@@ -18,15 +18,13 @@ import java.util.stream.Collectors;
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
-    @ElementCollection
-    private Set<Incumbent> incumbents;
+    private Incumbent incumbent;
 
     @Transient
     private Set<PrecinctNode> borderPrecincts;
 
     public DistrictNode(){
         super();
-        this.incumbents = new HashSet<>();
     }
 
     public DistrictNode(PrecinctNode child) {
@@ -59,20 +57,19 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography){
         super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography);
-        this.incumbents = new HashSet<>();
     }
 
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography,
-                        Set<PrecinctNode> precincts, Set<String> counties, StateNode state, Set<Incumbent> incumbents){
+                        Set<PrecinctNode> precincts, Set<String> counties, StateNode state, Incumbent incumbent){
         super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography, precincts, counties, state);
-        this.incumbents = incumbents;
+        this.incumbent = incumbent;
     }
 
     public DistrictNode(DistrictNode obj){
         this(UUID.randomUUID().toString(), obj.getName(), obj.nodeType, new DemographicData(obj.demographicData),
                 new ElectionData(obj.electionData), new HashSet<>(obj.adjacentEdges), null, new HashSet<>(obj.children),
-                new HashSet<>(obj.counties), obj.parent, new HashSet<>(obj.incumbents));
+                new HashSet<>(obj.counties), obj.parent, obj.incumbent);
     }
 
     @Override
