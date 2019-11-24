@@ -5,49 +5,28 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class DistrictService {
+public class DistrictService extends EntityService<DistrictNode> {
     
     @Autowired
     private DistrictRepository repo;
 
     public List<DistrictNode> getAllDistricts(){
-        List<DistrictNode> allEntities = repo.findAll();
-        if (allEntities.size() > 0){
-            return allEntities;
-        }
-        else {
-            return new ArrayList<>();
-        }
+        return this.getAllEntities(this.repo);
     }
 
     public DistrictNode getDistrictById(String id){
-        Optional<DistrictNode> entity = repo.findById(id);
-        if (entity.isPresent()){
-            return entity.get();
-        }
-        else {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
+        return this.getEntityById(this.repo, id);
     }
 
-    public DistrictNode createDistrict(DistrictNode entity){
-        repo.save(entity);
-        return entity;
+    public DistrictNode createDistrict(DistrictNode district){
+        return this.createEntity(this.repo, district);
     }
 
-    public void deleteDistrictById(String id){
-        Optional<DistrictNode> entity = repo.findById(id);
-        if (entity.isPresent()){
-            repo.deleteById(id);
-        }
-        else {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
+    public boolean deleteDistrictById(String id){
+        return this.deleteEntityById(this.repo, id);
     }
     
 }

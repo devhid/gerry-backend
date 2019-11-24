@@ -9,7 +9,6 @@ import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,19 @@ public class StateController {
         System.out.println("in echoState");
         state.fillInTransientProperties();
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<StateNode> createState(@RequestBody StateNode state){
+        state.fillInTransientProperties();
+        stateService.createState(state);
+        return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deleteStateById(@PathVariable String id){
+        stateService.deleteStateById(id);
+        return new ResponseEntity(new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/new_test")
