@@ -17,9 +17,9 @@ import java.util.Set;
 @RequestMapping("/algorithm")
 public class AlgorithmController {
     @PostMapping("/phase0")
-    public ResponseEntity<Set<PhaseZeroResult>> getPrecinctBlocs(@RequestBody PhaseZeroInputs phaseZeroInputs) {
+    public ResponseEntity<PhaseZeroResult> getPrecinctBlocs(@RequestBody PhaseZeroInputs phaseZeroInputs) {
         final PhaseZeroWorker phaseZeroWorker = new PhaseZeroWorker();
-        final Set<PhaseZeroResult> phaseZeroReport = phaseZeroWorker.run(phaseZeroInputs).getPhaseZeroResults();
+        final PhaseZeroResult phaseZeroReport = phaseZeroWorker.run(phaseZeroInputs).getPhaseZeroResults();
         return new ResponseEntity<>(phaseZeroReport, new HttpHeaders(), HttpStatus.OK);
     }
 }
