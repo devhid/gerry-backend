@@ -9,6 +9,9 @@ import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
 import lombok.Setter;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.geojson.GeoJsonReader;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -56,14 +59,20 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     @ManyToMany(cascade=CascadeType.ALL)     // one node has many edges, an edge has 2 (many) nodes
     protected Set<E> adjacentEdges;
 
+    @Lob
+    @Column(name="geometry", columnDefinition="CLOB")
+    @JsonProperty(value="geometry", defaultValue="{}")
+    protected String geometryJson;
+
     @Getter
     @Setter
     @Transient
     protected P parent;
 
-    @Lob
-    @Column(name="geography", columnDefinition="CLOB")
-    protected String geography;
+    @Getter
+    @Transient
+    @JsonIgnore
+    private Geometry geometry;
 
     protected GerryNode(){
         this.id = UUID.randomUUID().toString();
@@ -71,18 +80,18 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.demographicData = new DemographicData();
         this.electionData = new ElectionData();
         this.adjacentEdges = new HashSet<>();
-        this.geography = null;
+        this.geometryJson = null;
     }
 
     protected GerryNode(String id, String name,
                         DemographicData demographicData, ElectionData electionData,
-                        Set<E> adjacentEdges, String geography) {
+                        Set<E> adjacentEdges, String geometryJson) {
         this.id = id;
         this.name = name;
         this.demographicData = demographicData;
         this.electionData = electionData;
         this.adjacentEdges = adjacentEdges;
-        this.geography = geography;
+        this.geometryJson = geometryJson;
     }
 
     public Set<GerryNode> getAdjacentNodes() {
@@ -101,6 +110,13 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.adjacentEdges.add(edge);
     }
 
+    public void removeEdge(E edge) throws InvalidEdgeException {
+        if (!(this.adjacentEdges.contains(edge))){
+            throw new InvalidEdgeException("Replace this string later!");
+        }
+        this.adjacentEdges.remove(edge);
+    }
+
     public void clearEdges() {
         this.adjacentEdges.clear();
     }
@@ -110,11 +126,19 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     }
 
     @JsonRawValue
-    public String getGeography(){
-        return this.geography;
+    public String getGeometryJson(){
+        return this.geometryJson;
     }
 
-    public void setGeography(JsonNode node){
-        this.geography = node.toString();
+    public void setGeometryJson(JsonNode node){
+        this.geometryJson = node.toString();
+    }
+
+    public Geometry getGeometry() throws ParseException {
+        if (this.geometry == null){
+            GeoJsonReader reader = new GeoJsonReader();
+            this.geometry = reader.read(this.geometryJson);
+        }
+        return this.geometry;
     }
 }

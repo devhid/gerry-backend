@@ -1,13 +1,21 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.NodeTypeConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
+import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
+import org.locationtech.jts.algorithm.MinimumBoundingCircle;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
 
 import javax.persistence.*;
 import java.util.*;
@@ -35,6 +43,18 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     @Getter
     @Convert(converter=NodeTypeConverter.class)
     protected NodeType nodeType;
+
+    @Transient
+    @JsonIgnore
+    protected MultiPolygon multiPolygon;
+
+    @Transient
+    @JsonIgnore
+    protected Geometry boundingCircle;
+
+    @Transient
+    @JsonIgnore
+    protected Geometry convexHull;
 
     protected ClusterNode(){
         super();
@@ -66,5 +86,106 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     }
 
     protected abstract void loadAllCounties();
+
+    protected void setChildren(Set<C> children) throws MismatchedElectionException {
+        this.children = children;
+        ElectionData aggregateElections = null;
+        DemographicData aggregateDemographics = null;
+        for (C child : children){
+            if (aggregateElections == null || aggregateDemographics == null){
+                aggregateElections = child.getElectionData();
+                aggregateDemographics = child.getDemographicData();
+            }
+            else {
+                aggregateElections = ElectionData.combine(aggregateElections, child.getElectionData());
+                aggregateDemographics = DemographicData.combine(aggregateDemographics, child.getDemographicData());
+            }
+            // TODO: how to suppress this?
+            child.setParent(this);
+        }
+        this.electionData = aggregateElections;
+        this.demographicData = aggregateDemographics;
+        this.loadAllCounties();
+    }
+
+    @Override
+    public Geometry getGeometry(){
+        return this.getConvexHull();
+    }
+
+    protected void computeMultiPolygon() throws ParseException {
+        List<Polygon> polygons = new ArrayList<>();
+        for (C child : this.children){
+            Geometry childGeometry = child.getGeometry();
+            if (childGeometry instanceof Polygon){
+                polygons.add((Polygon) childGeometry);
+            }
+            else {
+                polygons.add((Polygon) childGeometry.convexHull());
+            }
+        }
+        Polygon[] polygonsArr = new Polygon[polygons.size()];
+        polygonsArr = polygons.toArray(polygonsArr);
+        this.multiPolygon = new MultiPolygon(polygonsArr, new GeometryFactory());
+    }
+
+    protected void computeConvexHull() throws ParseException {
+        if (this.multiPolygon == null){
+            this.computeMultiPolygon();
+        }
+        this.convexHull = this.multiPolygon.convexHull();
+    }
+
+    protected void computeBoundingCircle() throws ParseException {
+        if (this.multiPolygon == null){
+            this.computeMultiPolygon();
+        }
+        this.boundingCircle = new MinimumBoundingCircle(this.multiPolygon).getCircle();
+    }
+
+    public MultiPolygon getMultiPolygon(){
+        try {
+            if (this.multiPolygon == null){
+                this.computeMultiPolygon();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return this.multiPolygon;
+    }
+
+    public Geometry getConvexHull(){
+        try {
+            if (this.convexHull == null){
+                this.computeConvexHull();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return this.convexHull;
+    }
+
+    public Geometry getBoundingCircle(){
+        try {
+            if (this.boundingCircle == null){
+                this.computeBoundingCircle();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return this.boundingCircle;
+    }
+
+    protected void markGeometriesStale(){
+        this.multiPolygon = null;
+        this.boundingCircle = null;
+        this.convexHull = null;
+    }
+
+    protected void updateGeometries() throws ParseException {
+        this.computeMultiPolygon();
+        this.computeBoundingCircle();
+        this.computeConvexHull();
+    }
 
 }

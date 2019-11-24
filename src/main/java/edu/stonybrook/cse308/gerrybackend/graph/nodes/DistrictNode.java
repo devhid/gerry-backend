@@ -1,11 +1,14 @@
 package edu.stonybrook.cse308.gerrybackend.graph.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
+import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 
 import javax.persistence.*;
@@ -17,6 +20,9 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     @ElementCollection
     private Set<Incumbent> incumbents;
+
+    @Transient
+    private Set<PrecinctNode> borderPrecincts;
 
     public DistrictNode(){
         super();
@@ -35,7 +41,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     public DistrictNode(PrecinctNode child, StateNode state) {
         this();
-        this.setState(state);
+        this.setParent(state);
         Set<PrecinctNode> precincts = new HashSet<>();
         precincts.add(child);
         this.children = precincts;
@@ -47,7 +53,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     public DistrictNode(String id, String name, NodeType nodeType, Set<PrecinctNode> precincts, String geography)
             throws MismatchedElectionException {
         this(id, name, nodeType, null, null, new HashSet<>(), geography);
-        this.setPrecincts(precincts);
+        this.setChildren(precincts);
     }
 
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
@@ -74,32 +80,133 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.counties = this.children.stream().map(PrecinctNode::getCounty).collect(Collectors.toSet());
     }
 
-    private void setPrecincts(Set<PrecinctNode> precincts) throws MismatchedElectionException {
-        this.children = precincts;
-        ElectionData districtElection = null;
-        DemographicData districtDemographics = null;
-        for (PrecinctNode p : precincts){
-            if (districtElection == null || districtDemographics == null){
-                districtElection = p.getElectionData();
-                districtDemographics = p.getDemographicData();
-            }
-            else {
-                districtElection = ElectionData.combine(districtElection, p.getElectionData());
-                districtDemographics = DemographicData.combine(districtDemographics, p.getDemographicData());
-            }
-            p.setParent(this);
+    public boolean isBorderPrecinct(PrecinctNode precinct){
+        if (!(this.children.contains(precinct))){
+            throw new IllegalArgumentException("Replace this string later!");
         }
-        this.electionData = districtElection;
-        this.demographicData = districtDemographics;
-        this.loadAllCounties();
+        for (PrecinctNode adjPrecinct : GenericUtils.castSetOfObjects(precinct.getAdjacentNodes(), PrecinctNode.class)){
+            if (!(this.children.contains(adjPrecinct))){
+                return true;
+            }
+        }
+        return false;
     }
 
-    public void setState(StateNode state){
-        this.parent = state;
+    private void computeBorderPrecincts(){
+        this.borderPrecincts = new HashSet<>();
+        this.children.forEach(p -> {
+            if (this.isBorderPrecinct(p)){
+                this.borderPrecincts.add(p);
+            }
+        });
+    }
+
+    @JsonIgnore
+    public Set<PrecinctNode> getBorderPrecincts(){
+        if (this.borderPrecincts == null){
+            this.computeBorderPrecincts();
+        }
+        return this.borderPrecincts;
+    }
+
+    private void updateEdgeJoinability(){
+        this.adjacentEdges.forEach(GerryEdge::computeNewJoinability);
     }
 
     /**
-     * Merges two disjoint ClusterNode objects (they do not share any internal nodes).
+     * Adds a border precinct to this DistrictNode.
+     * Designed as a helper for Phase II: Simulated Annealing.
+     * @param precinct the border precinct selected for a move into this district
+     * @throws MismatchedElectionException if the precinct's inner ElectionType does not match this DistrictNode's
+     */
+    public void addBorderPrecinct(PrecinctNode precinct) throws MismatchedElectionException {
+        this.electionData = ElectionData.combine(this.electionData, precinct.getElectionData());
+        this.demographicData = DemographicData.combine(this.demographicData, precinct.getDemographicData());
+        if (this.borderPrecincts != null){
+            this.borderPrecincts.add(precinct);
+        }
+        this.children.add(precinct);
+        precinct.setParent(this);
+        Set<DistrictNode> adjDistricts = GenericUtils.castSetOfObjects(this.getAdjacentNodes(), DistrictNode.class);
+        Set<PrecinctNode> adjPrecincts = GenericUtils.castSetOfObjects(precinct.getAdjacentNodes(), PrecinctNode.class);
+        Set<DistrictNode> newAdjDistricts = new HashSet<>();
+        adjPrecincts.forEach(adjPrecinct -> {
+            if (!(adjDistricts.contains(adjPrecinct.getParent()))){
+                newAdjDistricts.add(adjPrecinct.getParent());
+            }
+        });
+        newAdjDistricts.forEach(newAdjDistrict -> {
+            DistrictEdge newEdge = new DistrictEdge(UUID.randomUUID().toString(), this, newAdjDistrict);
+            try {
+                this.addEdge(newEdge);
+                newAdjDistrict.addEdge(newEdge);
+            } catch (InvalidEdgeException e) {
+                // should never happen
+                e.printStackTrace();
+            }
+        });
+        this.updateEdgeJoinability();
+        this.markGeometriesStale();
+    }
+
+    /**
+     * Removes a border precinct from this DistrictNode.
+     * Designed as a helper for Phase II: Simulated Annealing.
+     * @param precinct the border precinct selected to be removed from this DistrictNode
+     * @throws MismatchedElectionException if the precinct passed does not have the same ElectionType as this District
+     */
+    public void removeBorderPrecinct(PrecinctNode precinct) throws MismatchedElectionException {
+        this.electionData.subtract(precinct.getElectionData());
+        this.demographicData.subtract(precinct.getDemographicData());
+        if (this.borderPrecincts == null){
+            this.computeBorderPrecincts();
+        }
+        if (this.borderPrecincts != null){
+            this.borderPrecincts.remove(precinct);
+        }
+        this.children.remove(precinct);
+
+        // Determine which DistrictNode objects are no longer adjacent after removing this border precinct.
+        Set<DistrictNode> noLongerAdjDistricts = new HashSet<>();
+        Set<PrecinctNode> adjPrecincts = GenericUtils.castSetOfObjects(precinct.getAdjacentNodes(), PrecinctNode.class);
+        adjPrecincts.forEach(adjPrecinct -> {
+            DistrictNode adjPrecinctParent = adjPrecinct.getParent();
+            if (adjPrecinctParent != this){
+                noLongerAdjDistricts.add(adjPrecinct.getParent());
+            }
+        });
+
+        // Filter out the adjacent districts that are still tied to this district by a different border precinct.
+        this.borderPrecincts.forEach(borderPrecinct -> {
+            Set<PrecinctNode> adjToBorderPrecinctNodes = GenericUtils.castSetOfObjects(borderPrecinct.getAdjacentNodes(), PrecinctNode.class);
+            adjToBorderPrecinctNodes.forEach(adjBorderPrecinct -> {
+                if (noLongerAdjDistricts.contains(adjBorderPrecinct.getParent())){
+                    noLongerAdjDistricts.remove(adjBorderPrecinct.getParent());
+                }
+            });
+        });
+
+        // Remove the old edges.
+        Set<DistrictEdge> oldEdges = new HashSet<>();
+        this.adjacentEdges.forEach(edge -> {
+            DistrictNode otherDistrict = (edge.getItem1() == this) ? edge.getItem2() : edge.getItem1();
+            if (noLongerAdjDistricts.contains(otherDistrict)){
+                try {
+                    otherDistrict.removeEdge(edge);
+                    oldEdges.add(edge);
+                } catch (InvalidEdgeException e) {
+                    // should never happen
+                    e.printStackTrace();
+                }
+            }
+        });
+        this.adjacentEdges.removeAll(oldEdges);
+        this.updateEdgeJoinability();
+        this.markGeometriesStale();
+    }
+
+    /**
+     * Merges two disjoint DistrictNode objects (they do not share any internal nodes).
      *
      * This is mainly used for Phase 1 execution.
      * @param d1 first DistrictNode object to merge

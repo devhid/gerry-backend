@@ -44,21 +44,7 @@ public class StateController {
     public ResponseEntity<StateNode> echoState(@RequestBody StateNode state){
         System.out.println("in echoState");
         state.fillInTransientProperties();
-        Set<DistrictNode> districts = state.getChildren();
-        districts.forEach(d -> {
-            Set<GerryNode> adjNodes = d.getAdjacentNodes();
-            adjNodes.forEach(n -> {
-                System.out.println("district " + d.getId() + " is adj to " + n.getId());
-            });
-        });
-        Set<PrecinctNode> precincts = state.getAllPrecincts();
-        precincts.forEach(p -> {
-            Set<GerryNode> adjNodes = p.getAdjacentNodes();
-            adjNodes.forEach(n -> {
-                System.out.println("precinct " + p.getId() + " is adj to " + n.getId());
-            });
-        });
-        return new ResponseEntity<StateNode>(state, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/new_test")

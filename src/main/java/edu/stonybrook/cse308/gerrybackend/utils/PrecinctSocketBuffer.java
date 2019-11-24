@@ -29,7 +29,7 @@ public class PrecinctSocketBuffer implements Callable<Void> {
         for (int i = 0; i < this.collection.size(); i += Math.min(this.batchSize, this.collection.size() - i + 1)) {
             List<PrecinctNode> precincts = this.collection.subList(i, Math.min(this.batchSize + i, this.collection.size() - i));
             List<String> precinctJson = precincts.stream()
-                    .map(precinct -> precinct.getGeography())
+                    .map(precinct -> precinct.getGeometryJson())
                     .collect(Collectors.toList());
             this.session.sendMessage(new TextMessage(precinctJson.toString()));
         }
