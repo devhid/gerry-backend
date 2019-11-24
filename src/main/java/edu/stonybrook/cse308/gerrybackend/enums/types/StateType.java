@@ -27,4 +27,14 @@ public enum StateType implements IntEnumInterface {
     public static StateType getDefault(){
         return NOT_SET;
     }
+
+    public static StateType getMemberByName(String name){
+        for (StateType stateType : StateType.values()){
+            if (stateType.getName().equals(name)){
+                return stateType;
+            }
+        }
+        return null;
+    }
+
 }

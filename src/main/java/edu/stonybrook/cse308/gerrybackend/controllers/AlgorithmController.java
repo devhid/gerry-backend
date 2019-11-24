@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
-
 @RestController
 @RequestMapping("/algorithm")
 public class AlgorithmController {
@@ -57,10 +55,10 @@ public class AlgorithmController {
     }
 
     @PostMapping("/phase0")
-    public ResponseEntity<Set<PhaseZeroResult>> handlePhaseZero(@RequestBody PhaseZeroInputs inputs) {
+    public ResponseEntity<PhaseZeroResult> handlePhaseZero(@RequestBody PhaseZeroInputs inputs) {
         inputs.setState(stateService.findOriginalStateByStateType(inputs.getStateType()));
         final PhaseZeroReport report = (PhaseZeroReport) handle(inputs);
-        final Set<PhaseZeroResult> results = report.getPhaseZeroResults();
+        final PhaseZeroResult results = report.getPhaseZeroResults();
         return new ResponseEntity<>(results, new HttpHeaders(), HttpStatus.OK);
     }
 

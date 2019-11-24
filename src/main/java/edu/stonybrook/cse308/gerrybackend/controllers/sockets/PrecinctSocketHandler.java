@@ -1,8 +1,5 @@
 package edu.stonybrook.cse308.gerrybackend.controllers.sockets;
 
-import edu.stonybrook.cse308.gerrybackend.db.repositories.PrecinctRepository;
-import edu.stonybrook.cse308.gerrybackend.db.repositories.StateRepository;
-import edu.stonybrook.cse308.gerrybackend.db.services.PrecinctService;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
@@ -36,27 +33,20 @@ public class PrecinctSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
         LOGGER.info(String.format("Connected to session %s.", session.getId()));
-        final String state = UriUtils.getLastPath(session.getUri());
-        StateType stateType = StateType.NOT_SET;
-        if (state.equals(StateType.CALIFORNIA.getName())) {
-            LOGGER.info("CA");
-            stateType = StateType.CALIFORNIA;
-        } else if (state.equals(StateType.UTAH.getName())) {
-            LOGGER.info("UT");
-            stateType = StateType.UTAH;
-        } else if (state.equals(StateType.VIRGINIA.getName())) {
-            LOGGER.info("VA");
-            stateType = StateType.VIRGINIA;
-        } else {
-            LOGGER.error("Invalid state selected.");
-        }
+        final String state = UriUtils.getStatePath(session.getUri());
+        StateType stateType = StateType.getMemberByName(state);
         StateNode stateNode = stateService.findOriginalStateByStateType(stateType);
-        Set<PrecinctNode> precincts = stateNode.getAllPrecincts();
-
+        CloseStatus closeStatus;
+        if (stateNode == null){
+            closeStatus = new CloseStatus(CloseStatus.SERVER_ERROR.getCode(), "Invalid state selected.");
+            session.close(closeStatus);
+            return;
+        }
+        closeStatus = new CloseStatus(CloseStatus.NORMAL.getCode(), "Completed fetching precincts.");
+        final Set<PrecinctNode> precincts = stateNode.getAllPrecincts();
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         Future<?> future = executorService.submit(new PrecinctSocketBuffer(session, precincts, BATCH_SIZE));
 
-        CloseStatus closeStatus = new CloseStatus(CloseStatus.NORMAL.getCode(), "Completed fetching precincts.");
         try {
             future.get();
         } catch (final ExecutionException e) {
