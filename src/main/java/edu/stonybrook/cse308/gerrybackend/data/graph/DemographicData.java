@@ -89,6 +89,10 @@ public class DemographicData {
         Map<DemographicType, Integer> d2Pop = d2.population;
         Map<DemographicType, Integer> d2VotingAgePop = d2.votingAgePopulation;
 
+        if (!(d1Pop.keySet().equals(d2Pop.keySet())) || !(d1VotingAgePop.keySet().equals(d2VotingAgePop.keySet()))){
+            throw new IllegalArgumentException("Replace this string later!");
+        }
+
         Set<DemographicType> demoTypes = d1Pop.keySet();
         Map<DemographicType, Integer> combinedPop = new EnumMap<>(DemographicType.class);
         Map<DemographicType, Integer> combinedVotingAgePop = new EnumMap<>(DemographicType.class);
@@ -97,6 +101,24 @@ public class DemographicData {
            combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
         }
         return new DemographicData(UUID.randomUUID().toString(), combinedPop, combinedVotingAgePop);
+    }
+
+    public void subtract(DemographicData subDemoData){
+        Map<DemographicType, Integer> subPop = subDemoData.population;
+        Map<DemographicType, Integer> subVotingAgePop = subDemoData.votingAgePopulation;
+
+        if (!(this.population.keySet().equals(subPop.keySet())) ||
+                !(this.votingAgePopulation.keySet().equals(subVotingAgePop.keySet()))){
+            throw new IllegalArgumentException("Replace this string later!");
+        }
+        for (DemographicType demoType : this.population.keySet()){
+            if ((this.population.get(demoType) < subPop.get(demoType)) ||
+                    (this.votingAgePopulation.get(demoType) < subVotingAgePop.get(demoType))){
+                throw new IllegalArgumentException("Replace this string later!");
+            }
+            this.population.put(demoType, this.population.get(demoType) - subPop.get(demoType));
+            this.votingAgePopulation.put(demoType, this.votingAgePopulation.get(demoType) - subVotingAgePop.get(demoType));
+        }
     }
 
 }

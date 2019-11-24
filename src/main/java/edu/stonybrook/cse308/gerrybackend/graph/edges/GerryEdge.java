@@ -47,7 +47,7 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         this.computeNewJoinability();
     }
 
-    private void computeNewJoinability(){
+    public void computeNewJoinability(){
         this.joinability = new Joinability(this.item1, this.item2);
     }
 

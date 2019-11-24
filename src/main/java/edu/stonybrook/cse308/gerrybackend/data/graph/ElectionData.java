@@ -80,6 +80,21 @@ public class ElectionData {
         return new EnumMap<>(this.votes);
     }
 
+    private static PoliticalParty determineWinner(Map<PoliticalParty, Integer> votes){
+        int max = votes.values().stream().mapToInt(Integer::intValue).max().getAsInt();
+        long maxOccurrences = votes.entrySet().stream()
+                .filter(entry -> entry.getValue() == max)
+                .count();
+        PoliticalParty winner = PoliticalParty.TIE;
+        if (maxOccurrences == 1){
+            winner = votes.entrySet().stream()
+                    .filter(entry -> entry.getValue() == max)
+                    .map(Map.Entry::getKey)
+                    .findFirst().get();
+        }
+        return winner;
+    }
+
     public static ElectionData combine(ElectionData e1, ElectionData e2) throws MismatchedElectionException {
         if (e1.electionType != e2.electionType){
             throw new MismatchedElectionException("Replace this string later.");
@@ -102,16 +117,26 @@ public class ElectionData {
             }
             combinedVotes.put(partyType, e1Votes.get(partyType) + e2Votes.get(partyType));
         }
-        int max = combinedVotes.values().stream().mapToInt(Integer::intValue).max().getAsInt();
-        long maxOccurrences = combinedVotes.entrySet().stream().filter(
-                entry -> entry.getValue() == max).count();
-        PoliticalParty winner = (maxOccurrences > 1) ? PoliticalParty.TIE : PoliticalParty.getDefault();
-        if (maxOccurrences == 1){
-            winner = combinedVotes.entrySet().stream()
-                    .filter(entry -> entry.getValue() == max)
-                    .map(Map.Entry::getKey)
-                    .findFirst().get();
-        }
+        PoliticalParty winner = ElectionData.determineWinner(combinedVotes);
         return new ElectionData(UUID.randomUUID().toString(), e1.electionType, combinedVotes, winner);
+    }
+
+    public void subtract(ElectionData subElectionData) throws MismatchedElectionException {
+        if (this.electionType != subElectionData.electionType){
+            throw new MismatchedElectionException("Replace this string later.");
+        }
+
+        Map<PoliticalParty, Integer> subVotes = subElectionData.votes;
+        if (!this.votes.keySet().equals(subVotes.keySet())){
+            throw new IllegalArgumentException("Replace this string later!");
+        }
+
+        for (PoliticalParty partyType : this.votes.keySet()){
+            if (this.votes.get(partyType) < subVotes.get(partyType)){
+                throw new IllegalArgumentException("Replace this string later!");
+            }
+            this.votes.put(partyType, this.votes.get(partyType) - subVotes.get(partyType));
+        }
+        this.winner = ElectionData.determineWinner(this.votes);
     }
 }
