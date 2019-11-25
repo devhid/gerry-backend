@@ -22,8 +22,8 @@ public class StateService extends EntityService<StateNode> {
         return this.getEntityById(this.repo, id);
     }
 
-    public StateNode createState(StateNode state) {
-        return this.createEntity(this.repo, state);
+    public StateNode createOrUpdateState(StateNode state) {
+        return this.createOrUpdateEntity(this.repo, state);
     }
 
     public boolean deleteStateById(String id) {

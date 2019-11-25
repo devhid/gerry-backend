@@ -21,8 +21,8 @@ public class DistrictService extends EntityService<DistrictNode> {
         return this.getEntityById(this.repo, id);
     }
 
-    public DistrictNode createDistrict(DistrictNode district) {
-        return this.createEntity(this.repo, district);
+    public DistrictNode createOrUpdateDistrict(DistrictNode district) {
+        return this.createOrUpdateEntity(this.repo, district);
     }
 
     public boolean deleteDistrictById(String id) {

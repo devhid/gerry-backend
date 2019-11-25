@@ -35,7 +35,7 @@ public class PrecinctController {
     @GetMapping("/empty")
     public ResponseEntity<PrecinctNode> getEmptyPrecinct() {
         PrecinctNode precinct = new PrecinctNode();
-        precinctService.createPrecinct(precinct);
+        precinctService.createOrUpdatePrecinct(precinct);
         return new ResponseEntity<>(precinct, new HttpHeaders(), HttpStatus.OK);
     }
 

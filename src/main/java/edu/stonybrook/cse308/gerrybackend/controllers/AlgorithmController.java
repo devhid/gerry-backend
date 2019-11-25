@@ -10,19 +10,12 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseZeroReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.*;
 import edu.stonybrook.cse308.gerrybackend.communication.PhaseZeroResult;
-import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
 
 @RestController
 @RequestMapping("/algorithm")

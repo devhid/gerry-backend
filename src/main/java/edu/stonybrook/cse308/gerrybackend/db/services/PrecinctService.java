@@ -21,8 +21,8 @@ public class PrecinctService extends EntityService<PrecinctNode> {
         return this.getEntityById(this.repo, id);
     }
 
-    public PrecinctNode createPrecinct(PrecinctNode precinct) {
-        return this.createEntity(this.repo, precinct);
+    public PrecinctNode createOrUpdatePrecinct(PrecinctNode precinct) {
+        return this.createOrUpdateEntity(this.repo, precinct);
     }
 
     public boolean deletePrecinctById(String id) {

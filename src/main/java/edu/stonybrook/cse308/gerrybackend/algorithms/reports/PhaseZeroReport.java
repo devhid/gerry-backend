@@ -20,8 +20,7 @@ public class PhaseZeroReport extends AlgPhaseReport {
         this.precinctVoteBlocs = precinctVoteBlocs;
     }
 
-    private Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> getVoteBlocSummaries() { // TODO: Return
-        // type will be changed to Map<PoliticalParty, List<PrecinctBlocSummary>>
+    private Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> getVoteBlocSummaries() {
         final Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> precinctBlocSummaries = new HashMap<>();
         for (PoliticalParty party : PoliticalParty.values()) {
             precinctBlocSummaries.put(party, new HashMap<>());

@@ -17,7 +17,7 @@ public abstract class EntityService<T> {
         return entity.orElse(null);
     }
 
-    protected T createEntity(JpaRepository<T, String> repo, T entity) {
+    protected T createOrUpdateEntity(JpaRepository<T, String> repo, T entity) {
         repo.save(entity);
         return entity;
     }
