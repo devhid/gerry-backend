@@ -2,11 +2,13 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
+import lombok.Getter;
 
 import java.util.*;
 
 public class PhaseOneReport extends AlgPhaseReport {
 
+    @Getter
     private Queue<PhaseOneMergeDelta> deltas;
 
     public PhaseOneReport(Queue<PhaseOneMergeDelta> deltas) {
@@ -14,16 +16,31 @@ public class PhaseOneReport extends AlgPhaseReport {
     }
 
     /**
+     * Fetches the next batch of PhaseOneMergeDeltas wrapped in a PhaseOneReport.
+     *
+     * @param num number of deltas to fetch
+     * @return PhaseOneReport containing the batch of deltas
+     */
+    public PhaseOneReport fetchNextDeltas(int num) {
+        Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
+        for (int i = 0; i < num; i++) {
+            deltas.offer(this.deltas.poll());
+        }
+        return new PhaseOneReport(deltas);
+    }
+
+    /**
      * Extracts initial precinct assignments from the first delta.
+     *
      * @param initialPrecinctAssignment map whose key is a precinct id and value is a district id
-     * @param initialDistricts map whose key is a district id and value is a district
-     * @param precinctAssignments map whose key is a node.id and value is the list of districts it has been merged into
-     * @param newDistricts map whose key is a district id and value is a district
+     * @param initialDistricts          map whose key is a district id and value is a district
+     * @param precinctAssignments       map whose key is a node.id and value is the list of districts it has been merged into
+     * @param newDistricts              map whose key is a district id and value is a district
      */
     private void extractInitialPrecinctAssignments(Map<String, String> initialPrecinctAssignment,
                                                    Map<String, DistrictNode> initialDistricts,
                                                    Map<String, List<String>> precinctAssignments,
-                                                   Map<String, DistrictNode> newDistricts){
+                                                   Map<String, DistrictNode> newDistricts) {
         initialPrecinctAssignment.forEach((precinctId, districtId) -> {
             List<String> precinctDistricts = new ArrayList<>();
             precinctDistricts.add(districtId);
@@ -35,15 +52,16 @@ public class PhaseOneReport extends AlgPhaseReport {
 
     /**
      * Updates the precinct assignments map to keep track of which district each precinct has been merged into.
+     *
      * @param precinctAssignments map whose key is a node.id and value is the list of districts it has been merged into
-     * @param newDistricts map whose key is a district id and value is a district
+     * @param newDistricts        map whose key is a district id and value is a district
      * @return the number of iterations executed
      */
     private int trackDistrictMerges(Map<String, List<String>> precinctAssignments,
-                                    Map<String, DistrictNode> newDistricts){
+                                    Map<String, DistrictNode> newDistricts) {
         PhaseOneMergeDelta currDelta;
         int iteration = 0;
-        while (!deltas.isEmpty()){
+        while (!deltas.isEmpty()) {
             currDelta = deltas.poll();
             iteration = currDelta.getIteration();
             final Map<String, String> mergedDistricts = currDelta.getChangedNodes();
@@ -61,9 +79,10 @@ public class PhaseOneReport extends AlgPhaseReport {
 
     /**
      * Aggregates the record of deltas into one delta for a non-iterative final update if specified by the user.
+     *
      * @return the aggregated PhaseOneMergeDelta describing which district each precinct belongs to
      */
-    public PhaseOneMergeDelta getAggregateDelta(){
+    public PhaseOneMergeDelta fetchAggregateDelta() {
         // For precinctAssignments,
         // key = node.id where node is a precinct or district
         // value = list of districts that the node has been merged into
@@ -73,7 +92,7 @@ public class PhaseOneReport extends AlgPhaseReport {
         Map<String, String> changedNodes = new HashMap<>();
         Map<String, DistrictNode> newDistricts = new HashMap<>();
 
-        if (deltas.peek() == null){
+        if (deltas.peek() == null) {
             return null;
         }
 
