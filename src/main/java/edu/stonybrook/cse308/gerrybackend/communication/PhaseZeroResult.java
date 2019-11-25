@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.controllers.mappings;
+package edu.stonybrook.cse308.gerrybackend.communication;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;

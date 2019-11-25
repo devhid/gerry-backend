@@ -9,7 +9,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseZeroReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.*;
-import edu.stonybrook.cse308.gerrybackend.controllers.mappings.PhaseZeroResult;
+import edu.stonybrook.cse308.gerrybackend.communication.PhaseZeroResult;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
