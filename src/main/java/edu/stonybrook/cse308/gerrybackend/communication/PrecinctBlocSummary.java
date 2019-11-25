@@ -8,7 +8,7 @@ import lombok.Setter;
 public class PrecinctBlocSummary {
 
     @Getter @Setter
-    private int precinctCount;
+    private int votingBlocCount;
     @Getter @Setter
     private PoliticalParty partyType;
     @Getter @Setter
@@ -27,11 +27,15 @@ public class PrecinctBlocSummary {
 
     public void addPartyPercentage(double percentage) {
         this.totalPartyPercentage += percentage;
-        this.meanPartyPercentage = this.totalPartyPercentage / this.precinctCount;
+        this.meanPartyPercentage = this.totalPartyPercentage / this.votingBlocCount;
     }
 
     public void addDemographicPercentage(double percentage) {
         this.totalDemographicPercentage += percentage;
-        this.meanDemographicPercentage = this.totalDemographicPercentage / this.precinctCount;
+        this.meanDemographicPercentage = this.totalDemographicPercentage / this.votingBlocCount;
+    }
+
+    public void incrementVotingBlocCount() {
+        this.votingBlocCount++;
     }
 }

@@ -31,12 +31,13 @@ public class PhaseZeroReport extends AlgPhaseReport {
             final VoteBloc voteBloc = this.precinctVoteBlocs.get(voteBlocKey);
             final Map<DemographicType, Integer> demographicMap = demoBloc.getDemoBlocPopulation();
 
-            // TODO: Remove when map is removed
             for (DemographicType demographicType : demographicMap.keySet()) {
                 final Map<DemographicType, PrecinctBlocSummary> votingBlocs =
                         precinctBlocSummaries.get(voteBloc.getWinningParty());
                 final PrecinctBlocSummary precinctBlocSummary = votingBlocs.getOrDefault(demographicType,
                         new PrecinctBlocSummary(voteBloc.getWinningParty(), demographicType));
+
+                precinctBlocSummary.incrementVotingBlocCount();
                 double votePercent = (1.0 * voteBloc.getWinningVotes()) / voteBloc.getTotalVotes();
                 double demographicPercent = (1.0 * demographicMap.get(demographicType)) / demoBloc.getTotalPop();
 
