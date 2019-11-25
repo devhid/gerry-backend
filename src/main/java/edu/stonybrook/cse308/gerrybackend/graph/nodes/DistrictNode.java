@@ -18,6 +18,11 @@ import java.util.stream.Collectors;
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="name", column=@Column(name="incumbent_name")),
+            @AttributeOverride(name="party", column=@Column(name="incumbent_party"))
+    })
     private Incumbent incumbent;
 
     @Transient

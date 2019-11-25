@@ -86,8 +86,8 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         if (!(obj instanceof GerryEdge)){
             return false;
         }
-        GerryEdge otherEdge = GenericUtils.castInstanceOfObject(obj, GerryEdge.class);
-        if (otherEdge == null || otherEdge.size() != this.size()){
+        GerryEdge otherEdge = (GerryEdge) obj;
+        if (otherEdge.size() != this.size()){
             return false;
         }
         boolean item1Found = true;

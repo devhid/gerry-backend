@@ -1,6 +1,5 @@
 package edu.stonybrook.cse308.gerrybackend.data.reports;
 
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedStringPair;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import lombok.Getter;
 
@@ -12,15 +11,14 @@ public class PhaseOneMergeDelta {
     private int iteration;
 
     @Getter
-    private Map<UnorderedStringPair, String> mergedDistricts;
+    private Map<String, String> changedNodes;
 
     @Getter
     private Map<String, DistrictNode> newDistricts;
 
-    public PhaseOneMergeDelta(int iteration, Map<UnorderedStringPair, String> mergedDistricts,
-                              Map<String, DistrictNode> newDistricts) {
+    public PhaseOneMergeDelta(int iteration, Map<String, String> changedNodes, Map<String, DistrictNode> newDistricts) {
         this.iteration = iteration;
-        this.mergedDistricts = mergedDistricts;
+        this.changedNodes = changedNodes;
         this.newDistricts = newDistricts;
     }
 }

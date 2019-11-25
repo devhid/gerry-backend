@@ -6,6 +6,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MapUtils {
 
@@ -15,7 +16,8 @@ public class MapUtils {
         }
     }
 
-    public static void populateEdgeNodeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap, Set<? extends GerryNode> nodes){
+    public static void populateEdgeNodeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                                  Set<? extends GerryNode> nodes){
         for (GerryNode node : nodes){
             Set<GerryEdge> nodeEdges = node.getAdjacentEdges();
             for (GerryEdge nodeEdge : nodeEdges){
@@ -29,5 +31,9 @@ public class MapUtils {
                 }
             }
         }
+    }
+
+    public static Map<String,String> transformMapEntriesToIds(Map<? extends GerryNode, ? extends GerryNode> map){
+        return map.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getId(), e -> e.getValue().getId()));
     }
 }

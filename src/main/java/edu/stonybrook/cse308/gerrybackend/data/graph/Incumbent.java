@@ -1,6 +1,5 @@
 package edu.stonybrook.cse308.gerrybackend.data.graph;
 
-import edu.stonybrook.cse308.gerrybackend.enums.converters.ElectionTypeConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.PoliticalPartyConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import lombok.Getter;
@@ -12,12 +11,6 @@ import java.util.UUID;
 public class Incumbent {
 
     @Getter
-    @Id
-    @Column(name="id")
-    private String id;
-
-    @Getter
-    @Column(name="name")
     private String name;
 
     @Getter
@@ -25,13 +18,11 @@ public class Incumbent {
     private PoliticalParty party;
 
     public Incumbent() {
-        this.id = UUID.randomUUID().toString();
         this.name = "";
         this.party = PoliticalParty.NOT_SET;
     }
 
-    public Incumbent(String id, String name, PoliticalParty party) {
-        this.id = id;
+    public Incumbent(String name, PoliticalParty party) {
         this.name = name;
         this.party = party;
     }

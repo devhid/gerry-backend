@@ -251,8 +251,8 @@ public class UnorderedPair<E> implements Set<E> {
         if (!(obj instanceof UnorderedPair)){
             return false;
         }
-        UnorderedPair otherPair = GenericUtils.castInstanceOfObject(obj, UnorderedPair.class);
-        if (otherPair == null || otherPair.size() != this.size()){
+        UnorderedPair otherPair = (UnorderedPair) obj;
+        if (otherPair.size() != this.size()){
             return false;
         }
         boolean item1Found = true;
