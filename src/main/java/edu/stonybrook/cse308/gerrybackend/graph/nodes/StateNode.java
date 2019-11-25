@@ -15,6 +15,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.StateEdge;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -40,33 +41,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         this.stateType = StateType.NOT_SET;
     }
 
-    public StateNode(NodeType nodeType, StateType stateType, Set<DistrictNode> nodes){
-        super();
-        this.adjacentEdges = null;
-        this.parent = null;
-        this.nodeType = nodeType;
-        this.stateType = stateType;
-        this.children = nodes;
-        this.loadAllCounties();
-    }
-
-    public StateNode(StateNode obj, Map<DistrictNode,DistrictNode> changedDistricts){
-        this(UUID.randomUUID().toString(), obj.name, NodeType.USER, new DemographicData(obj.demographicData),
-                new ElectionData(obj.electionData), null, new HashSet<>(obj.children),
-                new HashSet<>(obj.counties), obj.stateType);
-        this.children = this.children.stream()
-                .map(d -> changedDistricts.getOrDefault(d, new DistrictNode(d)))
-                .collect(Collectors.toSet());
-        this.children.forEach(d -> d.parent = this);
-    }
-
-    // TODO: remove later, for testing insertion of data
-    public StateNode(String id, String name, NodeType nodeType, Set<DistrictNode> districts, String geography,
-                     Set<String> counties, StateType stateType) throws MismatchedElectionException {
-        this(id, name, nodeType, null, null, geography, districts, counties, stateType);
-        this.setChildren(districts);
-    }
-
+    @Builder
     public StateNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                      ElectionData electionData, String geography, Set<DistrictNode> districts, Set<String> counties,
                      StateType stateType){
@@ -197,7 +172,19 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     public StateNode copyAndExecuteMove(PrecinctMove move){
         Map<DistrictNode,DistrictNode> newDistricts = move.computeNewDistricts();
-        return new StateNode(this, newDistricts);
+        StateNode newState = StateNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name(this.name)
+                .nodeType(NodeType.USER)
+                .demographicData(new DemographicData(this.demographicData))
+                .electionData(new ElectionData(this.electionData))
+                .districts(new HashSet<>(this.children))
+                .build();
+        newState.children = newState.children.stream()
+                .map(d -> newDistricts.getOrDefault(d, new DistrictNode(d)))
+                .collect(Collectors.toSet());
+        newState.children.forEach(d -> d.setParent(newState));
+        return newState;
     }
 
 

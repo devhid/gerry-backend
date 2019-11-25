@@ -64,20 +64,18 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     }
 
     protected ClusterNode(String id, String name, NodeType nodeType, DemographicData demographicData,
-                          ElectionData electionData, Set<E> adjacentEdges, String geography) {
-        super(id, name, demographicData, electionData, adjacentEdges, geography);
-        this.nodeType = nodeType;
-        this.children = null;
-        this.counties = new HashSet<>();
-    }
-
-    protected ClusterNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                           ElectionData electionData, Set<E> adjacentEdges, String geography,
                           Set<C> children, Set<String> counties, StateNode parent) {
         super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.nodeType = nodeType;
-        this.children = children;
-        this.counties = counties;
+        this.setChildren(children);
+        this.aggregateStatistics();
+        if (counties == null){
+            this.loadAllCounties();
+        }
+        else {
+            this.counties = counties;
+        }
         this.parent = parent;
     }
 
@@ -87,25 +85,35 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
 
     protected abstract void loadAllCounties();
 
-    protected void setChildren(Set<C> children) throws MismatchedElectionException {
+    protected void setChildren(Set<C> children) {
         this.children = children;
+        for (C child : children){
+            // TODO: how to suppress this?
+            child.setParent(this);
+        }
+        this.loadAllCounties();
+    }
+
+    protected void aggregateStatistics(){
         ElectionData aggregateElections = null;
         DemographicData aggregateDemographics = null;
-        for (C child : children){
+        for (C child : this.children){
             if (aggregateElections == null || aggregateDemographics == null){
                 aggregateElections = child.getElectionData();
                 aggregateDemographics = child.getDemographicData();
             }
             else {
-                aggregateElections = ElectionData.combine(aggregateElections, child.getElectionData());
-                aggregateDemographics = DemographicData.combine(aggregateDemographics, child.getDemographicData());
+                try {
+                    aggregateElections = ElectionData.combine(aggregateElections, child.getElectionData());
+                    aggregateDemographics = DemographicData.combine(aggregateDemographics, child.getDemographicData());
+                } catch (MismatchedElectionException e) {
+                    // should never happen
+                    e.printStackTrace();
+                }
             }
-            // TODO: how to suppress this?
-            child.setParent(this);
         }
         this.electionData = aggregateElections;
         this.demographicData = aggregateDemographics;
-        this.loadAllCounties();
     }
 
     @Override

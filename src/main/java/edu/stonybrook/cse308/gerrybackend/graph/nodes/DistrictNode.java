@@ -10,6 +10,7 @@ import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
+import lombok.Builder;
 
 import javax.persistence.*;
 import java.util.*;
@@ -32,6 +33,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         super();
     }
 
+    @Builder(builderClassName="DistrictNodeChildBuilder", builderMethodName="childBuilder")
     public DistrictNode(PrecinctNode child) {
         this();
         Set<PrecinctNode> precincts = new HashSet<>();
@@ -42,28 +44,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.counties.add(child.getCounty());
     }
 
-    public DistrictNode(PrecinctNode child, StateNode state) {
-        this();
-        this.setParent(state);
-        Set<PrecinctNode> precincts = new HashSet<>();
-        precincts.add(child);
-        this.children = precincts;
-        this.demographicData = new DemographicData(child.demographicData);
-        this.electionData = new ElectionData(child.electionData);
-    }
-
-    // TODO: remove later, for testing inserting data
-    public DistrictNode(String id, String name, NodeType nodeType, Set<PrecinctNode> precincts, String geography)
-            throws MismatchedElectionException {
-        this(id, name, nodeType, null, null, new HashSet<>(), geography);
-        this.setChildren(precincts);
-    }
-
-    public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
-                        ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography){
-        super(id, name, nodeType, demographicData, electionData, adjacentEdges, geography);
-    }
-
+    @Builder
     public DistrictNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                         ElectionData electionData, Set<DistrictEdge> adjacentEdges, String geography,
                         Set<PrecinctNode> precincts, Set<String> counties, StateNode state, Incumbent incumbent){

@@ -38,7 +38,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                                         Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList){
         allPrecincts.forEach(p -> {
             if (!precinctToDistrict.containsKey(p)){
-                DistrictNode newDistrict = new DistrictNode(p);
+                DistrictNode newDistrict = DistrictNode.childBuilder().child(p).build();
                 precinctToDistrict.put(p, newDistrict);
             }
             final DistrictNode district = precinctToDistrict.get(p);
@@ -49,7 +49,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             final Set<DistrictNode> adjacentNodes = newDistrictAdjList.get(district);
             adjPrecincts.forEach(adjP -> {
                 if (!precinctToDistrict.containsKey(adjP)){
-                    DistrictNode newAdjDistrict = new DistrictNode(adjP);
+                    DistrictNode newAdjDistrict = DistrictNode.childBuilder().child(adjP).build();
                     precinctToDistrict.put(adjP, newAdjDistrict);
                 }
                 DistrictNode adjDistrict = precinctToDistrict.get(adjP);
@@ -115,7 +115,11 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         createInitialEdges(newDistrictAdjList);
         createInitialDelta(precinctToDistrict, deltas, iteration);
 
-        return new StateNode(NodeType.USER, state.getStateType(), new HashSet<>(precinctToDistrict.values()));
+        return StateNode.builder()
+                .nodeType(NodeType.USER)
+                .stateType(state.getStateType())
+                .districts(new HashSet<>(precinctToDistrict.values()))
+                .build();
     }
 
     /**

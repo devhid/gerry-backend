@@ -104,9 +104,33 @@ public class StateController {
         ElectionData election3 = new ElectionData(UUID.randomUUID().toString(), electionType, votes3, PoliticalParty.DEMOCRATIC);
 
         // Create precincts
-        PrecinctNode p1 = new PrecinctNode(UUID.randomUUID().toString(), "p1", demo1, election1, new HashSet<>(), "{}", "p1-county", null);
-        PrecinctNode p2 = new PrecinctNode(UUID.randomUUID().toString(), "p2", demo2, election2, new HashSet<>(), "{}", "p2-county", null);
-        PrecinctNode p3 = new PrecinctNode(UUID.randomUUID().toString(), "p3", demo3, election3, new HashSet<>(), "{}", "p3-county", null);
+        PrecinctNode p1 = PrecinctNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name("p1")
+                .demographicData(demo1)
+                .electionData(election1)
+                .adjacentEdges(new HashSet<>())
+                .geography("{}")
+                .county("p1-county")
+                .build();
+        PrecinctNode p2 = PrecinctNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name("p2")
+                .demographicData(demo2)
+                .electionData(election2)
+                .adjacentEdges(new HashSet<>())
+                .geography("{}")
+                .county("p2-county")
+                .build();
+        PrecinctNode p3 = PrecinctNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name("p3")
+                .demographicData(demo3)
+                .electionData(election3)
+                .adjacentEdges(new HashSet<>())
+                .geography("{}")
+                .county("p3-county")
+                .build();
 
         PrecinctEdge p1p2Edge = new PrecinctEdge(UUID.randomUUID().toString(),p1,p2);
         PrecinctEdge p1p3Edge = new PrecinctEdge(UUID.randomUUID().toString(),p1,p3);
@@ -126,8 +150,22 @@ public class StateController {
         d1Precincts.add(p2);
         d2Precincts.add(p3);
 
-        DistrictNode d1 = new DistrictNode(UUID.randomUUID().toString(), "d1", NodeType.ORIGINAL, d1Precincts, "{}");
-        DistrictNode d2 = new DistrictNode(UUID.randomUUID().toString(), "d2", NodeType.ORIGINAL, d2Precincts, "{}");
+        DistrictNode d1 = DistrictNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name("d1")
+                .nodeType(NodeType.ORIGINAL)
+                .precincts(d1Precincts)
+                .geography("{}")
+                .adjacentEdges(new HashSet<>())
+                .build();
+        DistrictNode d2 = DistrictNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name("d2")
+                .nodeType(NodeType.ORIGINAL)
+                .precincts(d2Precincts)
+                .geography("{}")
+                .adjacentEdges(new HashSet<>())
+                .build();
 
         DistrictEdge d1d2Edge = new DistrictEdge(UUID.randomUUID().toString(), d1, d2);
         d1.addEdge(d1d2Edge);
@@ -142,7 +180,15 @@ public class StateController {
         counties.add(p2.getCounty());
         counties.add(p3.getCounty());
 
-        StateNode state = new StateNode(UUID.randomUUID().toString(), "state", NodeType.ORIGINAL, districts, "{}", counties, StateType.CALIFORNIA);
+        StateNode state = StateNode.builder()
+                .id(UUID.randomUUID().toString())
+                .name("state")
+                .nodeType(NodeType.ORIGINAL)
+                .districts(districts)
+                .geography("{}")
+                .counties(counties)
+                .stateType(StateType.CALIFORNIA)
+                .build();
         stateService.createState(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
