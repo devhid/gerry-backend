@@ -13,13 +13,13 @@ public enum PhaseTwoDepth implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    PhaseTwoDepth(int value, String name){
+    PhaseTwoDepth(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 

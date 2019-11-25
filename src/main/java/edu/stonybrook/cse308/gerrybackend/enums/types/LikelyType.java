@@ -13,17 +13,17 @@ public enum LikelyType implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    LikelyType(int value, String name){
+    LikelyType(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
-    public boolean isGreaterThanOrEqualTo(LikelyType other){
+    public boolean isGreaterThanOrEqualTo(LikelyType other) {
         return this.value >= other.value;
     }
 

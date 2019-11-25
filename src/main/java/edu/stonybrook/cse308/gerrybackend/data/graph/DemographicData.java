@@ -16,28 +16,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity(name="demographic")
+@Entity(name = "demographic")
 @JsonIgnoreProperties({"populationCopy", "votingAgePopulationCopy"})
 public class DemographicData {
 
     @Getter
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     private String id;
 
     @NotNull
     @ElementCollection
-    @Column(name="population")
+    @Column(name = "population")
     @JsonProperty("population")
     private Map<DemographicType, Integer> population;
 
     @NotNull
     @ElementCollection
-    @Column(name="voting_age_population")
+    @Column(name = "voting_age_population")
     @JsonProperty("voting_age_population")
     private Map<DemographicType, Integer> votingAgePopulation;
 
-    public DemographicData(){
+    public DemographicData() {
         this.id = UUID.randomUUID().toString();
         this.population = new EnumMap<>(DemographicType.class);
         this.votingAgePopulation = new EnumMap<>(DemographicType.class);
@@ -46,51 +46,51 @@ public class DemographicData {
     }
 
     public DemographicData(String id, Map<DemographicType, Integer> population,
-                           Map<DemographicType, Integer> votingAgePopulation){
+                           Map<DemographicType, Integer> votingAgePopulation) {
         this.id = id;
         this.population = population;
         this.votingAgePopulation = votingAgePopulation;
     }
 
-    public DemographicData(DemographicData obj){
+    public DemographicData(DemographicData obj) {
         this(UUID.randomUUID().toString(), obj.getPopulationCopy(), obj.getVotingAgePopulationCopy());
     }
 
-    public int getDemoPopulation(DemographicType demo){
+    public int getDemoPopulation(DemographicType demo) {
         return this.population.get(demo);
     }
 
-    public int getDemoPopulation(Set<DemographicType> demoTypes){
+    public int getDemoPopulation(Set<DemographicType> demoTypes) {
         int demoPop = 0;
-        for (DemographicType demoType : demoTypes){
+        for (DemographicType demoType : demoTypes) {
             demoPop += this.population.get(demoType);
         }
         return demoPop;
     }
 
-    public int getDemoPopulation(boolean canVote, DemographicType demo){
-        if (!canVote){
+    public int getDemoPopulation(boolean canVote, DemographicType demo) {
+        if (!canVote) {
             return this.population.get(demo) - this.votingAgePopulation.get(demo);
         }
         return this.votingAgePopulation.get(demo);
     }
 
-    public int getDemoPopulation(boolean canVote, Set<DemographicType> demoTypes){
+    public int getDemoPopulation(boolean canVote, Set<DemographicType> demoTypes) {
         int demoPop = 0;
-        for (DemographicType demoType : demoTypes){
+        for (DemographicType demoType : demoTypes) {
             demoPop += this.population.get(demoType);
-            if (!canVote){
+            if (!canVote) {
                 demoPop -= this.votingAgePopulation.get(demoType);
             }
         }
         return demoPop;
     }
 
-    public void setDemoPopulation(DemographicType demo, int demoPop){
+    public void setDemoPopulation(DemographicType demo, int demoPop) {
         this.population.put(demo, demoPop);
     }
 
-    public void setVotingAgeDemoPopulation(DemographicType demo, int demoPop){
+    public void setVotingAgeDemoPopulation(DemographicType demo, int demoPop) {
         this.votingAgePopulation.put(demo, demoPop);
     }
 
@@ -102,37 +102,37 @@ public class DemographicData {
         return new EnumMap<>(this.votingAgePopulation);
     }
 
-    public static DemographicData combine(DemographicData d1, DemographicData d2){
+    public static DemographicData combine(DemographicData d1, DemographicData d2) {
         Map<DemographicType, Integer> d1Pop = d1.population;
         Map<DemographicType, Integer> d1VotingAgePop = d1.votingAgePopulation;
         Map<DemographicType, Integer> d2Pop = d2.population;
         Map<DemographicType, Integer> d2VotingAgePop = d2.votingAgePopulation;
 
-        if (!(d1Pop.keySet().equals(d2Pop.keySet())) || !(d1VotingAgePop.keySet().equals(d2VotingAgePop.keySet()))){
+        if (!(d1Pop.keySet().equals(d2Pop.keySet())) || !(d1VotingAgePop.keySet().equals(d2VotingAgePop.keySet()))) {
             throw new IllegalArgumentException("Replace this string later!");
         }
 
         Set<DemographicType> demoTypes = d1Pop.keySet();
         Map<DemographicType, Integer> combinedPop = new EnumMap<>(DemographicType.class);
         Map<DemographicType, Integer> combinedVotingAgePop = new EnumMap<>(DemographicType.class);
-        for (DemographicType demoType : demoTypes){
-           combinedPop.put(demoType, d1Pop.get(demoType) + d2Pop.get(demoType));
-           combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
+        for (DemographicType demoType : demoTypes) {
+            combinedPop.put(demoType, d1Pop.get(demoType) + d2Pop.get(demoType));
+            combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
         }
         return new DemographicData(UUID.randomUUID().toString(), combinedPop, combinedVotingAgePop);
     }
 
-    public void subtract(DemographicData subDemoData){
+    public void subtract(DemographicData subDemoData) {
         Map<DemographicType, Integer> subPop = subDemoData.population;
         Map<DemographicType, Integer> subVotingAgePop = subDemoData.votingAgePopulation;
 
         if (!(this.population.keySet().equals(subPop.keySet())) ||
-                !(this.votingAgePopulation.keySet().equals(subVotingAgePop.keySet()))){
+                !(this.votingAgePopulation.keySet().equals(subVotingAgePop.keySet()))) {
             throw new IllegalArgumentException("Replace this string later!");
         }
-        for (DemographicType demoType : this.population.keySet()){
+        for (DemographicType demoType : this.population.keySet()) {
             if ((this.population.get(demoType) < subPop.get(demoType)) ||
-                    (this.votingAgePopulation.get(demoType) < subVotingAgePop.get(demoType))){
+                    (this.votingAgePopulation.get(demoType) < subVotingAgePop.get(demoType))) {
                 throw new IllegalArgumentException("Replace this string later!");
             }
             this.population.put(demoType, this.population.get(demoType) - subPop.get(demoType));

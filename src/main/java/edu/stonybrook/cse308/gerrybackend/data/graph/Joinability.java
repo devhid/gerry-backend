@@ -14,70 +14,70 @@ import java.util.Set;
 @Embeddable
 public class Joinability {
 
-    @Column(name="population")
+    @Column(name = "population")
     private double population;
 
-    @Column(name="compactness")
+    @Column(name = "compactness")
     private double compactness;
 
     @ElementCollection
-    @Column(name="political")
+    @Column(name = "political")
     private Map<PoliticalParty, Double> political;
 
     @ElementCollection
-    @Column(name="minority")
+    @Column(name = "minority")
     private Map<DemographicType, Double> minority;
 
-    public Joinability(){
+    public Joinability() {
         this.political = new EnumMap<>(PoliticalParty.class);
         this.minority = new EnumMap<>(DemographicType.class);
     }
 
-    public Joinability(GerryNode node1, GerryNode node2){
+    public Joinability(GerryNode node1, GerryNode node2) {
         this.computeJoinability(node1, node2);
     }
 
-    public Joinability(Map<PoliticalParty, Double> political, double population, Map<DemographicType, Double> minority, double compactness){
+    public Joinability(Map<PoliticalParty, Double> political, double population, Map<DemographicType, Double> minority, double compactness) {
         this.political = political;
         this.population = population;
         this.minority = minority;
         this.compactness = compactness;
     }
 
-    private void computeJoinability(GerryNode node1, GerryNode node2){
+    private void computeJoinability(GerryNode node1, GerryNode node2) {
         this.political = Joinability.computePoliticalJoinability(node1, node2);
         this.population = Joinability.computePopulationJoinability(node1, node2);
         this.minority = Joinability.computeMinorityJoinability(node1, node2);
         this.compactness = Joinability.computeCompactnessJoinability(node1, node2);
     }
 
-    private static double computePopulationJoinability(GerryNode node1, GerryNode node2){
+    private static double computePopulationJoinability(GerryNode node1, GerryNode node2) {
         return -1.0;
     }
 
-    private static double computeCompactnessJoinability(GerryNode node1, GerryNode node2){
+    private static double computeCompactnessJoinability(GerryNode node1, GerryNode node2) {
         return -1.0;
     }
 
-    private static Map<PoliticalParty, Double> computePoliticalJoinability(GerryNode node1, GerryNode node2){
+    private static Map<PoliticalParty, Double> computePoliticalJoinability(GerryNode node1, GerryNode node2) {
         Map<PoliticalParty, Double> politicalJoinability = new EnumMap<>(PoliticalParty.class);
         return politicalJoinability;
     }
 
-    private static Map<DemographicType, Double> computeMinorityJoinability(GerryNode node1, GerryNode node2){
+    private static Map<DemographicType, Double> computeMinorityJoinability(GerryNode node1, GerryNode node2) {
         Map<DemographicType, Double> minorityJoinability = new EnumMap<>(DemographicType.class);
         return minorityJoinability;
     }
 
-    public double getValue(Set<PoliticalParty> partyTypes, Set<DemographicType> demoTypes){
+    public double getValue(Set<PoliticalParty> partyTypes, Set<DemographicType> demoTypes) {
         // fake math
         double politicalAvg = 0.0;
         double minorityAvg = 0.0;
 
-        for (PoliticalParty partyType : partyTypes){
+        for (PoliticalParty partyType : partyTypes) {
             politicalAvg += this.political.get(partyType);
         }
-        for (DemographicType demoType : demoTypes){
+        for (DemographicType demoType : demoTypes) {
             minorityAvg += this.minority.get(demoType);
         }
 

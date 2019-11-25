@@ -12,7 +12,7 @@ public class PrecinctMove {
     private DistrictNode newDistrict;
     private PrecinctNode precinct;
 
-    public Map<DistrictNode, DistrictNode> computeNewDistricts(){
+    public Map<DistrictNode, DistrictNode> computeNewDistricts() {
         Map<DistrictNode, DistrictNode> oldToNewDistrictMap = new HashMap<>();
         /*
             TODO: fill in

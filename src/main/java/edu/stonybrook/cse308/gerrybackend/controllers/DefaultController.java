@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DefaultController {
 
-    @RequestMapping(path="/", method=RequestMethod.GET)
+    @RequestMapping(path = "/", method = RequestMethod.GET)
     public String index() {
         return "200\n";
     }

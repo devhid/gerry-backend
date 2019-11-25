@@ -33,28 +33,28 @@ public class StateController {
     }
 
     @GetMapping("/original/{stateType}")
-    public ResponseEntity<StateNode> getOriginalState(@PathVariable StateType stateType){
+    public ResponseEntity<StateNode> getOriginalState(@PathVariable StateType stateType) {
         StateNode originalState = stateService.findOriginalStateByStateType(stateType);
         originalState.fillInTransientProperties();
         return new ResponseEntity<>(originalState, new HttpHeaders(), HttpStatus.OK);
     }
 
     @PostMapping("/echo")
-    public ResponseEntity<StateNode> echoState(@RequestBody StateNode state){
+    public ResponseEntity<StateNode> echoState(@RequestBody StateNode state) {
         System.out.println("in echoState");
         state.fillInTransientProperties();
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<StateNode> createState(@RequestBody StateNode state){
+    public ResponseEntity<StateNode> createState(@RequestBody StateNode state) {
         state.fillInTransientProperties();
         stateService.createState(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteStateById(@PathVariable String id){
+    public ResponseEntity deleteStateById(@PathVariable String id) {
         stateService.deleteStateById(id);
         return new ResponseEntity(new HttpHeaders(), HttpStatus.OK);
     }
@@ -62,12 +62,12 @@ public class StateController {
     @GetMapping("/new_test")
     public ResponseEntity<StateNode> getNewTestState() throws MismatchedElectionException, InvalidEdgeException {
         // Create demographic data.
-        Map<DemographicType,Integer> pop1 = new EnumMap<>(DemographicType.class);
-        Map<DemographicType,Integer> votingAgePop1 = new EnumMap<>(DemographicType.class);
-        Map<DemographicType,Integer> pop2 = new EnumMap<>(DemographicType.class);
-        Map<DemographicType,Integer> votingAgePop2 = new EnumMap<>(DemographicType.class);
-        Map<DemographicType,Integer> pop3 = new EnumMap<>(DemographicType.class);
-        Map<DemographicType,Integer> votingAgePop3 = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> pop1 = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> votingAgePop1 = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> pop2 = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> votingAgePop2 = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> pop3 = new EnumMap<>(DemographicType.class);
+        Map<DemographicType, Integer> votingAgePop3 = new EnumMap<>(DemographicType.class);
 
         pop1.put(DemographicType.ALL, 100);
         votingAgePop1.put(DemographicType.ALL, 50);
@@ -82,9 +82,9 @@ public class StateController {
 
         // Create election data.
         ElectionType electionType = ElectionType.PRESIDENTIAL_2016;
-        Map<PoliticalParty,Integer> votes1 = new EnumMap<>(PoliticalParty.class);
-        Map<PoliticalParty,Integer> votes2 = new EnumMap<>(PoliticalParty.class);
-        Map<PoliticalParty,Integer> votes3 = new EnumMap<>(PoliticalParty.class);
+        Map<PoliticalParty, Integer> votes1 = new EnumMap<>(PoliticalParty.class);
+        Map<PoliticalParty, Integer> votes2 = new EnumMap<>(PoliticalParty.class);
+        Map<PoliticalParty, Integer> votes3 = new EnumMap<>(PoliticalParty.class);
 
         votes1.put(PoliticalParty.DEMOCRATIC, 0);
         votes1.put(PoliticalParty.REPUBLICAN, 50);
@@ -132,9 +132,9 @@ public class StateController {
                 .county("p3-county")
                 .build();
 
-        PrecinctEdge p1p2Edge = new PrecinctEdge(UUID.randomUUID().toString(),p1,p2);
-        PrecinctEdge p1p3Edge = new PrecinctEdge(UUID.randomUUID().toString(),p1,p3);
-        PrecinctEdge p2p3Edge = new PrecinctEdge(UUID.randomUUID().toString(),p2,p3);
+        PrecinctEdge p1p2Edge = new PrecinctEdge(UUID.randomUUID().toString(), p1, p2);
+        PrecinctEdge p1p3Edge = new PrecinctEdge(UUID.randomUUID().toString(), p1, p3);
+        PrecinctEdge p2p3Edge = new PrecinctEdge(UUID.randomUUID().toString(), p2, p3);
 
         p1.addEdge(p1p2Edge);
         p1.addEdge(p1p3Edge);

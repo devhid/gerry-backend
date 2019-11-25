@@ -6,14 +6,14 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 public interface PoliticalCompetitivenessMeasure {
 
     class MarginOfVictory {
-        public static double computeCompetitivenessScore(DistrictNode district){
+        public static double computeCompetitivenessScore(DistrictNode district) {
             return -1.0;
         }
     }
 
-    static double computeCompetitivenessScore(PoliticalCompetitivenessEnum measure, DistrictNode district){
+    static double computeCompetitivenessScore(PoliticalCompetitivenessEnum measure, DistrictNode district) {
         double competitivenessScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case MARGIN_OF_VICTORY:
                 competitivenessScore = MarginOfVictory.computeCompetitivenessScore(district);
                 break;
@@ -22,5 +22,5 @@ public interface PoliticalCompetitivenessMeasure {
         }
         return competitivenessScore;
     }
-    
+
 }

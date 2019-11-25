@@ -11,13 +11,13 @@ public enum PhaseOneStop implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    PhaseOneStop(int value, String name){
+    PhaseOneStop(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 }

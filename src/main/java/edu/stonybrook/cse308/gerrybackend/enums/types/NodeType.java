@@ -13,17 +13,17 @@ public enum NodeType implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    NodeType(int value, String name){
+    NodeType(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
-    public static NodeType getDefault(){
+    public static NodeType getDefault() {
         return NodeType.NOT_SET;
     }
 }

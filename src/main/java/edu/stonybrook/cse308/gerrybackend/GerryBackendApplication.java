@@ -8,11 +8,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class GerryBackendApplication {
 
-	@Autowired
-	private PrecinctService precinctService;
+    @Autowired
+    private PrecinctService precinctService;
 
-	public static void main(String[] args) {
-		SpringApplication.run(GerryBackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(GerryBackendApplication.class, args);
+    }
 
 }

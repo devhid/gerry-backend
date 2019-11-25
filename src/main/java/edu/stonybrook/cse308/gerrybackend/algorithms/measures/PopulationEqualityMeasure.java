@@ -14,37 +14,37 @@ public interface PopulationEqualityMeasure {
             return computePercentDifference(mostPopulated, leastPopulated);
         }
 
-        private static DistrictNode getMostPopulatedDistrict(StateNode state){
+        private static DistrictNode getMostPopulatedDistrict(StateNode state) {
             // TODO: fill in
             return null;
         }
 
-        private static DistrictNode getLeastPopulatedDistrict(StateNode state){
+        private static DistrictNode getLeastPopulatedDistrict(StateNode state) {
             // TODO: fill in
             return null;
         }
 
-        private static double computePercentDifference(DistrictNode mostPopulated, DistrictNode leastPopulated){
+        private static double computePercentDifference(DistrictNode mostPopulated, DistrictNode leastPopulated) {
             // TODO: fill in
             return -1.0;
         }
     }
 
     class Ideal {
-        public static double computePopulationEqualityScore(DistrictNode district){
+        public static double computePopulationEqualityScore(DistrictNode district) {
             StateNode state = district.getParent();
-            double idealPopulation = (double)state.getDemographicData().getDemoPopulation(DemographicType.ALL) / state.getChildren().size();
+            double idealPopulation = (double) state.getDemographicData().getDemoPopulation(DemographicType.ALL) / state.getChildren().size();
             int truePopulation = district.getDemographicData().getDemoPopulation(DemographicType.ALL);
-            if (idealPopulation >= truePopulation){
+            if (idealPopulation >= truePopulation) {
                 return ((double) truePopulation) / idealPopulation;
             }
             return idealPopulation / truePopulation;
         }
     }
 
-    static double computePopulationEqualityScore(PopulationEqualityEnum measure, DistrictNode district){
+    static double computePopulationEqualityScore(PopulationEqualityEnum measure, DistrictNode district) {
         double popEqualityScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case IDEAL:
                 popEqualityScore = Ideal.computePopulationEqualityScore(district);
                 break;
@@ -54,9 +54,9 @@ public interface PopulationEqualityMeasure {
         return popEqualityScore;
     }
 
-    static double computePopulationEqualityScore(PopulationEqualityEnum measure, StateNode state){
+    static double computePopulationEqualityScore(PopulationEqualityEnum measure, StateNode state) {
         double popEqualityScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case MOST_TO_LEAST:
                 popEqualityScore = MostToLeast.computePopulationEqualityScore(state);
                 break;

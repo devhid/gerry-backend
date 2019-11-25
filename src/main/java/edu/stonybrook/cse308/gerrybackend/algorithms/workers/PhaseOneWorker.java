@@ -7,8 +7,6 @@ import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedStringPair;
-import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneMajMinPairs;
-import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneOtherPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
@@ -29,26 +27,27 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     /**
      * Creates an initial district for each precinct and populates an adjacency list for the newly created districts.
-     * @param allPrecincts all precincts for the given state
+     *
+     * @param allPrecincts       all precincts for the given state
      * @param precinctToDistrict map whose key is the precinct and the value is the initial containing district
      * @param newDistrictAdjList map whose key is a district and value is the set of adjacent districts
      */
     private void createInitialDistricts(Set<PrecinctNode> allPrecincts,
                                         Map<PrecinctNode, DistrictNode> precinctToDistrict,
-                                        Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList){
+                                        Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
         allPrecincts.forEach(p -> {
-            if (!precinctToDistrict.containsKey(p)){
+            if (!precinctToDistrict.containsKey(p)) {
                 DistrictNode newDistrict = DistrictNode.childBuilder().child(p).build();
                 precinctToDistrict.put(p, newDistrict);
             }
             final DistrictNode district = precinctToDistrict.get(p);
             final Set<PrecinctNode> adjPrecincts = GenericUtils.castSetOfObjects(p.getAdjacentNodes(), PrecinctNode.class);
-            if (!newDistrictAdjList.containsKey(district)){
+            if (!newDistrictAdjList.containsKey(district)) {
                 newDistrictAdjList.put(district, new HashSet<>());
             }
             final Set<DistrictNode> adjacentNodes = newDistrictAdjList.get(district);
             adjPrecincts.forEach(adjP -> {
-                if (!precinctToDistrict.containsKey(adjP)){
+                if (!precinctToDistrict.containsKey(adjP)) {
                     DistrictNode newAdjDistrict = DistrictNode.childBuilder().child(adjP).build();
                     precinctToDistrict.put(adjP, newAdjDistrict);
                 }
@@ -60,14 +59,15 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     /**
      * Creates DistrictEdge references amongst the newly created districts.
+     *
      * @param newDistrictAdjList map whose key is a district and value is the set of adjacent districts
      */
-    private void createInitialEdges(Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList){
+    private void createInitialEdges(Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
         final Set<UnorderedStringPair> createdEdges = new HashSet<>();
         newDistrictAdjList.forEach((district, adjDistricts) -> {
             adjDistricts.forEach(adjDistrict -> {
                 UnorderedStringPair districtIdPair = new UnorderedStringPair(district.getId(), adjDistrict.getId());
-                if (createdEdges.contains(districtIdPair)){
+                if (createdEdges.contains(districtIdPair)) {
                     return;
                 }
                 createdEdges.add(districtIdPair);
@@ -86,12 +86,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     /**
      * Creates the initial PhaseOneMergeDelta describing the assignment of each precinct to its own district.
      * Additionally, it adds the created delta to the end of the specified list.
+     *
      * @param precinctToDistrict map whose key is the precinct and the value is the initial containing district
-     * @param deltas the queue containing the record of deltas per algorithm iteration
-     * @param iteration the iteration number to assign to this initial delta
+     * @param deltas             the queue containing the record of deltas per algorithm iteration
+     * @param iteration          the iteration number to assign to this initial delta
      */
     private void createInitialDelta(Map<PrecinctNode, DistrictNode> precinctToDistrict,
-                                    Queue<PhaseOneMergeDelta> deltas, int iteration){
+                                    Queue<PhaseOneMergeDelta> deltas, int iteration) {
         Map<String, String> initialPrecinctAssignment = MapUtils.transformMapEntriesToIds(precinctToDistrict);
         Map<String, DistrictNode> newDistricts = precinctToDistrict.values().stream()
                 .collect(Collectors.toMap(GerryNode::getId, Function.identity()));
@@ -101,12 +102,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     /**
      * Assigns each precinct in the state its own initial district.
-     * @param state the original StateNode graph
-     * @param deltas the queue containing the record of deltas per algorithm iteration
+     *
+     * @param state     the original StateNode graph
+     * @param deltas    the queue containing the record of deltas per algorithm iteration
      * @param iteration the iteration number to assign to the initial delta produced
      * @return a user copy of a StateNode with the initial districts
      */
-    private StateNode assignInitialDistricts(StateNode state, Queue<PhaseOneMergeDelta> deltas, int iteration){
+    private StateNode assignInitialDistricts(StateNode state, Queue<PhaseOneMergeDelta> deltas, int iteration) {
         final Map<PrecinctNode, DistrictNode> precinctToDistrict = new HashMap<>();
         final Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList = new HashMap<>();
         final Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
@@ -125,6 +127,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     /**
      * Determines the majority-minority pairs for the given state.
      * The strategy used depends on the heuristic specified.
+     *
      * @param inputs the inputs for phase 1
      * @return a set of LikelyCandidatePair objects representing which districts should be merged
      */
@@ -135,7 +138,8 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     /**
      * Determines the non-majority-minority pairs for the given state.
      * The strategy used depends on the heuristic specified.
-     * @param inputs the inputs for phase 1
+     *
+     * @param inputs      the inputs for phase 1
      * @param majMinPairs the set of previously identified majority-minority pairs
      * @return a set of LikelyCandidatePair objects representing which districts should be merged
      */
@@ -145,6 +149,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     /**
      * Determines the majority-minority and non-MM candidate pairs for a given StateNode graph using specified heuristics.
+     *
      * @param inputs the inputs for phase 1
      * @return a CandidatePairs object containing the majority-minority and non-MM candidate pairs
      */
@@ -156,8 +161,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     /**
      * Determines whether or not the given algorithm run is in its last iteration by comparing the number of districts.
-     * @param state the StateNode graph
-     * @param pairs the majority-minority and non-MM pairs identified for this iteration
+     *
+     * @param state        the StateNode graph
+     * @param pairs        the majority-minority and non-MM pairs identified for this iteration
      * @param numDistricts the input number of desired districts
      * @return whether or not the number of districts will have been reached after executing the determined pairs
      */
@@ -168,8 +174,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     /**
      * Filters the determined candidate pairs for a specified number of allowed merges.
      * Exclusively used during the last iteration of the algorithm run.
-     * @param heuristic the heuristic for filtering last iteration pairs
-     * @param pairs the majority-minority and non-MM pairs identified for this iteration
+     *
+     * @param heuristic        the heuristic for filtering last iteration pairs
+     * @param pairs            the majority-minority and non-MM pairs identified for this iteration
      * @param numAllowedMerges the number of allowed merges (less than the number of identified pairs)
      */
     private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges) {
@@ -178,8 +185,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     /**
      * Joins the identified candidate pairs for this iteration and produces a delta describing the merges.
-     * @param state the StateNode graph
-     * @param pairs the majority-minority and non-MM pairs identified for this iteration
+     *
+     * @param state     the StateNode graph
+     * @param pairs     the majority-minority and non-MM pairs identified for this iteration
      * @param iteration the current iteration of the algorithm
      * @return a PhaseOneMergeDelta object describing the merges that occurred
      */

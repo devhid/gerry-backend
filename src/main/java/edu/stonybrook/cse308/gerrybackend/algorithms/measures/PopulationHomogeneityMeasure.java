@@ -12,9 +12,9 @@ public interface PopulationHomogeneityMeasure {
         }
     }
 
-    static double computePopulationHomogeneityScore(PopulationHomogeneityEnum measure, DistrictNode district){
+    static double computePopulationHomogeneityScore(PopulationHomogeneityEnum measure, DistrictNode district) {
         double popHomogeneityScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case NORMALIZED_SQUARE_ERROR:
                 popHomogeneityScore = NormalizedSquareError.computePopulationHomogeneityScore(district);
                 break;

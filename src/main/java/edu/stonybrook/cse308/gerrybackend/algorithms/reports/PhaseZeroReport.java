@@ -1,13 +1,14 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
+import edu.stonybrook.cse308.gerrybackend.communication.PhaseZeroResult;
 import edu.stonybrook.cse308.gerrybackend.communication.PrecinctBlocSummary;
 import edu.stonybrook.cse308.gerrybackend.data.reports.DemoBloc;
-import edu.stonybrook.cse308.gerrybackend.communication.PhaseZeroResult;
 import edu.stonybrook.cse308.gerrybackend.data.reports.VoteBloc;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PhaseZeroReport extends AlgPhaseReport {
 

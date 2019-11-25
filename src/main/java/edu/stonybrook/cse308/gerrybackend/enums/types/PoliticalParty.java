@@ -16,17 +16,17 @@ public enum PoliticalParty implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    PoliticalParty(int value, String name){
+    PoliticalParty(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
-    public static PoliticalParty getDefault(){
+    public static PoliticalParty getDefault() {
         return PoliticalParty.NOT_SET;
     }
 }

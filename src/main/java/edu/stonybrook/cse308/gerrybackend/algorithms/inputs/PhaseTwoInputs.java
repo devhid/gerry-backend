@@ -1,10 +1,10 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.inputs;
 
+import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureEnumInterface;
 import edu.stonybrook.cse308.gerrybackend.enums.types.AlgRunType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
-import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import lombok.Getter;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
     private double epsilon;
 
     @Getter
-    private Map<MeasureEnumInterface,Double> weights;
+    private Map<MeasureEnumInterface, Double> weights;
 
     @Getter
     private PhaseTwoDepth phaseTwoDepthHeuristic;

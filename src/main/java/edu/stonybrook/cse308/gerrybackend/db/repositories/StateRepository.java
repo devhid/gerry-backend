@@ -16,7 +16,7 @@ public interface StateRepository extends JpaRepository<StateNode, String> {
     Collection<StateNode> findStateByNodeTypeAndStateType(@Param("nodeType") NodeType nodeType,
                                                           @Param("stateType") StateType stateType);
 
-    default StateNode findOriginalStateByStateType(StateType stateType){
+    default StateNode findOriginalStateByStateType(StateType stateType) {
         Collection<StateNode> stateNodes = findStateByNodeTypeAndStateType(NodeType.ORIGINAL, stateType);
         return stateNodes.iterator().next();
     }

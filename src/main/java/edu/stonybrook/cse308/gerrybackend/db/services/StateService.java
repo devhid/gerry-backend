@@ -14,23 +14,23 @@ public class StateService extends EntityService<StateNode> {
     @Autowired
     private StateRepository repo;
 
-    public List<StateNode> getAllStates(){
+    public List<StateNode> getAllStates() {
         return this.getAllEntities(this.repo);
     }
 
-    public StateNode getStateById(String id){
+    public StateNode getStateById(String id) {
         return this.getEntityById(this.repo, id);
     }
 
-    public StateNode createState(StateNode state){
+    public StateNode createState(StateNode state) {
         return this.createEntity(this.repo, state);
     }
 
-    public boolean deleteStateById(String id){
+    public boolean deleteStateById(String id) {
         return this.deleteEntityById(this.repo, id);
     }
 
-    public StateNode findOriginalStateByStateType(StateType stateType){
+    public StateNode findOriginalStateByStateType(StateType stateType) {
         return repo.findOriginalStateByStateType(stateType);
     }
 }

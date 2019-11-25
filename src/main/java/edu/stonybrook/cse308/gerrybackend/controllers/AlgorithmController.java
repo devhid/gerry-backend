@@ -10,12 +10,19 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseZeroReport;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.*;
 import edu.stonybrook.cse308.gerrybackend.communication.PhaseZeroResult;
+import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 @RestController
 @RequestMapping("/algorithm")
@@ -24,16 +31,14 @@ public class AlgorithmController {
     @Autowired
     private StateService stateService;
 
-    private AlgPhaseReport handle(AlgPhaseInputs inputs){
+    private AlgPhaseReport handle(AlgPhaseInputs inputs) {
         AlgPhaseWorker worker = null;
-        if (inputs instanceof PhaseZeroInputs){
+        if (inputs instanceof PhaseZeroInputs) {
             worker = new PhaseZeroWorker();
-        }
-        else if (inputs instanceof PhaseOneInputs){
+        } else if (inputs instanceof PhaseOneInputs) {
             worker = new PhaseOneWorker();
-        }
-        else if (inputs instanceof PhaseTwoInputs){
-            switch (((PhaseTwoInputs) inputs).getPhaseTwoDepthHeuristic()){
+        } else if (inputs instanceof PhaseTwoInputs) {
+            switch (((PhaseTwoInputs) inputs).getPhaseTwoDepthHeuristic()) {
                 case STANDARD:
                     worker = new PhaseTwoStandardWorker();
                     break;
@@ -44,8 +49,7 @@ public class AlgorithmController {
                     worker = new PhaseTwoTreeWorker();
                     break;
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Replace this string later!");
         }
         return worker.run(inputs);

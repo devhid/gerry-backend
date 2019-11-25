@@ -1,6 +1,5 @@
 package edu.stonybrook.cse308.gerrybackend.utils;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,7 +13,7 @@ public class GenericUtils {
         }
     }
 
-    public static <T> Set<T> castSetOfObjects(Set<?> objects, Class<T> clazz){
+    public static <T> Set<T> castSetOfObjects(Set<?> objects, Class<T> clazz) {
         return objects.stream().map(clazz::cast).collect(Collectors.toSet());
     }
 }

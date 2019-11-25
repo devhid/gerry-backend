@@ -9,12 +9,12 @@ import java.util.Map;
 public class DemoBloc {
 
     @Getter
-    private Map<DemographicType,Integer> demoBlocPopulation;
+    private Map<DemographicType, Integer> demoBlocPopulation;
 
     @Getter
     private int totalPop;
 
-    public DemoBloc(int totalPop){
+    public DemoBloc(int totalPop) {
         this.demoBlocPopulation = new EnumMap<>(DemographicType.class);
         this.totalPop = totalPop;
     }

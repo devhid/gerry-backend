@@ -48,9 +48,9 @@ public interface PoliticalFairnessMeasure {
         }
     }
 
-    static double computeFairnessScore(PoliticalFairnessEnum measure, DistrictNode district){
+    static double computeFairnessScore(PoliticalFairnessEnum measure, DistrictNode district) {
         double fairnessScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case EFFICIENCY_GAP:
                 fairnessScore = EfficiencyGap.computeFairnessScore(district);
                 break;
@@ -72,9 +72,9 @@ public interface PoliticalFairnessMeasure {
         return fairnessScore;
     }
 
-    static double computeFairnessScore(PoliticalFairnessEnum measure, StateNode state){
+    static double computeFairnessScore(PoliticalFairnessEnum measure, StateNode state) {
         double fairnessScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case MEAN_MEDIAN:
                 fairnessScore = MeanMedian.computeFairnessScore(state);
                 break;

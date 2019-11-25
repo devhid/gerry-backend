@@ -7,7 +7,6 @@ import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.locationtech.jts.geom.Geometry;
@@ -16,53 +15,55 @@ import org.locationtech.jts.io.geojson.GeoJsonReader;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @MappedSuperclass
 @JsonIgnoreProperties({"adjacentNodes", "electionType"})
 @JsonTypeInfo(
-        use=JsonTypeInfo.Id.NAME,
-        include=JsonTypeInfo.As.PROPERTY,
-        property="type"
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value=PrecinctNode.class, name="precinct"),
-        @JsonSubTypes.Type(value=ClusterNode.class, name="cluster")
+        @JsonSubTypes.Type(value = PrecinctNode.class, name = "precinct"),
+        @JsonSubTypes.Type(value = ClusterNode.class, name = "cluster")
 })
 @JsonIdentityInfo(
-        generator=ObjectIdGenerators.PropertyGenerator.class,
-        property="id"
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
 )
 public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     @Getter
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     protected String id;
 
     @Getter
-    @Column(name="name")
+    @Column(name = "name")
     protected String name;
 
     @Getter
     @NotNull
-    @OneToOne(optional=false, cascade=CascadeType.ALL)
-    @JoinColumn(name="node_demo_id")
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "node_demo_id")
     protected DemographicData demographicData;
 
     @Getter
     @NotNull
-    @OneToOne(optional=false, cascade=CascadeType.ALL)
-    @JoinColumn(name="node_election_id")
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "node_election_id")
     protected ElectionData electionData;
 
     @Getter
-    @ManyToMany(cascade=CascadeType.ALL)     // one node has many edges, an edge has 2 (many) nodes
+    @ManyToMany(cascade = CascadeType.ALL)     // one node has many edges, an edge has 2 (many) nodes
     protected Set<E> adjacentEdges;
 
     @Lob
-    @Column(name="geometry", columnDefinition="CLOB")
-    @JsonProperty(value="geometry", defaultValue="{}")
+    @Column(name = "geometry", columnDefinition = "CLOB")
+    @JsonProperty(value = "geometry", defaultValue = "{}")
     protected String geometryJson;
 
     @Getter
@@ -75,7 +76,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     @JsonIgnore
     private Geometry geometry;
 
-    protected GerryNode(){
+    protected GerryNode() {
         this.id = UUID.randomUUID().toString();
         this.name = "";
         this.demographicData = new DemographicData();
@@ -97,7 +98,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     public Set<GerryNode> getAdjacentNodes() {
         Set<GerryNode> adjNodes = new HashSet<>();
-        for (E edge : adjacentEdges){
+        for (E edge : adjacentEdges) {
             GerryNode adjNode = (GerryNode) ((edge.getItem1() == this) ? edge.getItem2() : edge.getItem1());
             adjNodes.add(adjNode);
         }
@@ -105,14 +106,14 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     }
 
     public void addEdge(E edge) throws InvalidEdgeException {
-        if (this.adjacentEdges.contains(edge)){
+        if (this.adjacentEdges.contains(edge)) {
             throw new InvalidEdgeException("Replace this string later!");
         }
         this.adjacentEdges.add(edge);
     }
 
     public void removeEdge(E edge) throws InvalidEdgeException {
-        if (!(this.adjacentEdges.contains(edge))){
+        if (!(this.adjacentEdges.contains(edge))) {
             throw new InvalidEdgeException("Replace this string later!");
         }
         this.adjacentEdges.remove(edge);
@@ -122,21 +123,21 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.adjacentEdges.clear();
     }
 
-    public ElectionType getElectionType(){
+    public ElectionType getElectionType() {
         return this.electionData.getElectionType();
     }
 
     @JsonRawValue
-    public String getGeometryJson(){
+    public String getGeometryJson() {
         return this.geometryJson;
     }
 
-    public void setGeometryJson(JsonNode node){
+    public void setGeometryJson(JsonNode node) {
         this.geometryJson = node.toString();
     }
 
     public Geometry getGeometry() throws ParseException {
-        if (this.geometry == null){
+        if (this.geometry == null) {
             GeoJsonReader reader = new GeoJsonReader();
             this.geometry = reader.read(this.geometryJson);
         }

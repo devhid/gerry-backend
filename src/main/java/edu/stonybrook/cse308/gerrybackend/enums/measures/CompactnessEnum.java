@@ -13,13 +13,13 @@ public enum CompactnessEnum implements IntEnumInterface, MeasureEnumInterface {
     private final int value;
     private final String name;
 
-    CompactnessEnum(int value, String name){
+    CompactnessEnum(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 }

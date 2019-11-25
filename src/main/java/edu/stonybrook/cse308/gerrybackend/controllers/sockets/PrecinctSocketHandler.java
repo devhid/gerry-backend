@@ -46,7 +46,7 @@ public class PrecinctSocketHandler extends TextWebSocketHandler {
         StateType stateType = StateType.getMemberByName(state);
         StateNode stateNode = stateService.findOriginalStateByStateType(stateType);
         CloseStatus closeStatus;
-        if (stateNode == null){
+        if (stateNode == null) {
             closeStatus = new CloseStatus(CloseStatus.SERVER_ERROR.getCode(), "Invalid state selected.");
             session.close(closeStatus);
             return;

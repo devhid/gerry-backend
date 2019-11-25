@@ -6,37 +6,37 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 public interface CompactnessMeasure {
 
     class GraphTheoretical {
-        static double computeCompactnessScore(DistrictNode district){
+        static double computeCompactnessScore(DistrictNode district) {
             // TODO: fill in
             return -1.0;
         }
     }
 
     class PolsbyPopper {
-        static double computeCompactnessScore(DistrictNode district){
+        static double computeCompactnessScore(DistrictNode district) {
             // TODO: fill in
             return -1.0;
         }
     }
 
     class Schwartzberg {
-        private static double computePerimeter(DistrictNode district){
+        private static double computePerimeter(DistrictNode district) {
             return -1.0;
         }
 
-        private static double computeCircumferenceOfSameAreaCircle(DistrictNode district){
+        private static double computeCircumferenceOfSameAreaCircle(DistrictNode district) {
             return -1.0;
         }
 
-        static double computeCompactnessScore(DistrictNode district){
+        static double computeCompactnessScore(DistrictNode district) {
             // TODO: fill in
             return -1.0;
         }
     }
 
-    static double computeCompactnessScore(CompactnessEnum measure, DistrictNode district){
+    static double computeCompactnessScore(CompactnessEnum measure, DistrictNode district) {
         double compactnessScore = 0.0;
-        switch (measure){
+        switch (measure) {
             case GRAPH_THEORETICAL:
                 compactnessScore = GraphTheoretical.computeCompactnessScore(district);
                 break;

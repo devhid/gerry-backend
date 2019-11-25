@@ -8,7 +8,7 @@ public abstract class IntEnumConverter<T> implements AttributeConverter<IntEnumI
 
     @Override
     public Integer convertToDatabaseColumn(IntEnumInterface intEnumInterface) {
-        if (intEnumInterface == null){
+        if (intEnumInterface == null) {
             return null;
         }
         return intEnumInterface.getValue();

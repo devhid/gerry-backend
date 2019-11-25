@@ -4,8 +4,8 @@ import edu.stonybrook.cse308.gerrybackend.enums.converters.PoliticalPartyConvert
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import lombok.Getter;
 
-import javax.persistence.*;
-import java.util.UUID;
+import javax.persistence.Convert;
+import javax.persistence.Embeddable;
 
 @Embeddable
 public class Incumbent {
@@ -14,7 +14,7 @@ public class Incumbent {
     private String name;
 
     @Getter
-    @Convert(converter=PoliticalPartyConverter.class)
+    @Convert(converter = PoliticalPartyConverter.class)
     private PoliticalParty party;
 
     public Incumbent() {

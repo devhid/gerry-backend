@@ -13,19 +13,19 @@ public class PrecinctService extends EntityService<PrecinctNode> {
     @Autowired
     private PrecinctRepository repo;
 
-    public List<PrecinctNode> getAllPrecincts(){
+    public List<PrecinctNode> getAllPrecincts() {
         return this.getAllEntities(this.repo);
     }
 
-    public PrecinctNode getPrecinctById(String id){
+    public PrecinctNode getPrecinctById(String id) {
         return this.getEntityById(this.repo, id);
     }
 
-    public PrecinctNode createPrecinct(PrecinctNode precinct){
+    public PrecinctNode createPrecinct(PrecinctNode precinct) {
         return this.createEntity(this.repo, precinct);
     }
 
-    public boolean deletePrecinctById(String id){
+    public boolean deletePrecinctById(String id) {
         return this.deleteEntityById(this.repo, id);
     }
 

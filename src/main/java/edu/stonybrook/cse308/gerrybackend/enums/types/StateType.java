@@ -14,23 +14,23 @@ public enum StateType implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    StateType(int value, String name){
+    StateType(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
-    public static StateType getDefault(){
+    public static StateType getDefault() {
         return NOT_SET;
     }
 
-    public static StateType getMemberByName(String name){
-        for (StateType stateType : StateType.values()){
-            if (stateType.getName().equals(name)){
+    public static StateType getMemberByName(String name) {
+        for (StateType stateType : StateType.values()) {
+            if (stateType.getName().equals(name)) {
                 return stateType;
             }
         }

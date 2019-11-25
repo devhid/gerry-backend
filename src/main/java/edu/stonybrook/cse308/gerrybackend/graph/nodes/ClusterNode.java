@@ -18,22 +18,25 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @MappedSuperclass
 @JsonTypeInfo(
-        use=JsonTypeInfo.Id.NAME,
-        include=JsonTypeInfo.As.PROPERTY,
-        property="type"
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value=DistrictNode.class, name="district"),
-        @JsonSubTypes.Type(value=StateNode.class, name="state")
+        @JsonSubTypes.Type(value = DistrictNode.class, name = "district"),
+        @JsonSubTypes.Type(value = StateNode.class, name = "state")
 })
-public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> extends GerryNode<E,StateNode> {
+public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> extends GerryNode<E, StateNode> {
 
     @Getter
-    @ManyToMany(cascade=CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     protected Set<C> children;
 
     @Getter
@@ -41,7 +44,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     protected Set<String> counties;
 
     @Getter
-    @Convert(converter=NodeTypeConverter.class)
+    @Convert(converter = NodeTypeConverter.class)
     protected NodeType nodeType;
 
     @Transient
@@ -56,7 +59,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     @JsonIgnore
     protected Geometry convexHull;
 
-    protected ClusterNode(){
+    protected ClusterNode() {
         super();
         this.children = null;
         this.counties = new HashSet<>();
@@ -70,16 +73,15 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         this.nodeType = nodeType;
         this.setChildren(children);
         this.aggregateStatistics();
-        if (counties == null){
+        if (counties == null) {
             this.loadAllCounties();
-        }
-        else {
+        } else {
             this.counties = counties;
         }
         this.parent = parent;
     }
 
-    int size(){
+    int size() {
         return this.children.size();
     }
 
@@ -87,22 +89,21 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
 
     protected void setChildren(Set<C> children) {
         this.children = children;
-        for (C child : children){
+        for (C child : children) {
             // TODO: how to suppress this?
             child.setParent(this);
         }
         this.loadAllCounties();
     }
 
-    protected void aggregateStatistics(){
+    protected void aggregateStatistics() {
         ElectionData aggregateElections = null;
         DemographicData aggregateDemographics = null;
-        for (C child : this.children){
-            if (aggregateElections == null || aggregateDemographics == null){
+        for (C child : this.children) {
+            if (aggregateElections == null || aggregateDemographics == null) {
                 aggregateElections = child.getElectionData();
                 aggregateDemographics = child.getDemographicData();
-            }
-            else {
+            } else {
                 try {
                     aggregateElections = ElectionData.combine(aggregateElections, child.getElectionData());
                     aggregateDemographics = DemographicData.combine(aggregateDemographics, child.getDemographicData());
@@ -117,18 +118,17 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     }
 
     @Override
-    public Geometry getGeometry(){
+    public Geometry getGeometry() {
         return this.getConvexHull();
     }
 
     protected void computeMultiPolygon() throws ParseException {
         List<Polygon> polygons = new ArrayList<>();
-        for (C child : this.children){
+        for (C child : this.children) {
             Geometry childGeometry = child.getGeometry();
-            if (childGeometry instanceof Polygon){
+            if (childGeometry instanceof Polygon) {
                 polygons.add((Polygon) childGeometry);
-            }
-            else {
+            } else {
                 polygons.add((Polygon) childGeometry.convexHull());
             }
         }
@@ -138,22 +138,22 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     }
 
     protected void computeConvexHull() throws ParseException {
-        if (this.multiPolygon == null){
+        if (this.multiPolygon == null) {
             this.computeMultiPolygon();
         }
         this.convexHull = this.multiPolygon.convexHull();
     }
 
     protected void computeBoundingCircle() throws ParseException {
-        if (this.multiPolygon == null){
+        if (this.multiPolygon == null) {
             this.computeMultiPolygon();
         }
         this.boundingCircle = new MinimumBoundingCircle(this.multiPolygon).getCircle();
     }
 
-    public MultiPolygon getMultiPolygon(){
+    public MultiPolygon getMultiPolygon() {
         try {
-            if (this.multiPolygon == null){
+            if (this.multiPolygon == null) {
                 this.computeMultiPolygon();
             }
         } catch (ParseException e) {
@@ -162,9 +162,9 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         return this.multiPolygon;
     }
 
-    public Geometry getConvexHull(){
+    public Geometry getConvexHull() {
         try {
-            if (this.convexHull == null){
+            if (this.convexHull == null) {
                 this.computeConvexHull();
             }
         } catch (ParseException e) {
@@ -173,9 +173,9 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         return this.convexHull;
     }
 
-    public Geometry getBoundingCircle(){
+    public Geometry getBoundingCircle() {
         try {
-            if (this.boundingCircle == null){
+            if (this.boundingCircle == null) {
                 this.computeBoundingCircle();
             }
         } catch (ParseException e) {
@@ -184,7 +184,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         return this.boundingCircle;
     }
 
-    protected void markGeometriesStale(){
+    protected void markGeometriesStale() {
         this.multiPolygon = null;
         this.boundingCircle = null;
         this.convexHull = null;

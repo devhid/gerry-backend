@@ -10,8 +10,8 @@ public class LikelyCandidatePair extends UnorderedPair<DistrictNode> implements 
     @Getter
     private LikelyType likelyType;
 
-    public LikelyCandidatePair(DistrictNode d1, DistrictNode d2, LikelyType likelyType){
-        super(d1,d2);
+    public LikelyCandidatePair(DistrictNode d1, DistrictNode d2, LikelyType likelyType) {
+        super(d1, d2);
         this.likelyType = likelyType;
     }
 

@@ -3,7 +3,6 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneMajMinPairs;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.LikelyType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
@@ -24,16 +23,14 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
             double d2DemoPop = d2Demo.getDemoPopulation(inputs.getDemographicTypes());
             double d1TotalPop = d1Demo.getDemoPopulation(DemographicType.ALL);
             double d2TotalPop = d2Demo.getDemoPopulation(DemographicType.ALL);
-            double potentialRatio = (d1DemoPop + d2DemoPop)/(d1TotalPop + d2TotalPop);
+            double potentialRatio = (d1DemoPop + d2DemoPop) / (d1TotalPop + d2TotalPop);
             double currentRatio = d1DemoPop / d1TotalPop;
             LikelyType likelyType;
-            if (currentRatio < inputs.getLowerBound()){
+            if (currentRatio < inputs.getLowerBound()) {
                 likelyType = (potentialRatio >= currentRatio) ? LikelyType.VERY : LikelyType.NOT;
-            }
-            else if (currentRatio > inputs.getUpperBound()){
+            } else if (currentRatio > inputs.getUpperBound()) {
                 likelyType = (potentialRatio <= currentRatio) ? LikelyType.VERY : LikelyType.NOT;
-            }
-            else {
+            } else {
                 likelyType = ((inputs.getLowerBound() <= potentialRatio) &&
                         (potentialRatio <= inputs.getUpperBound())) ? LikelyType.KIND_OF : LikelyType.NOT;
             }
@@ -41,7 +38,7 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
         }
 
         private static boolean checkBothDistrictsPaired(LikelyCandidatePair likelyPair,
-                                                        Map<DistrictNode,LikelyCandidatePair> likelyPairs,
+                                                        Map<DistrictNode, LikelyCandidatePair> likelyPairs,
                                                         Set<LikelyCandidatePair> kindOfLikelyPairs,
                                                         Queue<DistrictNode> districtsToConsider) {
             DistrictNode d1 = likelyPair.getItem1();
@@ -49,10 +46,10 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
             LikelyType likelyType = likelyPair.getLikelyType();
             LikelyCandidatePair oldD1Pair = likelyPairs.get(d1);
             LikelyCandidatePair oldD2Pair = likelyPairs.get(d2);
-            if (oldD1Pair.getLikelyType().isGreaterThanOrEqualTo(likelyType)){
+            if (oldD1Pair.getLikelyType().isGreaterThanOrEqualTo(likelyType)) {
                 return false;
             }
-            if (oldD2Pair.getLikelyType().isGreaterThanOrEqualTo(likelyType)){
+            if (oldD2Pair.getLikelyType().isGreaterThanOrEqualTo(likelyType)) {
                 return false;
             }
             kindOfLikelyPairs.remove(oldD1Pair);
@@ -67,10 +64,10 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
         }
 
         private static boolean checkOnlyOneDistrictPaired(DistrictNode d, LikelyType likelyType,
-                                                          Map<DistrictNode,LikelyCandidatePair> likelyPairs,
+                                                          Map<DistrictNode, LikelyCandidatePair> likelyPairs,
                                                           Set<LikelyCandidatePair> kindOfLikelyPairs,
                                                           Queue<DistrictNode> districtsToConsider) {
-            if (likelyPairs.get(d).getLikelyType().isGreaterThanOrEqualTo(likelyType)){
+            if (likelyPairs.get(d).getLikelyType().isGreaterThanOrEqualTo(likelyType)) {
                 return false;
             }
             LikelyCandidatePair oldPair = likelyPairs.get(d);
@@ -83,44 +80,41 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
 
         public static Set<LikelyCandidatePair> determinePairs(PhaseOneInputs inputs) {
             StateNode state = inputs.getState();
-            Map<DistrictNode,LikelyCandidatePair> likelyPairs = new HashMap<>();
+            Map<DistrictNode, LikelyCandidatePair> likelyPairs = new HashMap<>();
             Set<LikelyCandidatePair> kindOfLikelyPairs = new HashSet<>();
             Set<LikelyCandidatePair> veryLikelyPairs = new HashSet<>();
             Queue<DistrictNode> districtsToConsider = new LinkedList<>(state.getChildren());
-            while (!districtsToConsider.isEmpty()){
+            while (!districtsToConsider.isEmpty()) {
                 DistrictNode d1 = districtsToConsider.poll();
                 Set<DistrictNode> adjNodes = GenericUtils.castSetOfObjects(d1.getAdjacentNodes(), DistrictNode.class);
-                for (DistrictNode d2 : adjNodes){
+                for (DistrictNode d2 : adjNodes) {
                     LikelyCandidatePair likelyPair = Standard.createLikelyCandidatePair(inputs, d1, d2);
                     LikelyType likelyType = likelyPair.getLikelyType();
-                    if (likelyType == LikelyType.NOT){
+                    if (likelyType == LikelyType.NOT) {
                         continue;
                     }
                     boolean takePair = true;
                     boolean d1Paired = likelyPairs.containsKey(d1);
                     boolean d2Paired = likelyPairs.containsKey(d2);
-                    if (d1Paired || d2Paired){
+                    if (d1Paired || d2Paired) {
                         if (likelyType == LikelyType.KIND_OF && kindOfLikelyPairs.contains(likelyPair)) {
                             continue;
                         }
                         if (likelyType == LikelyType.VERY && veryLikelyPairs.contains(likelyPair)) {
                             continue;
-                        }
-                        else if (d1Paired && d2Paired) {
+                        } else if (d1Paired && d2Paired) {
                             takePair = Standard.checkBothDistrictsPaired(likelyPair, likelyPairs, kindOfLikelyPairs,
                                     districtsToConsider);
-                        }
-                        else if (d1Paired) {
+                        } else if (d1Paired) {
                             takePair = Standard.checkOnlyOneDistrictPaired(d1, likelyType, likelyPairs,
                                     kindOfLikelyPairs, districtsToConsider);
-                        }
-                        else {
+                        } else {
                             takePair = Standard.checkOnlyOneDistrictPaired(d2, likelyType, likelyPairs,
                                     kindOfLikelyPairs, districtsToConsider);
                         }
                     }
-                    if (takePair){
-                        switch (likelyType){
+                    if (takePair) {
+                        switch (likelyType) {
                             case KIND_OF:
                                 kindOfLikelyPairs.add(likelyPair);
                                 break;
@@ -139,7 +133,7 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
 
     static Set<LikelyCandidatePair> determinePairs(PhaseOneInputs inputs) {
         Set<LikelyCandidatePair> pairs;
-        switch (inputs.getPhaseOneMajMinPairsHeuristic()){
+        switch (inputs.getPhaseOneMajMinPairsHeuristic()) {
             case STANDARD:
                 pairs = Standard.determinePairs(inputs);
                 break;

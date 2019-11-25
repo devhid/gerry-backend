@@ -14,17 +14,17 @@ public enum ElectionType implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    ElectionType(int value, String name){
+    ElectionType(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
-    public static ElectionType getDefault(){
+    public static ElectionType getDefault() {
         return ElectionType.NOT_SET;
     }
 

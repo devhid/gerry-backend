@@ -12,13 +12,13 @@ public enum AlgRunType implements IntEnumInterface {
     private final int value;
     private final String name;
 
-    AlgRunType(int value, String name){
+    AlgRunType(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
     @JsonValue
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 }

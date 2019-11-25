@@ -7,16 +7,21 @@ import lombok.Setter;
 
 public class PrecinctBlocSummary {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private int votingBlocCount;
-    @Getter @Setter
+    @Getter
+    @Setter
     private PoliticalParty partyType;
-    @Getter @Setter
+    @Getter
+    @Setter
     private double meanPartyPercentage;
     private double totalPartyPercentage;
-    @Getter @Setter
+    @Getter
+    @Setter
     private DemographicType demographicType;
-    @Getter @Setter
+    @Getter
+    @Setter
     private double meanDemographicPercentage;
     private double totalDemographicPercentage;
 

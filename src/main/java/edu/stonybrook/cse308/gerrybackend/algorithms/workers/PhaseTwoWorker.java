@@ -9,16 +9,16 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 import java.util.Map;
 
-public abstract class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs,PhaseTwoReport> {
+public abstract class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoReport> {
 
-    protected Map<PrecinctMove,StateNode> potentialMoves;
+    protected Map<PrecinctMove, StateNode> potentialMoves;
 
-    protected double computeObjectiveFunction(){
+    protected double computeObjectiveFunction() {
         // TODO: fill in
         return -1.0;
     }
 
-    protected PrecinctMove selectPrecinctMove(PhaseTwoPrecinctMove heuristic, StateNode state){
+    protected PrecinctMove selectPrecinctMove(PhaseTwoPrecinctMove heuristic, StateNode state) {
         return Heuristics.selectPrecinct(heuristic, state);
     }
 

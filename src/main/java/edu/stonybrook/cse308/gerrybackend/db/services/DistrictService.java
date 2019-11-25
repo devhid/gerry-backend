@@ -9,24 +9,24 @@ import java.util.List;
 
 @Service
 public class DistrictService extends EntityService<DistrictNode> {
-    
+
     @Autowired
     private DistrictRepository repo;
 
-    public List<DistrictNode> getAllDistricts(){
+    public List<DistrictNode> getAllDistricts() {
         return this.getAllEntities(this.repo);
     }
 
-    public DistrictNode getDistrictById(String id){
+    public DistrictNode getDistrictById(String id) {
         return this.getEntityById(this.repo, id);
     }
 
-    public DistrictNode createDistrict(DistrictNode district){
+    public DistrictNode createDistrict(DistrictNode district) {
         return this.createEntity(this.repo, district);
     }
 
-    public boolean deleteDistrictById(String id){
+    public boolean deleteDistrictById(String id) {
         return this.deleteEntityById(this.repo, id);
     }
-    
+
 }

@@ -16,10 +16,10 @@ public class UnorderedStringPair extends UnorderedPair<String> {
     @Override
     public String toString() {
         String pair = "";
-        if (this.item1 != null){
+        if (this.item1 != null) {
             pair += this.item1 + ",";
         }
-        if (this.item2 != null){
+        if (this.item2 != null) {
             pair += this.item2 + ",";
         }
         pair = pair.substring(0, pair.length() - 1);
