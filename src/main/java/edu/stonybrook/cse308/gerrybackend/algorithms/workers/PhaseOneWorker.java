@@ -125,39 +125,32 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     /**
      * Determines the majority-minority pairs for the given state.
      * The strategy used depends on the heuristic specified.
-     * @param majMinPairsHeuristic the heuristic to determine majority-minority pairs
-     * @param state the StateNode graph
+     * @param inputs the inputs for phase 1
      * @return a set of LikelyCandidatePair objects representing which districts should be merged
      */
-    private Set<LikelyCandidatePair> determineMajorityMinorityPairs(PhaseOneMajMinPairs majMinPairsHeuristic,
-                                                                    StateNode state) {
-        return Heuristics.determineMajMinPairs(majMinPairsHeuristic, state);
+    private Set<LikelyCandidatePair> determineMajorityMinorityPairs(PhaseOneInputs inputs) {
+        return Heuristics.determineMajMinPairs(inputs);
     }
 
     /**
      * Determines the non-majority-minority pairs for the given state.
      * The strategy used depends on the heuristic specified.
-     * @param otherPairsHeuristic the heuristic to determine non-majority-minority pairs
-     * @param state the StateNode graph
+     * @param inputs the inputs for phase 1
      * @param majMinPairs the set of previously identified majority-minority pairs
      * @return a set of LikelyCandidatePair objects representing which districts should be merged
      */
-    private Set<LikelyCandidatePair> determineOtherPairs(PhaseOneOtherPairs otherPairsHeuristic, StateNode state,
-                                                         Set<LikelyCandidatePair> majMinPairs) {
-        return Heuristics.determineOtherPairs(otherPairsHeuristic, state, majMinPairs);
+    private Set<LikelyCandidatePair> determineOtherPairs(PhaseOneInputs inputs, Set<LikelyCandidatePair> majMinPairs) {
+        return Heuristics.determineOtherPairs(inputs, majMinPairs);
     }
 
     /**
      * Determines the majority-minority and non-MM candidate pairs for a given StateNode graph using specified heuristics.
-     * @param majMinPairsHeuristic the heuristic to determine majority-minority pairs
-     * @param otherPairsHeuristic the heuristic to determine non-majority-minority pairs
-     * @param state the StateNode graph
+     * @param inputs the inputs for phase 1
      * @return a CandidatePairs object containing the majority-minority and non-MM candidate pairs
      */
-    private CandidatePairs determineCandidatePairs(PhaseOneMajMinPairs majMinPairsHeuristic,
-                                                   PhaseOneOtherPairs otherPairsHeuristic, StateNode state) {
-        Set<LikelyCandidatePair> majMinPairs = this.determineMajorityMinorityPairs(majMinPairsHeuristic, state);
-        Set<LikelyCandidatePair> otherPairs = this.determineOtherPairs(otherPairsHeuristic, state, majMinPairs);
+    private CandidatePairs determineCandidatePairs(PhaseOneInputs inputs) {
+        Set<LikelyCandidatePair> majMinPairs = this.determineMajorityMinorityPairs(inputs);
+        Set<LikelyCandidatePair> otherPairs = this.determineOtherPairs(inputs, majMinPairs);
         return new CandidatePairs(majMinPairs, otherPairs);
     }
 
@@ -220,8 +213,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
         final int numDistricts = inputs.getNumDistricts();
         while (state.getChildren().size() != numDistricts) {
-            CandidatePairs pairs = this.determineCandidatePairs(inputs.getPhaseOneMajMinPairsHeuristic(),
-                    inputs.getPhaseOneOtherPairsHeuristic(), inputs.getState());
+            CandidatePairs pairs = this.determineCandidatePairs(inputs);
             boolean lastIteration = this.isLastIteration(state, pairs, numDistricts);
             if (lastIteration) {
                 int numAllowedMerges = state.getChildren().size() - numDistricts;

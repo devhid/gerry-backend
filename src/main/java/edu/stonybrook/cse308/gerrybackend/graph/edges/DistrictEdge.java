@@ -9,15 +9,15 @@ import javax.persistence.Entity;
 @JsonIgnoreProperties({"item1", "item2"})
 public class DistrictEdge extends GerryEdge<DistrictNode> {
 
-    public DistrictEdge(){
+    public DistrictEdge() {
         super();
     }
 
-    public DistrictEdge(String id){
+    public DistrictEdge(String id) {
         super(id);
     }
 
-    public DistrictEdge(String id, DistrictNode node1, DistrictNode node2){
+    public DistrictEdge(String id, DistrictNode node1, DistrictNode node2) {
         super(id, node1, node2);
     }
 
