@@ -60,11 +60,30 @@ public class DemographicData {
         return this.population.get(demo);
     }
 
+    public int getDemoPopulation(Set<DemographicType> demoTypes){
+        int demoPop = 0;
+        for (DemographicType demoType : demoTypes){
+            demoPop += this.population.get(demoType);
+        }
+        return demoPop;
+    }
+
     public int getDemoPopulation(boolean canVote, DemographicType demo){
         if (!canVote){
             return this.population.get(demo) - this.votingAgePopulation.get(demo);
         }
         return this.votingAgePopulation.get(demo);
+    }
+
+    public int getDemoPopulation(boolean canVote, Set<DemographicType> demoTypes){
+        int demoPop = 0;
+        for (DemographicType demoType : demoTypes){
+            demoPop += this.population.get(demoType);
+            if (!canVote){
+                demoPop -= this.votingAgePopulation.get(demoType);
+            }
+        }
+        return demoPop;
     }
 
     public void setDemoPopulation(DemographicType demo, int demoPop){

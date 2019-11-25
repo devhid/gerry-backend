@@ -216,6 +216,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         int iteration = 0;
         final Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
         final StateNode state = this.assignInitialDistricts(inputs.getState(), deltas, iteration++);
+        inputs.setState(state);
 
         final int numDistricts = inputs.getNumDistricts();
         while (state.getChildren().size() != numDistricts) {

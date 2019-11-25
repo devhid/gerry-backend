@@ -53,18 +53,16 @@ public class PrecinctSocketHandler extends TextWebSocketHandler {
         }
         closeStatus = new CloseStatus(CloseStatus.NORMAL.getCode(), "Completed fetching precincts.");
         final Set<PrecinctNode> precincts = stateNode.getAllPrecincts();
-        final List<GeoPrecinct> transformedPrecincts = precincts.stream()
-                .map(GeoPrecinct::fromPrecinctNode)
-                .collect(Collectors.toList());
-        final List<String> precinctJson = transformedPrecincts.stream()
+        final List<String> precinctJson = precincts.stream()
                 .map(p -> {
                     try {
-                        return objectMapper.writeValueAsString(p);
+                        return objectMapper.writeValueAsString(GeoPrecinct.fromPrecinctNode(p));
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
                     return null;
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         Future<?> future = executorService.submit(new PrecinctSocketBuffer(session, precinctJson, BATCH_SIZE));
 

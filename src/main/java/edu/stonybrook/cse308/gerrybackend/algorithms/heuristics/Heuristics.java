@@ -4,6 +4,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOn
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneOtherPairsHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneStopHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTwoPrecinctMoveHeuristic;
+import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
@@ -17,14 +18,13 @@ import java.util.Set;
 
 public abstract class Heuristics {
 
-    public static Set<LikelyCandidatePair> determineMajMinPairs(PhaseOneMajMinPairs heuristic, StateNode state){
-        return PhaseOneMajorityMinorityPairsHeuristic.determinePairs(heuristic, state);
+    public static Set<LikelyCandidatePair> determineMajMinPairs(PhaseOneInputs inputs){
+        return PhaseOneMajorityMinorityPairsHeuristic.determinePairs(inputs);
     }
 
-    public static Set<LikelyCandidatePair> determineOtherPairs(PhaseOneOtherPairs heuristic,
-                                                               StateNode state,
+    public static Set<LikelyCandidatePair> determineOtherPairs(PhaseOneInputs inputs,
                                                                Set<LikelyCandidatePair> majMinPairs){
-        return PhaseOneOtherPairsHeuristic.determinePairs(heuristic, state, majMinPairs);
+        return PhaseOneOtherPairsHeuristic.determinePairs(inputs, majMinPairs);
     }
 
     public static void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges){
