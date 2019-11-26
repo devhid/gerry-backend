@@ -52,7 +52,7 @@ public class AlgorithmController {
     public ResponseEntity<PhaseZeroResult> handlePhaseZero(@RequestBody PhaseZeroInputs inputs) {
         inputs.setState(stateService.findOriginalStateByStateType(inputs.getStateType()));
         final PhaseZeroReport report = (PhaseZeroReport) handle(inputs);
-        final PhaseZeroResult results = report.getPhaseZeroResults();
+        final PhaseZeroResult results = PhaseZeroResult.fromPhaseZeroReport(report);
         return new ResponseEntity<>(results, new HttpHeaders(), HttpStatus.OK);
     }
 
