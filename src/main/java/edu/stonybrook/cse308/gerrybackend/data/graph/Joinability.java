@@ -28,20 +28,8 @@ public class Joinability {
     @Column(name = "minority")
     private Map<DemographicType, Double> minority;
 
-    public Joinability() {
-        this.political = new EnumMap<>(PoliticalParty.class);
-        this.minority = new EnumMap<>(DemographicType.class);
-    }
-
     public Joinability(GerryNode node1, GerryNode node2) {
         this.computeJoinability(node1, node2);
-    }
-
-    public Joinability(Map<PoliticalParty, Double> political, double population, Map<DemographicType, Double> minority, double compactness) {
-        this.political = political;
-        this.population = population;
-        this.minority = minority;
-        this.compactness = compactness;
     }
 
     private void computeJoinability(GerryNode node1, GerryNode node2) {
@@ -69,18 +57,14 @@ public class Joinability {
         return minorityJoinability;
     }
 
-    public double getValue(Set<PoliticalParty> partyTypes, Set<DemographicType> demoTypes) {
+    public double getValue(PoliticalParty politicalParty, Set<DemographicType> demoTypes) {
         // fake math
-        double politicalAvg = 0.0;
         double minorityAvg = 0.0;
 
-        for (PoliticalParty partyType : partyTypes) {
-            politicalAvg += this.political.get(partyType);
-        }
         for (DemographicType demoType : demoTypes) {
             minorityAvg += this.minority.get(demoType);
         }
 
-        return politicalAvg + this.population + minorityAvg + this.compactness;
+        return this.population + this.compactness + this.political.get(politicalParty) + minorityAvg;
     }
 }
