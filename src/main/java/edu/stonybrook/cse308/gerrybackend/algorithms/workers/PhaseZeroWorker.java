@@ -4,39 +4,45 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseZeroInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseZeroReport;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.reports.DemoBloc;
+import edu.stonybrook.cse308.gerrybackend.data.reports.PrecinctBlocSummary;
 import edu.stonybrook.cse308.gerrybackend.data.reports.VoteBloc;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroReport> {
 
+    /**
+     * Retrieve demographic bloc information about each precinct in a state.
+     * @param state the StateNode graph
+     * @param threshold the user input threshold for demographic blocs
+     * @return a map whose keys are precincts who have demographic blocs and values are POJOS
+     */
     private Map<PrecinctNode, DemoBloc> getDemoBlocs(StateNode state, double threshold) {
         Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
         Map<PrecinctNode, DemoBloc> demoBlocs = new HashMap<>();
         allPrecincts.forEach(p -> {
             int precinctTotalPop = p.getDemographicData().getDemoPopulation(DemographicType.ALL);
-            DemoBloc precinctDemoBloc = new DemoBloc(precinctTotalPop);
             EnumSet.allOf(DemographicType.class).forEach(demoType -> {
                 int precinctDemoPop = p.getDemographicData().getDemoPopulation(demoType);
                 if (((double) precinctDemoPop / precinctTotalPop) >= threshold) {
-                    precinctDemoBloc.setDemoBlocPopulation(demoType, precinctDemoPop);
+                    demoBlocs.put(p, new DemoBloc(demoType, precinctDemoPop, precinctTotalPop));
                 }
             });
-            if (precinctDemoBloc.size() > 0) {
-                demoBlocs.put(p, precinctDemoBloc);
-            }
         });
         return demoBlocs;
     }
 
+    /**
+     * Retrieve vote bloc information about each precinct with a demographic bloc.
+     * @param demoBlocs the demographic bloc information retrieved from {@link #getDemoBlocs}
+     * @param threshold the user input threshold for vote blocs
+     * @return a map whose keys are precincts with demographic and vote blocs and values are POJOs
+     */
     private Map<PrecinctNode, VoteBloc> getVoteBlocs(Map<PrecinctNode, DemoBloc> demoBlocs, double threshold) {
         Map<PrecinctNode, VoteBloc> voteBlocs = new HashMap<>();
         demoBlocs.keySet().forEach(precinct -> {
@@ -51,16 +57,49 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
         return voteBlocs;
     }
 
+    /**
+     * Generates {@class PhaseZeroReport} by aggregating demographic bloc and voting bloc information.
+     * @param demoBlocs the demographic bloc information retrieved from {@link #getDemoBlocs}
+     * @param voteBlocs the voting bloc information retrieved from {@link #getVoteBlocs}
+     * @return a PhaseZeroReport object containing the finalized aggregated voter and demographic information.
+     */
+    public PhaseZeroReport aggregatePhaseZeroReport(Map<PrecinctNode, DemoBloc> demoBlocs,
+                                                    Map<PrecinctNode, VoteBloc> voteBlocs) {
+        final Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> precinctBlocSummaries = new HashMap<>();
+
+        // Iterate through all voting blocs found
+        voteBlocs.forEach((precinctWithVoteBloc, voteBloc) -> {
+            final DemoBloc demoBloc = demoBlocs.get(precinctWithVoteBloc);
+            final DemographicType demographicType = demoBloc.getDemographicType();
+            final Map<DemographicType, PrecinctBlocSummary> demographicEntry =
+                    precinctBlocSummaries.getOrDefault(voteBloc.getWinningParty(), new HashMap<>());
+            final PrecinctBlocSummary precinctBlocSummary = demographicEntry.getOrDefault(demographicType,
+                    new PrecinctBlocSummary(voteBloc.getWinningParty(), demographicType));
+
+            double votePercent = (1.0 * voteBloc.getWinningVotes()) / voteBloc.getTotalVotes();
+            double demographicPercent = (1.0 * demoBloc.getDemographicPopulation()) / demoBloc.getTotalPop();
+
+            // Update stats
+            precinctBlocSummary.incrementVotingBlocCount();
+            precinctBlocSummary.addPartyPercentage(votePercent);
+            precinctBlocSummary.addDemographicPercentage(demographicPercent);
+
+            demographicEntry.put(demographicType, precinctBlocSummary);
+        });
+        final Map<PoliticalParty, List<PrecinctBlocSummary>> result = precinctBlocSummaries.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue().values())));
+        return new PhaseZeroReport(result);
+    }
+
     @Override
     public PhaseZeroReport run(PhaseZeroInputs inputs) {
+        // Retrieve demographic bloc information from precincts.
         Map<PrecinctNode, DemoBloc> demoBlocs = getDemoBlocs(inputs.getState(), inputs.getPopulationThreshold());
+
+        // For precincts with a demographic bloc, check to see if they also have vote blocs.
         Map<PrecinctNode, VoteBloc> voteBlocs = getVoteBlocs(demoBlocs, inputs.getVoteThreshold());
 
-        Map<String, DemoBloc> demoBlocsTransformed = demoBlocs.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getId(), Map.Entry::getValue));
-        Map<String, VoteBloc> voteBlocsTransformed = voteBlocs.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getId(), Map.Entry::getValue));
-        return new PhaseZeroReport(demoBlocsTransformed, voteBlocsTransformed);
+        return aggregatePhaseZeroReport(demoBlocs, voteBlocs);
     }
 
 }

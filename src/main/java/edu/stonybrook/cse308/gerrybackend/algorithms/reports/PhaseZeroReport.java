@@ -1,20 +1,19 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
-import edu.stonybrook.cse308.gerrybackend.data.reports.DemoBloc;
-import edu.stonybrook.cse308.gerrybackend.data.reports.VoteBloc;
+import edu.stonybrook.cse308.gerrybackend.data.reports.PrecinctBlocSummary;
+import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Map;
 
 public class PhaseZeroReport extends AlgPhaseReport {
 
     @Getter
-    private Map<String, DemoBloc> precinctDemoBlocs;
-    @Getter
-    private Map<String, VoteBloc> precinctVoteBlocs;
+    private final Map<PoliticalParty, List<PrecinctBlocSummary>> precinctBlocs;
 
-    public PhaseZeroReport(Map<String, DemoBloc> precinctDemoBlocs, Map<String, VoteBloc> precinctVoteBlocs) {
-        this.precinctDemoBlocs = precinctDemoBlocs;
-        this.precinctVoteBlocs = precinctVoteBlocs;
+    public PhaseZeroReport(Map<PoliticalParty, List<PrecinctBlocSummary>> precinctBlocs) {
+        this.precinctBlocs = precinctBlocs;
     }
+
 }

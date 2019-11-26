@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.communication;
+package edu.stonybrook.cse308.gerrybackend.data.reports;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
@@ -10,19 +10,25 @@ public class PrecinctBlocSummary {
     @Getter
     @Setter
     private int votingBlocCount;
+
     @Getter
     @Setter
     private PoliticalParty partyType;
+
     @Getter
     @Setter
     private double meanPartyPercentage;
+
     private double totalPartyPercentage;
+
     @Getter
     @Setter
     private DemographicType demographicType;
+
     @Getter
     @Setter
     private double meanDemographicPercentage;
+
     private double totalDemographicPercentage;
 
     public PrecinctBlocSummary(final PoliticalParty partyType, final DemographicType demographicType) {

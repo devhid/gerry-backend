@@ -9,22 +9,17 @@ import java.util.Map;
 public class DemoBloc {
 
     @Getter
-    private Map<DemographicType, Integer> demoBlocPopulation;
+    private DemographicType demographicType;
+
+    @Getter
+    private int demographicPopulation;
 
     @Getter
     private int totalPop;
-
-    public DemoBloc(int totalPop) {
-        this.demoBlocPopulation = new EnumMap<>(DemographicType.class);
+    
+    public DemoBloc(DemographicType demographicType, int demographicPopulation, int totalPop) {
+        this.demographicType = demographicType;
+        this.demographicPopulation = demographicPopulation;
         this.totalPop = totalPop;
     }
-
-    public int size() {
-        return this.demoBlocPopulation.size();
-    }
-
-    public void setDemoBlocPopulation(DemographicType demoType, int demoPop) {
-        this.demoBlocPopulation.put(demoType, demoPop);
-    }
-
 }
