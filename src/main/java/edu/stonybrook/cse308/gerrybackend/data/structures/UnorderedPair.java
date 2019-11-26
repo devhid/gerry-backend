@@ -266,13 +266,8 @@ public class UnorderedPair<E> implements Set<E> {
 
     @Override
     public int hashCode() {
-        int result = hashCodeInitial;
-        if (this.item1 != null) {
-            result = hashCodeMultiplier * result + this.item1.hashCode();
-        }
-        if (this.item2 != null) {
-            result = hashCodeMultiplier * result + this.item2.hashCode();
-        }
-        return result;
+        int item1Hash = (this.item1 != null) ? this.item1.hashCode() : 0;
+        int item2Hash = (this.item2 != null) ? this.item2.hashCode() : 0;
+        return hashCodeInitial * hashCodeMultiplier + (item1Hash + item2Hash);
     }
 }
