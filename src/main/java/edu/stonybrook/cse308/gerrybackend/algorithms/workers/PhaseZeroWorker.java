@@ -64,7 +64,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
      * @return a PhaseZeroReport object containing the finalized aggregated voter and demographic information.
      */
     private PhaseZeroReport aggregatePhaseZeroReport(Map<PrecinctNode, DemoBloc> demoBlocs,
-                                                    Map<PrecinctNode, VoteBloc> voteBlocs) {
+                                                     Map<PrecinctNode, VoteBloc> voteBlocs) {
         final Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> precinctBlocSummaries = new HashMap<>();
 
         // Iterate through all voting blocs found
@@ -83,6 +83,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
             precinctBlocSummary.incrementVotingBlocCount();
             precinctBlocSummary.addPartyPercentage(votePercent);
             precinctBlocSummary.addDemographicPercentage(demographicPercent);
+            precinctBlocSummary.addCounty(precinctWithVoteBloc.getCounty());
 
             demographicEntry.put(demographicType, precinctBlocSummary);
         });

@@ -5,6 +5,9 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class PrecinctBlocSummary {
 
     @Getter
@@ -31,9 +34,12 @@ public class PrecinctBlocSummary {
 
     private double totalDemographicPercentage;
 
+    private Set<String> counties;
+
     public PrecinctBlocSummary(final PoliticalParty partyType, final DemographicType demographicType) {
         this.partyType = partyType;
         this.demographicType = demographicType;
+        this.counties = new HashSet<>();
     }
 
     public void addPartyPercentage(double percentage) {
@@ -48,5 +54,9 @@ public class PrecinctBlocSummary {
 
     public void incrementVotingBlocCount() {
         this.votingBlocCount++;
+    }
+
+    public void addCounty(String county){
+        this.counties.add(county);
     }
 }
