@@ -63,7 +63,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
      * @param voteBlocs the voting bloc information retrieved from {@link #getVoteBlocs}
      * @return a PhaseZeroReport object containing the finalized aggregated voter and demographic information.
      */
-    public PhaseZeroReport aggregatePhaseZeroReport(Map<PrecinctNode, DemoBloc> demoBlocs,
+    private PhaseZeroReport aggregatePhaseZeroReport(Map<PrecinctNode, DemoBloc> demoBlocs,
                                                     Map<PrecinctNode, VoteBloc> voteBlocs) {
         final Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> precinctBlocSummaries = new HashMap<>();
 
@@ -86,10 +86,13 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
 
             demographicEntry.put(demographicType, precinctBlocSummary);
         });
-        final Map<PoliticalParty, List<PrecinctBlocSummary>> result = precinctBlocSummaries.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue().values())));
+
+        final Map<PoliticalParty, List<PrecinctBlocSummary>> result = precinctBlocSummaries.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, partyEntry -> new ArrayList<>(partyEntry.getValue().values())));
         return new PhaseZeroReport(result);
     }
+
 
     @Override
     public PhaseZeroReport run(PhaseZeroInputs inputs) {
