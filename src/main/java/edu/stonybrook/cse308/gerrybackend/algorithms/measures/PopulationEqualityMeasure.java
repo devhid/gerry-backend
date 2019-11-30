@@ -1,7 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 
 import edu.stonybrook.cse308.gerrybackend.enums.measures.PopulationEqualityEnum;
-import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
@@ -14,27 +13,42 @@ public interface PopulationEqualityMeasure {
             return computePercentDifference(mostPopulated, leastPopulated);
         }
 
+        private static DistrictNode getExtremePopulationDistrict(StateNode state, boolean mostPopulated) {
+            DistrictNode extremeDistrict = null;
+            for (DistrictNode d : state.getChildren()) {
+                int currentMostPop = (extremeDistrict == null) ? 0 : extremeDistrict.getDemographicData().getTotalPopulation();
+                int districtPop = d.getDemographicData().getTotalPopulation();
+                if (mostPopulated) {
+                    extremeDistrict = (districtPop > currentMostPop) ? d : extremeDistrict;
+                } else {
+                    extremeDistrict = (districtPop < currentMostPop) ? d : extremeDistrict;
+                }
+            }
+            return extremeDistrict;
+        }
+
         private static DistrictNode getMostPopulatedDistrict(StateNode state) {
-            // TODO: fill in
-            return null;
+            return MostToLeast.getExtremePopulationDistrict(state, true);
         }
 
         private static DistrictNode getLeastPopulatedDistrict(StateNode state) {
-            // TODO: fill in
-            return null;
+            return MostToLeast.getExtremePopulationDistrict(state, false);
         }
 
         private static double computePercentDifference(DistrictNode mostPopulated, DistrictNode leastPopulated) {
-            // TODO: fill in
-            return -1.0;
+            int maxPopulation = mostPopulated.getDemographicData().getTotalPopulation();
+            int leastPopulation = leastPopulated.getDemographicData().getTotalPopulation();
+            int difference = maxPopulation - leastPopulation;
+            double avg = ((double) (maxPopulation + leastPopulation)) / 2;
+            return difference / avg;
         }
     }
 
     class Ideal {
         public static double computePopulationEqualityScore(DistrictNode district) {
             StateNode state = district.getParent();
-            double idealPopulation = (double) state.getDemographicData().getDemoPopulation(DemographicType.ALL) / state.getChildren().size();
-            int truePopulation = district.getDemographicData().getDemoPopulation(DemographicType.ALL);
+            double idealPopulation = (double) state.getDemographicData().getTotalPopulation() / state.getChildren().size();
+            int truePopulation = district.getDemographicData().getTotalPopulation();
             if (idealPopulation >= truePopulation) {
                 return ((double) truePopulation) / idealPopulation;
             }
@@ -43,7 +57,7 @@ public interface PopulationEqualityMeasure {
     }
 
     static double computePopulationEqualityScore(PopulationEqualityEnum measure, DistrictNode district) {
-        double popEqualityScore = 0.0;
+        double popEqualityScore;
         switch (measure) {
             case IDEAL:
                 popEqualityScore = Ideal.computePopulationEqualityScore(district);
@@ -55,7 +69,7 @@ public interface PopulationEqualityMeasure {
     }
 
     static double computePopulationEqualityScore(PopulationEqualityEnum measure, StateNode state) {
-        double popEqualityScore = 0.0;
+        double popEqualityScore;
         switch (measure) {
             case MOST_TO_LEAST:
                 popEqualityScore = MostToLeast.computePopulationEqualityScore(state);

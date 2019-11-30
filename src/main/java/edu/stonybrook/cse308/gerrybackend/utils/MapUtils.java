@@ -4,6 +4,7 @@ import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,4 +36,10 @@ public class MapUtils {
     public static Map<String, String> transformMapEntriesToIds(Map<? extends GerryNode, ? extends GerryNode> map) {
         return map.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getId(), e -> e.getValue().getId()));
     }
+
+    public static int sumIntValuedMap(Map<?, Integer> map) {
+        Collection<Integer> allValues = map.values();
+        return allValues.stream().mapToInt(Integer::intValue).sum();
+    }
+
 }

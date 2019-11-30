@@ -7,7 +7,9 @@ import lombok.Getter;
 public enum CompactnessEnum implements IntEnumInterface, MeasureEnumInterface {
     GRAPH_THEORETICAL(0, "graph_theoretical"),
     POLSBY_POPPER(1, "polsby_popper"),
-    SCHWARTZBERG(2, "schwartzberg");
+    SCHWARTZBERG(2, "schwartzberg"),
+    REOCK(3, "reock"),
+    CONVEX_HULL(4, "convex_hull");
 
     @Getter
     private final int value;

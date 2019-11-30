@@ -157,12 +157,12 @@ public class PopulateController {
         Map<DemographicType, Integer> pop3 = new EnumMap<>(DemographicType.class);
         Map<DemographicType, Integer> votingAgePop3 = new EnumMap<>(DemographicType.class);
 
-        pop1.put(DemographicType.ALL, 100);
-        votingAgePop1.put(DemographicType.ALL, 50);
-        pop2.put(DemographicType.ALL, 200);
-        votingAgePop2.put(DemographicType.ALL, 100);
-        pop3.put(DemographicType.ALL, 300);
-        votingAgePop3.put(DemographicType.ALL, 150);
+        pop1.put(DemographicType.H_WHITE, 100);
+        votingAgePop1.put(DemographicType.H_WHITE, 50);
+        pop2.put(DemographicType.H_WHITE, 200);
+        votingAgePop2.put(DemographicType.H_WHITE, 100);
+        pop3.put(DemographicType.H_WHITE, 300);
+        votingAgePop3.put(DemographicType.H_WHITE, 150);
 
         DemographicData demo1 = new DemographicData(UUID.randomUUID().toString(), pop1, votingAgePop1);
         DemographicData demo2 = new DemographicData(UUID.randomUUID().toString(), pop2, votingAgePop2);

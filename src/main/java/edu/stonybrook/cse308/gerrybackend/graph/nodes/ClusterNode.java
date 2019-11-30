@@ -119,7 +119,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
 
     @Override
     public Geometry getGeometry() {
-        return this.getConvexHull();
+        return this.getMultiPolygon();
     }
 
     protected void computeMultiPolygon() throws ParseException {

@@ -18,7 +18,8 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
 
     /**
      * Retrieve demographic bloc information about each precinct in a state.
-     * @param state the StateNode graph
+     *
+     * @param state     the StateNode graph
      * @param threshold the user input threshold for demographic blocs
      * @return a map whose keys are precincts who have demographic blocs and values are POJOS
      */
@@ -26,7 +27,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
         Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
         Map<PrecinctNode, DemoBloc> demoBlocs = new HashMap<>();
         allPrecincts.forEach(p -> {
-            int precinctTotalPop = p.getDemographicData().getDemoPopulation(DemographicType.ALL);
+            int precinctTotalPop = p.getDemographicData().getTotalPopulation();
             EnumSet.allOf(DemographicType.class).forEach(demoType -> {
                 int precinctDemoPop = p.getDemographicData().getDemoPopulation(demoType);
                 if (((double) precinctDemoPop / precinctTotalPop) >= threshold) {
@@ -39,6 +40,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
 
     /**
      * Retrieve vote bloc information about each precinct with a demographic bloc.
+     *
      * @param demoBlocs the demographic bloc information retrieved from {@link #getDemoBlocs}
      * @param threshold the user input threshold for vote blocs
      * @return a map whose keys are precincts with demographic and vote blocs and values are POJOs
@@ -59,6 +61,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
 
     /**
      * Generates {@class PhaseZeroReport} by aggregating demographic bloc and voting bloc information.
+     *
      * @param demoBlocs the demographic bloc information retrieved from {@link #getDemoBlocs}
      * @param voteBlocs the voting bloc information retrieved from {@link #getVoteBlocs}
      * @return a PhaseZeroReport object containing the finalized aggregated voter and demographic information.

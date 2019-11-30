@@ -56,7 +56,7 @@ public class PrecinctBlocSummary {
         this.votingBlocCount++;
     }
 
-    public void addCounty(String county){
+    public void addCounty(String county) {
         this.counties.add(county);
     }
 }

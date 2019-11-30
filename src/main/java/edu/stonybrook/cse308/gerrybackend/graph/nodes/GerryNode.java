@@ -143,4 +143,12 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         }
         return this.geometry;
     }
+
+    public double getPopulationDensity() {
+        if (this.geometry != null && this.geometry.getArea() != 0) {
+            return this.demographicData.getTotalPopulation() / this.geometry.getArea();
+        }
+        return -1.0;
+    }
+
 }

@@ -17,8 +17,7 @@ public enum DemographicType implements IntEnumInterface {
     NH_NATIVE_AMERICAN(9, "nonhispanic_native_american"),
     H_NATIVE_AMERICAN(10, "hispanic_native_american"),
     BIRACIAL(11, "biracial"),
-    OTHER(12, "other"),
-    ALL(13, "all");
+    OTHER(12, "other");
 
     @Getter
     private final int value;

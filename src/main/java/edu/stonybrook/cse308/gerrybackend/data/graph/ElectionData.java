@@ -12,7 +12,10 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity(name = "election")
 @JsonIgnoreProperties({"votesCopy"})
@@ -67,13 +70,22 @@ public class ElectionData {
         return this.votes.get(party);
     }
 
+    public int getAllOtherPartyVotes(PoliticalParty party) {
+        int allOtherVotes = 0;
+        for (Map.Entry<PoliticalParty, Integer> entry : this.votes.entrySet()) {
+            if (entry.getKey() != party) {
+                allOtherVotes += entry.getValue();
+            }
+        }
+        return allOtherVotes;
+    }
+
     public void setPartyVotes(PoliticalParty party, int partyVotes) {
         this.votes.put(party, partyVotes);
     }
 
     public int getTotalVotes() {
-        Collection<Integer> allVotes = this.votes.values();
-        return allVotes.stream().mapToInt(Integer::intValue).sum();
+        return MapUtils.sumIntValuedMap(this.votes);
     }
 
     public Map<PoliticalParty, Integer> getVotesCopy() {

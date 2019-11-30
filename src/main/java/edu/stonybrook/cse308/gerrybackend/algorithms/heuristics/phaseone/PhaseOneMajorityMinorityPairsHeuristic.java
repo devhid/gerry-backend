@@ -3,7 +3,6 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
-import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.LikelyType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
@@ -21,8 +20,8 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
             DemographicData d2Demo = d2.getDemographicData();
             double d1DemoPop = d1Demo.getDemoPopulation(inputs.getDemographicTypes());
             double d2DemoPop = d2Demo.getDemoPopulation(inputs.getDemographicTypes());
-            double d1TotalPop = d1Demo.getDemoPopulation(DemographicType.ALL);
-            double d2TotalPop = d2Demo.getDemoPopulation(DemographicType.ALL);
+            double d1TotalPop = d1Demo.getTotalPopulation();
+            double d2TotalPop = d2Demo.getTotalPopulation();
             double potentialRatio = (d1DemoPop + d2DemoPop) / (d1TotalPop + d2TotalPop);
             double currentRatio = d1DemoPop / d1TotalPop;
             LikelyType likelyType;

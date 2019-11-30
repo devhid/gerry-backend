@@ -86,6 +86,14 @@ public class DemographicData {
         return demoPop;
     }
 
+    public int getTotalPopulation() {
+        return MapUtils.sumIntValuedMap(this.population);
+    }
+
+    public int getTotalVotingAgePopulation() {
+        return MapUtils.sumIntValuedMap(this.votingAgePopulation);
+    }
+
     public void setDemoPopulation(DemographicType demo, int demoPop) {
         this.population.put(demo, demoPop);
     }

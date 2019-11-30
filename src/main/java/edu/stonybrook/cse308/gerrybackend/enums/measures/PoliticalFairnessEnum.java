@@ -10,7 +10,8 @@ public enum PoliticalFairnessEnum implements IntEnumInterface, MeasureEnumInterf
     GERRYMANDER_REPUBLICAN(2, "gerrymander_republican"),
     LOPSIDED_MARGINS(3, "lopsided_margins"),
     MEAN_MEDIAN(4, "mean_median"),
-    PARTISAN(5, "partisan");
+    PARTISAN_DEMOCRAT(5, "partisan_democrat"),
+    PARTISAN_REPUBLICAN(6, "partisan_republican");
 
     @Getter
     private final int value;
