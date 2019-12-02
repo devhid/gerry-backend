@@ -12,7 +12,7 @@ public enum DemographicType implements IntEnumInterface {
     NH_PACIFIC_ISLANDER(4, "pop_nhpi_nh"),
     NH_NATIVE_AMERICAN(5, "pop_amin_nh"),
     NH_TWO_OR_MORE(6, "pop_2more_nh"),
-    NH_OTHER(7, "nh_other"),
+    NH_OTHER(7, "pop_other_nh");
 
     @Getter
     private final int value;
