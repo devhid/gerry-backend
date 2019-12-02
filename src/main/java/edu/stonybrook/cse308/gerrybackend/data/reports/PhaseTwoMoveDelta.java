@@ -36,7 +36,7 @@ public class PhaseTwoMoveDelta {
         this.movedPrecinctId = movedPrecinctId;
     }
 
-    public static PhaseTwoMoveDelta fromPrecinctMove(PrecinctMove move, int iteration){
+    public static PhaseTwoMoveDelta fromPrecinctMove(PrecinctMove move, int iteration) {
         DistrictNode oldDistrict = move.getOldDistrict();
         DistrictNode newDistrict = move.getNewDistrict();
         PrecinctNode movedPrecinct = move.getPrecinct();
