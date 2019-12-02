@@ -28,6 +28,8 @@ public class Joinability {
     @Column(name = "minority")
     private Map<DemographicType, Double> minority;
 
+    public Joinability() { }
+
     public Joinability(GerryNode node1, GerryNode node2) {
         this.computeJoinability(node1, node2);
     }

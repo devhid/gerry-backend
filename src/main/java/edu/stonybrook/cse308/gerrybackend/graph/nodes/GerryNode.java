@@ -62,7 +62,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected Set<E> adjacentEdges;
 
     @Lob
-    @Column(name = "geometry", columnDefinition = "CLOB")
+    @Column(name = "geometry", columnDefinition = "LONGTEXT")
     @JsonProperty(value = "geometry", defaultValue = "{}")
     protected String geometryJson;
 

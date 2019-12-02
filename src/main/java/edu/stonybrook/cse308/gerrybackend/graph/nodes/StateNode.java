@@ -32,7 +32,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     @Getter
     @Lob
-    @Column(name = "redistricting_legislation", columnDefinition = "CLOB")
+    @Column(name = "redistricting_legislation", columnDefinition = "TEXT")
     private String redistrictingLegislation;
 
     public StateNode() {
