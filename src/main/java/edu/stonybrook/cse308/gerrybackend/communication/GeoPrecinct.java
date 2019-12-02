@@ -8,15 +8,15 @@ public class GeoPrecinct {
     private String id;
 
     @JsonRawValue
-    private String geometry;
+    private String geoJson;
 
-    public GeoPrecinct(String id, String geometry) {
+    public GeoPrecinct(String id, String geoJson) {
         this.id = id;
-        this.geometry = geometry;
+        this.geoJson = geoJson;
     }
 
     public static GeoPrecinct fromPrecinctNode(PrecinctNode precinct) {
-        return new GeoPrecinct(precinct.getId(), precinct.getGeometryJson());
+        return new GeoPrecinct(precinct.getId(), precinct.getGeoJson());
     }
 
 }
