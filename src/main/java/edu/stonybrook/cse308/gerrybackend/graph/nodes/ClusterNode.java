@@ -72,7 +72,6 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         super(id, name, demographicData, electionData, adjacentEdges, geography);
         this.nodeType = nodeType;
         this.setChildren(children);
-        this.aggregateStatistics();
         if (counties == null) {
             this.loadAllCounties();
         } else {
@@ -94,9 +93,10 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
             child.setParent(this);
         }
         this.loadAllCounties();
+        this.aggregateStatistics();
     }
 
-    protected void aggregateStatistics() {
+    private void aggregateStatistics() {
         ElectionData aggregateElections = null;
         DemographicData aggregateDemographics = null;
         for (C child : this.children) {
