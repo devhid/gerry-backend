@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @MappedSuperclass
-@JsonIgnoreProperties({"adjacentNodes", "electionType"})
+@JsonIgnoreProperties({"adjacentNodes", "electionType", "populationDensity"})
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -62,9 +62,9 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected Set<E> adjacentEdges;
 
     @Lob
-    @Column(name = "geometry", columnDefinition = "LONGTEXT")
-    @JsonProperty(value = "geometry", defaultValue = "{}")
-    protected String geometryJson;
+    @Column(name = "geojson", columnDefinition = "LONGTEXT")
+    @JsonProperty(value = "geojson", defaultValue = "{}")
+    protected String geoJson;
 
     @Getter
     @Setter
@@ -82,18 +82,18 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.demographicData = new DemographicData();
         this.electionData = new ElectionData();
         this.adjacentEdges = new HashSet<>();
-        this.geometryJson = null;
+        this.geoJson = null;
     }
 
     protected GerryNode(String id, String name,
                         DemographicData demographicData, ElectionData electionData,
-                        Set<E> adjacentEdges, String geometryJson) {
+                        Set<E> adjacentEdges, String geoJson) {
         this.id = id;
         this.name = name;
         this.demographicData = demographicData;
         this.electionData = electionData;
         this.adjacentEdges = adjacentEdges;
-        this.geometryJson = geometryJson;
+        this.geoJson = geoJson;
     }
 
     public Set<GerryNode> getAdjacentNodes() {
@@ -128,18 +128,18 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     }
 
     @JsonRawValue
-    public String getGeometryJson() {
-        return this.geometryJson;
+    public String getGeoJson() {
+        return this.geoJson;
     }
 
-    public void setGeometryJson(JsonNode node) {
-        this.geometryJson = node.toString();
+    public void setGeoJson(JsonNode node) {
+        this.geoJson = node.toString();
     }
 
     public Geometry getGeometry() throws ParseException {
         if (this.geometry == null) {
             GeoJsonReader reader = new GeoJsonReader();
-            this.geometry = reader.read(this.geometryJson);
+            this.geometry = reader.read(this.geoJson);
         }
         return this.geometry;
     }
