@@ -31,10 +31,10 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
     private Map<MeasureEnumInterface, Double> weights;
 
     @Getter
-    private PhaseTwoDepth phaseTwoDepthHeuristic;
+    private PhaseTwoDepth depthHeuristic;
 
     @Getter
-    private PhaseTwoPrecinctMove precinctMoveHeuristic;
+    private PhaseTwoPrecinctMove moveHeuristic;
 
     @Getter
     private AlgRunType algRunType;

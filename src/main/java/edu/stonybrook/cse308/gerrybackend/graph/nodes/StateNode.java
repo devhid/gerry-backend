@@ -10,6 +10,7 @@ import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
+import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.StateEdge;
@@ -172,7 +173,14 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         return null;
     }
 
-    public StateNode copyAndExecuteMove(PrecinctMove move) {
+    public void executeMove(PrecinctMove move) throws MismatchedElectionException {
+        DistrictNode oldDistrict = move.getOldDistrict();
+        DistrictNode newDistrict = move.getNewDistrict();
+        oldDistrict.removeBorderPrecinct(move.getPrecinct());
+        newDistrict.addBorderPrecinct(move.getPrecinct());
+    }
+
+    public StateNode copyAndExecuteMove(PrecinctMove move) throws MismatchedElectionException {
         Map<DistrictNode, DistrictNode> newDistricts = move.computeNewDistricts();
         StateNode newState = StateNode.builder()
                 .id(UUID.randomUUID().toString())

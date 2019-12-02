@@ -83,6 +83,10 @@ public class PhaseOneReport extends AlgPhaseReport {
      * @return the aggregated PhaseOneMergeDelta describing which district each precinct belongs to
      */
     public PhaseOneMergeDelta fetchAggregateDelta() {
+        if (deltas.peek() == null) {
+            return null;
+        }
+
         // For precinctAssignments,
         // key = node.id where node is a precinct or district
         // value = list of districts that the node has been merged into
@@ -91,10 +95,6 @@ public class PhaseOneReport extends AlgPhaseReport {
         Map<String, List<String>> precinctAssignments = new HashMap<>();
         Map<String, String> changedNodes = new HashMap<>();
         Map<String, DistrictNode> newDistricts = new HashMap<>();
-
-        if (deltas.peek() == null) {
-            return null;
-        }
 
         // Get the initial precinct to district mappings from the 0th delta.
         PhaseOneMergeDelta currDelta = deltas.poll();

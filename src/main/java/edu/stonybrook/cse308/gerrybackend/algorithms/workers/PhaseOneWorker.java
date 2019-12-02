@@ -32,9 +32,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param precinctToDistrict map whose key is the precinct and the value is the initial containing district
      * @param newDistrictAdjList map whose key is a district and value is the set of adjacent districts
      */
-    private void createInitialDistricts(Set<PrecinctNode> allPrecincts,
-                                        Map<PrecinctNode, DistrictNode> precinctToDistrict,
-                                        Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
+    private static void createInitialDistricts(Set<PrecinctNode> allPrecincts,
+                                               Map<PrecinctNode, DistrictNode> precinctToDistrict,
+                                               Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
         allPrecincts.forEach(p -> {
             if (!precinctToDistrict.containsKey(p)) {
                 DistrictNode newDistrict = DistrictNode.childBuilder().child(p).build();
@@ -62,7 +62,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      *
      * @param newDistrictAdjList map whose key is a district and value is the set of adjacent districts
      */
-    private void createInitialEdges(Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
+    private static void createInitialEdges(Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
         final Set<UnorderedStringPair> createdEdges = new HashSet<>();
         newDistrictAdjList.forEach((district, adjDistricts) -> {
             adjDistricts.forEach(adjDistrict -> {
@@ -91,8 +91,8 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param deltas             the queue containing the record of deltas per algorithm iteration
      * @param iteration          the iteration number to assign to this initial delta
      */
-    private void createInitialDelta(Map<PrecinctNode, DistrictNode> precinctToDistrict,
-                                    Queue<PhaseOneMergeDelta> deltas, int iteration) {
+    private static void createInitialDelta(Map<PrecinctNode, DistrictNode> precinctToDistrict,
+                                           Queue<PhaseOneMergeDelta> deltas, int iteration) {
         Map<String, String> initialPrecinctAssignment = MapUtils.transformMapEntriesToIds(precinctToDistrict);
         Map<String, DistrictNode> newDistricts = precinctToDistrict.values().stream()
                 .collect(Collectors.toMap(GerryNode::getId, Function.identity()));
@@ -108,7 +108,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param iteration the iteration number to assign to the initial delta produced
      * @return a user copy of a StateNode with the initial districts
      */
-    private StateNode assignInitialDistricts(StateNode state, Queue<PhaseOneMergeDelta> deltas, int iteration) {
+    private static StateNode assignInitialDistricts(StateNode state, Queue<PhaseOneMergeDelta> deltas, int iteration) {
         final Map<PrecinctNode, DistrictNode> precinctToDistrict = new HashMap<>();
         final Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList = new HashMap<>();
         final Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
@@ -131,7 +131,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param inputs the inputs for phase 1
      * @return a set of LikelyCandidatePair objects representing which districts should be merged
      */
-    private Set<LikelyCandidatePair> determineMajorityMinorityPairs(PhaseOneInputs inputs) {
+    private static Set<LikelyCandidatePair> determineMajorityMinorityPairs(PhaseOneInputs inputs) {
         return Heuristics.determineMajMinPairs(inputs);
     }
 
@@ -143,7 +143,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param majMinPairs the set of previously identified majority-minority pairs
      * @return a set of LikelyCandidatePair objects representing which districts should be merged
      */
-    private Set<LikelyCandidatePair> determineOtherPairs(PhaseOneInputs inputs, Set<LikelyCandidatePair> majMinPairs) {
+    private static Set<LikelyCandidatePair> determineOtherPairs(PhaseOneInputs inputs, Set<LikelyCandidatePair> majMinPairs) {
         return Heuristics.determineOtherPairs(inputs, majMinPairs);
     }
 
@@ -153,9 +153,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param inputs the inputs for phase 1
      * @return a CandidatePairs object containing the majority-minority and non-MM candidate pairs
      */
-    private CandidatePairs determineCandidatePairs(PhaseOneInputs inputs) {
-        Set<LikelyCandidatePair> majMinPairs = this.determineMajorityMinorityPairs(inputs);
-        Set<LikelyCandidatePair> otherPairs = this.determineOtherPairs(inputs, majMinPairs);
+    private static CandidatePairs determineCandidatePairs(PhaseOneInputs inputs) {
+        Set<LikelyCandidatePair> majMinPairs = determineMajorityMinorityPairs(inputs);
+        Set<LikelyCandidatePair> otherPairs = determineOtherPairs(inputs, majMinPairs);
         return new CandidatePairs(majMinPairs, otherPairs);
     }
 
@@ -167,7 +167,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param numDistricts the input number of desired districts
      * @return whether or not the number of districts will have been reached after executing the determined pairs
      */
-    private boolean isLastIteration(StateNode state, CandidatePairs pairs, int numDistricts) {
+    private static boolean isLastIteration(StateNode state, CandidatePairs pairs, int numDistricts) {
         return state.getChildren().size() - pairs.size() <= numDistricts;
     }
 
@@ -179,7 +179,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param pairs            the majority-minority and non-MM pairs identified for this iteration
      * @param numAllowedMerges the number of allowed merges (less than the number of identified pairs)
      */
-    private void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges) {
+    private static void filterLastIterationPairs(PhaseOneStop heuristic, CandidatePairs pairs, int numAllowedMerges) {
         Heuristics.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
@@ -191,7 +191,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @param iteration the current iteration of the algorithm
      * @return a PhaseOneMergeDelta object describing the merges that occurred
      */
-    private PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration) {
+    private static PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration) {
         Map<DistrictNode, DistrictNode> mergedDistricts = new HashMap<>();
         for (LikelyCandidatePair pair : pairs.getAllPairs()) {
             try {
@@ -216,18 +216,18 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     public PhaseOneReport run(PhaseOneInputs inputs) {
         int iteration = 0;
         final Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
-        final StateNode state = this.assignInitialDistricts(inputs.getState(), deltas, iteration++);
+        final StateNode state = assignInitialDistricts(inputs.getState(), deltas, iteration++);
         inputs.setState(state);
 
         final int numDistricts = inputs.getNumDistricts();
         while (state.getChildren().size() != numDistricts) {
-            CandidatePairs pairs = this.determineCandidatePairs(inputs);
-            boolean lastIteration = this.isLastIteration(state, pairs, numDistricts);
+            CandidatePairs pairs = determineCandidatePairs(inputs);
+            boolean lastIteration = isLastIteration(state, pairs, numDistricts);
             if (lastIteration) {
                 int numAllowedMerges = state.getChildren().size() - numDistricts;
-                this.filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
+                filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }
-            PhaseOneMergeDelta iterationDelta = this.joinCandidatePairs(state, pairs, iteration);
+            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration);
             deltas.offer(iterationDelta);
             iteration++;
         }

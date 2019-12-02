@@ -27,23 +27,13 @@ public class AlgorithmController {
     private StateService stateService;
 
     private AlgPhaseReport handle(AlgPhaseInputs inputs) {
-        AlgPhaseWorker worker = null;
+        AlgPhaseWorker worker;
         if (inputs instanceof PhaseZeroInputs) {
             worker = new PhaseZeroWorker();
         } else if (inputs instanceof PhaseOneInputs) {
             worker = new PhaseOneWorker();
         } else if (inputs instanceof PhaseTwoInputs) {
-            switch (((PhaseTwoInputs) inputs).getPhaseTwoDepthHeuristic()) {
-                case STANDARD:
-                    worker = new PhaseTwoStandardWorker();
-                    break;
-                case LEVEL:
-                    worker = new PhaseTwoLevelWorker();
-                    break;
-                case TREE:
-                    worker = new PhaseTwoTreeWorker();
-                    break;
-            }
+            worker = new PhaseTwoWorker();
         } else {
             throw new IllegalArgumentException("Replace this string later!");
         }

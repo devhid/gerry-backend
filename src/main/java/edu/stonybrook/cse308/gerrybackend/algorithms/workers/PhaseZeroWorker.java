@@ -23,7 +23,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
      * @param threshold the user input threshold for demographic blocs
      * @return a map whose keys are precincts who have demographic blocs and values are POJOS
      */
-    private Map<PrecinctNode, DemoBloc> getDemoBlocs(StateNode state, double threshold) {
+    private static Map<PrecinctNode, DemoBloc> getDemoBlocs(StateNode state, double threshold) {
         Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
         Map<PrecinctNode, DemoBloc> demoBlocs = new HashMap<>();
         allPrecincts.forEach(p -> {
@@ -45,7 +45,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
      * @param threshold the user input threshold for vote blocs
      * @return a map whose keys are precincts with demographic and vote blocs and values are POJOs
      */
-    private Map<PrecinctNode, VoteBloc> getVoteBlocs(Map<PrecinctNode, DemoBloc> demoBlocs, double threshold) {
+    private static Map<PrecinctNode, VoteBloc> getVoteBlocs(Map<PrecinctNode, DemoBloc> demoBlocs, double threshold) {
         Map<PrecinctNode, VoteBloc> voteBlocs = new HashMap<>();
         demoBlocs.keySet().forEach(precinct -> {
             ElectionData precinctElectionData = precinct.getElectionData();
@@ -66,8 +66,8 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
      * @param voteBlocs the voting bloc information retrieved from {@link #getVoteBlocs}
      * @return a PhaseZeroReport object containing the finalized aggregated voter and demographic information.
      */
-    private PhaseZeroReport aggregatePhaseZeroReport(Map<PrecinctNode, DemoBloc> demoBlocs,
-                                                     Map<PrecinctNode, VoteBloc> voteBlocs) {
+    private static PhaseZeroReport aggregatePhaseZeroReport(Map<PrecinctNode, DemoBloc> demoBlocs,
+                                                            Map<PrecinctNode, VoteBloc> voteBlocs) {
         final Map<PoliticalParty, Map<DemographicType, PrecinctBlocSummary>> precinctBlocSummaries = new HashMap<>();
 
         // Iterate through all voting blocs found
