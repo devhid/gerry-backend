@@ -14,6 +14,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.workers.PhaseTwoWorker;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.PhaseZeroWorker;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AlgorithmController {
 
     private final StateService stateService;
+    private final double phaseTwoEpsilon;
 
     @Autowired
-    public AlgorithmController(StateService stateService) {
+    public AlgorithmController(StateService stateService, @Value("${gerry.phase-two.epsilon}") double phaseTwoEpsilon) {
         this.stateService = stateService;
+        this.phaseTwoEpsilon = phaseTwoEpsilon;
     }
 
     private AlgPhaseReport handle(AlgPhaseInputs inputs) {
@@ -64,6 +67,7 @@ public class AlgorithmController {
     @PostMapping("/phase2")
     public ResponseEntity<PhaseTwoReport> handlePhaseTwo(@RequestBody PhaseTwoInputs inputs) {
         inputs.setState(stateService.getStateById(inputs.getStateId()));
+        inputs.setEpsilon(this.phaseTwoEpsilon);
         PhaseTwoReport report = (PhaseTwoReport) handle(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

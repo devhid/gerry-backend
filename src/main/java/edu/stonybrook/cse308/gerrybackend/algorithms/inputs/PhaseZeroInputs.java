@@ -10,4 +10,8 @@ public class PhaseZeroInputs extends AlgPhaseInputs {
     @Getter
     private double voteThreshold;
 
+    @Override
+    protected boolean isValid() {
+        return super.isValid();
+    }
 }

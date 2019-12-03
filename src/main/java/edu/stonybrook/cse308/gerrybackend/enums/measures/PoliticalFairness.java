@@ -1,10 +1,9 @@
 package edu.stonybrook.cse308.gerrybackend.enums.measures;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
-public enum PoliticalFairnessEnum implements IntEnumInterface, MeasureEnumInterface {
+public enum PoliticalFairness implements IntEnumInterface, MeasureInterface {
     EFFICIENCY_GAP(0, "efficiency_gap"),
     GERRYMANDER_DEMOCRAT(1, "gerrymander_democrat"),
     GERRYMANDER_REPUBLICAN(2, "gerrymander_republican"),
@@ -17,12 +16,12 @@ public enum PoliticalFairnessEnum implements IntEnumInterface, MeasureEnumInterf
     private final int value;
     private final String name;
 
-    PoliticalFairnessEnum(int value, String name) {
+    PoliticalFairness(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    @JsonValue
+    @Override
     public String getName() {
         return this.name;
     }

@@ -1,12 +1,14 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.inputs;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import edu.stonybrook.cse308.gerrybackend.data.weights.*;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
-import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureEnumInterface;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 public class PhaseTwoInputs extends AlgPhaseInputs {
@@ -23,20 +25,23 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
     @Getter
     private double lowerBound;
 
-    // TODO: set app property for now
-    @Getter
-    private double epsilon;
-
-    // TODO: change this to something like
-    //  {
-    //   compactness: { schwartzberg: 0.5 },
-    //   fairness: { efficiency_gap: 0.8}
-    //  }
-    @Getter
-    private Map<MeasureEnumInterface, Double> weights;
-
     @Getter
     private int numRetries;
+
+    @Getter
+    private CompactnessWeight compactnessWeight;
+
+    @Getter
+    private PoliticalCompetitivenessWeight competitivenessWeight;
+
+    @Getter
+    private PoliticalFairnessWeight fairnessWeight;
+
+    @Getter
+    private PopulationEqualityWeight popEqualityWeight;
+
+    @Getter
+    private PopulationHomogeneityWeight popHomogeneityWeight;
 
     @Getter
     private PhaseTwoDepth depthHeuristic;
@@ -44,4 +49,32 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
     @Getter
     private PhaseTwoPrecinctMove moveHeuristic;
 
+    @Getter
+    @Setter
+    private double epsilon;
+
+    @JsonIgnore
+    public Set<MeasureWeight> getWeights() {
+        Set<MeasureWeight> weights = new HashSet<>();
+        weights.add(this.compactnessWeight);
+        weights.add(this.competitivenessWeight);
+        weights.add(this.fairnessWeight);
+        weights.add(this.popEqualityWeight);
+        weights.add(this.popHomogeneityWeight);
+        return weights;
+    }
+
+    @Override
+    protected boolean isValid() {
+        boolean valid = this.stateId != null;
+        valid = valid && (this.demographicTypes != null) && (this.demographicTypes.size() > 0);
+        valid = valid && (this.upperBound > this.lowerBound);
+        valid = valid && (this.numRetries > 0);
+        for (MeasureWeight weight : this.getWeights()) {
+            valid = valid && (weight.isValid());
+        }
+        valid = valid && (this.depthHeuristic != null);
+        valid = valid && (this.moveHeuristic != null);
+        return valid;
+    }
 }

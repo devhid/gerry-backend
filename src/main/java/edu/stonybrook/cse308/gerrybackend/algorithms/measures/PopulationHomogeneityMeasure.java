@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 
-import edu.stonybrook.cse308.gerrybackend.enums.measures.PopulationHomogeneityEnum;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.PopulationHomogeneity;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 
@@ -23,7 +23,7 @@ public interface PopulationHomogeneityMeasure {
         }
     }
 
-    static double computePopulationHomogeneityScore(PopulationHomogeneityEnum measure, DistrictNode district) {
+    static double computePopulationHomogeneityScore(PopulationHomogeneity measure, DistrictNode district) {
         double popHomogeneityScore = 0.0;
         switch (measure) {
             case NORMALIZED_SQUARE_ERROR:

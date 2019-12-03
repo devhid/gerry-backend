@@ -1,11 +1,11 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 
-import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalFairnessEnum;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalFairness;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
-public interface PoliticalFairnessMeasure {
+public interface PoliticalFairnessMeasusre {
 
     class EfficiencyGap {
         static double computeFairnessScore(StateNode state) {
@@ -105,7 +105,7 @@ public interface PoliticalFairnessMeasure {
         }
     }
 
-    static double computeFairnessScore(PoliticalFairnessEnum measure, DistrictNode district) {
+    static double computeFairnessScore(PoliticalFairness measure, DistrictNode district) {
         double fairnessScore;
         switch (measure) {
             case GERRYMANDER_DEMOCRAT:
@@ -129,7 +129,7 @@ public interface PoliticalFairnessMeasure {
         return fairnessScore;
     }
 
-    static double computeFairnessScore(PoliticalFairnessEnum measure, StateNode state) {
+    static double computeFairnessScore(PoliticalFairness measure, StateNode state) {
         double fairnessScore;
         switch (measure) {
             case EFFICIENCY_GAP:

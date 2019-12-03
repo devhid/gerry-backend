@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.data.structures;
+package edu.stonybrook.cse308.gerrybackend.data.pairs;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

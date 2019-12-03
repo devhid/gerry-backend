@@ -2,7 +2,7 @@ package edu.stonybrook.cse308.gerrybackend.graph.edges;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Joinability;
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;

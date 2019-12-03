@@ -18,4 +18,8 @@ public abstract class AlgPhaseInputs {
     @Setter
     protected StateNode state;
 
+    protected boolean isValid() {
+        return (this.stateType != null && this.electionType != null);
+    }
+
 }

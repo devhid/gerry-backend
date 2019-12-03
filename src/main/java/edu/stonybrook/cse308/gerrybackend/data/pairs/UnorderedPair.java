@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.data.structures;
+package edu.stonybrook.cse308.gerrybackend.data.pairs;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

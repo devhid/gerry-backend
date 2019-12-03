@@ -2,7 +2,7 @@ package edu.stonybrook.cse308.gerrybackend.controllers;
 
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.db.services.DistrictService;
 import edu.stonybrook.cse308.gerrybackend.db.services.PrecinctService;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;

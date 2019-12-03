@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.data.algorithm;
 
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.enums.types.LikelyType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import lombok.Getter;

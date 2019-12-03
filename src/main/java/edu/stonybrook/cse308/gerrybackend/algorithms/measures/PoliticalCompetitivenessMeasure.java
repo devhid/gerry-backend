@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 
-import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalCompetitivenessEnum;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalCompetitiveness;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 
@@ -15,7 +15,7 @@ public interface PoliticalCompetitivenessMeasure {
         }
     }
 
-    static double computeCompetitivenessScore(PoliticalCompetitivenessEnum measure, DistrictNode district) {
+    static double computeCompetitivenessScore(PoliticalCompetitiveness measure, DistrictNode district) {
         double competitivenessScore;
         switch (measure) {
             case MARGIN_OF_VICTORY:

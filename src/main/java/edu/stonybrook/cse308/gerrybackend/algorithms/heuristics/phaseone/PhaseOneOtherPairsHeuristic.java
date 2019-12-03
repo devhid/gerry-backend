@@ -18,7 +18,7 @@ public interface PhaseOneOtherPairsHeuristic {
     static Set<LikelyCandidatePair> determinePairs(PhaseOneInputs inputs,
                                                    Set<LikelyCandidatePair> majMinPairs) {
         Set<LikelyCandidatePair> pairs;
-        switch (inputs.getPhaseOneOtherPairsHeuristic()) {
+        switch (inputs.getOtherPairsHeuristic()) {
             case STANDARD:
                 pairs = Standard.determinePairs(inputs, majMinPairs);
                 break;

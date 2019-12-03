@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 
-import edu.stonybrook.cse308.gerrybackend.enums.measures.CompactnessEnum;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.Compactness;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
@@ -52,7 +52,7 @@ public interface CompactnessMeasure {
         }
     }
 
-    static double computeCompactnessScore(CompactnessEnum measure, DistrictNode district) {
+    static double computeCompactnessScore(Compactness measure, DistrictNode district) {
         double compactnessScore;
         switch (measure) {
             case GRAPH_THEORETICAL:

@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.utils;
 
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 

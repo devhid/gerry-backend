@@ -1,6 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.measures;
 
-import edu.stonybrook.cse308.gerrybackend.enums.measures.PopulationEqualityEnum;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.PopulationEquality;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
@@ -56,7 +56,7 @@ public interface PopulationEqualityMeasure {
         }
     }
 
-    static double computePopulationEqualityScore(PopulationEqualityEnum measure, DistrictNode district) {
+    static double computePopulationEqualityScore(PopulationEquality measure, DistrictNode district) {
         double popEqualityScore;
         switch (measure) {
             case IDEAL:
@@ -68,7 +68,7 @@ public interface PopulationEqualityMeasure {
         return popEqualityScore;
     }
 
-    static double computePopulationEqualityScore(PopulationEqualityEnum measure, StateNode state) {
+    static double computePopulationEqualityScore(PopulationEquality measure, StateNode state) {
         double popEqualityScore;
         switch (measure) {
             case MOST_TO_LEAST:
