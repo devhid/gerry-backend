@@ -17,8 +17,12 @@ import java.util.List;
 @RequestMapping("/precincts")
 public class PrecinctController {
 
+    private final PrecinctService precinctService;
+
     @Autowired
-    PrecinctService precinctService;
+    public PrecinctController(PrecinctService precinctService) {
+        this.precinctService = precinctService;
+    }
 
     @GetMapping
     public ResponseEntity<List<PrecinctNode>> getAllPrecincts() {

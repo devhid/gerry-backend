@@ -29,16 +29,17 @@ import java.util.*;
 @RequestMapping("/populate")
 public class PopulateController {
 
-    @Autowired
-    private PrecinctService precinctService;
-
-    @Autowired
-    private DistrictService districtService;
-
-    @Autowired
-    private StateService stateService;
-
+    private final PrecinctService precinctService;
+    private final DistrictService districtService;
+    private final StateService stateService;
     private static final Logger LOGGER = LoggerFactory.getLogger(PopulateController.class);
+
+    @Autowired
+    public PopulateController(PrecinctService precinctService, DistrictService districtService, StateService stateService) {
+        this.precinctService = precinctService;
+        this.districtService = districtService;
+        this.stateService = stateService;
+    }
 
     private void createOrUpdateEntity(GerryNode node) {
         if (node instanceof PrecinctNode) {

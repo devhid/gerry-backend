@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class DistrictService extends EntityService<DistrictNode> {
 
+    private final DistrictRepository repo;
+
     @Autowired
-    private DistrictRepository repo;
+    public DistrictService(DistrictRepository repo) {
+        this.repo = repo;
+    }
 
     public List<DistrictNode> getAllDistricts() {
         return this.getAllEntities(this.repo);

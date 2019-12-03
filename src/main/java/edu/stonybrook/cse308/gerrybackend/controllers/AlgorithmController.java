@@ -26,8 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/algorithm")
 public class AlgorithmController {
 
+    private final StateService stateService;
+
     @Autowired
-    private StateService stateService;
+    public AlgorithmController(StateService stateService) {
+        this.stateService = stateService;
+    }
 
     private AlgPhaseReport handle(AlgPhaseInputs inputs) {
         AlgPhaseWorker worker;

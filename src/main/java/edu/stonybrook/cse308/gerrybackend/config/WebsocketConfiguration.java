@@ -11,11 +11,15 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebSocket
 public class WebsocketConfiguration implements WebSocketConfigurer {
-    // Autowire our websocket handlers
+
+    private final AlgorithmSocketHandler algorithmSocketHandler;
+    private final PrecinctSocketHandler precinctSocketHandler;
+
     @Autowired
-    AlgorithmSocketHandler algorithmSocketHandler;
-    @Autowired
-    PrecinctSocketHandler precinctSocketHandler;
+    public WebsocketConfiguration(AlgorithmSocketHandler algorithmSocketHandler, PrecinctSocketHandler precinctSocketHandler) {
+        this.algorithmSocketHandler = algorithmSocketHandler;
+        this.precinctSocketHandler = precinctSocketHandler;
+    }
 
     @Override
     public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {

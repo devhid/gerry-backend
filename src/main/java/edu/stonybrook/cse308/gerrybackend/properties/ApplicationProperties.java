@@ -2,7 +2,9 @@ package edu.stonybrook.cse308.gerrybackend.properties;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public final class ApplicationProperties {
 
     @Getter

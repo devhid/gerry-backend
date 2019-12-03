@@ -18,8 +18,12 @@ import java.util.List;
 @RequestMapping("/states")
 public class StateController {
 
+    private final StateService stateService;
+
     @Autowired
-    StateService stateService;
+    public StateController(StateService stateService) {
+        this.stateService = stateService;
+    }
 
     @GetMapping
     public ResponseEntity<List<StateNode>> getAllStates() {

@@ -11,8 +11,12 @@ import java.util.List;
 @Service
 public class StateService extends EntityService<StateNode> {
 
+    private final StateRepository repo;
+
     @Autowired
-    private StateRepository repo;
+    public StateService(StateRepository repo) {
+        this.repo = repo;
+    }
 
     public List<StateNode> getAllStates() {
         return this.getAllEntities(this.repo);

@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class PrecinctService extends EntityService<PrecinctNode> {
 
+    private final PrecinctRepository repo;
+
     @Autowired
-    private PrecinctRepository repo;
+    public PrecinctService(PrecinctRepository repo) {
+        this.repo = repo;
+    }
 
     public List<PrecinctNode> getAllPrecincts() {
         return this.getAllEntities(this.repo);

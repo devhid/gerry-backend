@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PhaseTwoLogBuilder implements IterativeAlgPhaseLogBuilder<PhaseTwoMoveDelta> {
 
-    private PhaseTwoProperties phaseTwoProperties;
+    private final PhaseTwoProperties phaseTwoProperties;
 
     @Autowired
     public PhaseTwoLogBuilder(PhaseTwoProperties phaseTwoProperties) {

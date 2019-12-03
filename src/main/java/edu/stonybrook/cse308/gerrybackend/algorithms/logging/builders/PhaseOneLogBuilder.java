@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PhaseOneLogBuilder implements IterativeAlgPhaseLogBuilder<PhaseOneMergeDelta> {
 
-    private PhaseOneProperties phaseOneProperties;
+    private final PhaseOneProperties phaseOneProperties;
 
     @Autowired
     public PhaseOneLogBuilder(PhaseOneProperties phaseOneProperties) {

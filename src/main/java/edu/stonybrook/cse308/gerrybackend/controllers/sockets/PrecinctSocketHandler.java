@@ -12,6 +12,7 @@ import edu.stonybrook.cse308.gerrybackend.utils.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -29,15 +30,18 @@ import java.util.stream.Collectors;
 @Component
 public class PrecinctSocketHandler extends TextWebSocketHandler {
 
-    private final int BATCH_SIZE = 100;
-
-    @Autowired
-    private StateService stateService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    private final StateService stateService;
+    private final ObjectMapper objectMapper;
+    private final int BATCH_SIZE;
     private static final Logger LOGGER = LoggerFactory.getLogger(PrecinctSocketHandler.class);
+
+    @Autowired
+    public PrecinctSocketHandler(StateService stateService, ObjectMapper objectMapper,
+                                 @Value("${gerry.sockets.batch-size}") int batchSize) {
+        this.stateService = stateService;
+        this.objectMapper = objectMapper;
+        this.BATCH_SIZE = batchSize;
+    }
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
