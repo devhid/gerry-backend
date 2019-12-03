@@ -1,32 +1,25 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
+import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.PhaseOneLogBuilder;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
-import lombok.Getter;
 
 import java.util.*;
 
-public class PhaseOneReport extends AlgPhaseReport {
+public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, PhaseOneLogBuilder> {
 
-    @Getter
-    private Queue<PhaseOneMergeDelta> deltas;
-
-    public PhaseOneReport(Queue<PhaseOneMergeDelta> deltas) {
-        this.deltas = deltas;
+    public PhaseOneReport(String newStateId, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder) {
+        super(newStateId, deltas, logBuilder);
     }
 
-    /**
-     * Fetches the next batch of PhaseOneMergeDeltas wrapped in a PhaseOneReport.
-     *
-     * @param num number of deltas to fetch
-     * @return PhaseOneReport containing the batch of deltas
-     */
-    public PhaseOneReport fetchNextDeltas(int num) {
-        Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
-        for (int i = 0; i < num; i++) {
-            deltas.offer(this.deltas.poll());
-        }
-        return new PhaseOneReport(deltas);
+    @Override
+    protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseOneMergeDelta> deltas) {
+        return new PhaseOneReport(this.newStateId, deltas, this.logBuilder);
+    }
+
+    public PhaseOneReport fetchNextReport(int num) {
+        IterativeAlgPhaseReport nextReport = super.fetchNextReport(num);
+        return (PhaseOneReport) nextReport;
     }
 
     /**
@@ -80,9 +73,10 @@ public class PhaseOneReport extends AlgPhaseReport {
     /**
      * Aggregates the record of deltas into one delta for a non-iterative final update if specified by the user.
      *
-     * @return the aggregated PhaseOneMergeDelta describing which district each precinct belongs to
+     * @return the same instance containing the aggregated PhaseOneMergeDelta describing the final district each
+     * precinct belongs to
      */
-    public PhaseOneMergeDelta fetchAggregateDelta() {
+    public PhaseOneReport fetchAggregateReport() {
         if (deltas.peek() == null) {
             return null;
         }
@@ -112,8 +106,9 @@ public class PhaseOneReport extends AlgPhaseReport {
             changedNodes.put(precinctId, finalDistrictId);
         });
 
-        return new PhaseOneMergeDelta(iteration, changedNodes, newDistricts);
+        PhaseOneMergeDelta aggregateDelta = new PhaseOneMergeDelta(iteration, changedNodes, newDistricts);
+        this.deltas.offer(aggregateDelta);
+        return this;
     }
-
 
 }

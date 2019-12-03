@@ -5,10 +5,7 @@ import lombok.Getter;
 
 import java.util.Map;
 
-public class PhaseOneMergeDelta {
-
-    @Getter
-    private int iteration;
+public class PhaseOneMergeDelta extends IterativeAlgPhaseDelta {
 
     @Getter
     private Map<String, String> changedNodes;
@@ -17,7 +14,7 @@ public class PhaseOneMergeDelta {
     private Map<String, DistrictNode> newDistricts;
 
     public PhaseOneMergeDelta(int iteration, Map<String, String> changedNodes, Map<String, DistrictNode> newDistricts) {
-        this.iteration = iteration;
+        super(iteration);
         this.changedNodes = changedNodes;
         this.newDistricts = newDistricts;
     }

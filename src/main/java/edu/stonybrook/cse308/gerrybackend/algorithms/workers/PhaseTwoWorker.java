@@ -8,6 +8,7 @@ import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
+import edu.stonybrook.cse308.gerrybackend.initializers.PhaseTwoReportInitializer;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,7 +26,8 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      */
     private static boolean shouldStop(StateNode state, Map<PrecinctMove, StateNode> potentialMoves) {
         // TODO: fill in
-        //  check potentialMoves - if all potential moves lead to an OF that is lower, then we should stop
+        //  check potentialMoves - if all potential moves lead to an OF that is lower, then we should recompute
+        //  a few times before we stop
         return true;
     }
 
@@ -165,7 +167,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
             iteration++;
             potentialMoves = computePotentialMoves(state, inputs.getDepthHeuristic(), inputs.getMoveHeuristic());
         }
-        return new PhaseTwoReport(deltas);
+        return PhaseTwoReportInitializer.initClass(state.getId(), deltas);
     }
 
 }

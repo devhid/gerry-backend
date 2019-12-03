@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 import java.util.Set;
 
 @Entity
-@JsonIdentityReference(alwaysAsId=true)
+@JsonIdentityReference(alwaysAsId = true)
 public class PrecinctNode extends GerryNode<PrecinctEdge, DistrictNode> {
 
     @Getter

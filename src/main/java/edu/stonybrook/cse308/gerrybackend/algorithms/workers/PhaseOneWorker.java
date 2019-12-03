@@ -16,6 +16,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
+import edu.stonybrook.cse308.gerrybackend.initializers.PhaseOneReportInitializer;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 
@@ -231,6 +232,6 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             deltas.offer(iterationDelta);
             iteration++;
         }
-        return new PhaseOneReport(deltas);
+        return PhaseOneReportInitializer.initClass(state.getId(), deltas);
     }
 }
