@@ -52,7 +52,8 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     }
 
     @Override
-    protected void loadAllCounties() {
+    protected void aggregateCounties() {
+        this.children.forEach(DistrictNode::aggregateCounties);
         this.counties = this.children.stream().flatMap(d -> d.getCounties().stream()).collect(Collectors.toSet());
     }
 

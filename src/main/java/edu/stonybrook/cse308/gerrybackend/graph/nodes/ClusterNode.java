@@ -73,7 +73,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         this.nodeType = nodeType;
         this.setChildren(children);
         if (counties == null) {
-            this.loadAllCounties();
+            this.aggregateCounties();
         } else {
             this.counties = counties;
         }
@@ -84,15 +84,12 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         return this.children.size();
     }
 
-    protected abstract void loadAllCounties();
-
     protected void setChildren(Set<C> children) {
         this.children = children;
         for (C child : children) {
             // TODO: how to suppress this?
             child.setParent(this);
         }
-        this.loadAllCounties();
         this.aggregateStatistics();
     }
 
@@ -101,6 +98,8 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         this.children = null;
         return children;
     }
+
+    protected abstract void aggregateCounties();
 
     public void aggregateStatistics() {
         ElectionData aggregateElections = null;
@@ -124,6 +123,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
                 }
             }
         }
+        this.aggregateCounties();
         this.electionData = aggregateElections;
         this.demographicData = aggregateDemographics;
     }

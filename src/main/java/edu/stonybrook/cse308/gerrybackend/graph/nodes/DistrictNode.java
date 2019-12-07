@@ -59,7 +59,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     }
 
     @Override
-    protected void loadAllCounties() {
+    protected void aggregateCounties() {
         this.counties = this.children.stream().map(PrecinctNode::getCounty).collect(Collectors.toSet());
     }
 
