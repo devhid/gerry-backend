@@ -125,6 +125,7 @@ public class PopulateController {
     @PostMapping("/create-state")
     public ResponseEntity<StateNode> createState(@RequestBody StateNode state) {
         state.fillInTransientProperties();
+        state.aggregateStatistics();
         this.populateDistrictEdges(state);
         createOrUpdateEntity(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
@@ -144,7 +145,14 @@ public class PopulateController {
 
     @DeleteMapping("/delete/state/{id}")
     public ResponseEntity deleteStateById(@PathVariable String id) {
-        stateService.deleteStateById(id);
+        StateNode state = stateService.getStateById(id);
+        if (state != null) {
+            Set<DistrictNode> children = state.clearAndReturnChildren();
+            for (DistrictNode district : children) {
+                districtService.deleteDistrictById(district.getId());
+            }
+            stateService.deleteStateById(id);
+        }
         return new ResponseEntity(new HttpHeaders(), HttpStatus.OK);
     }
 

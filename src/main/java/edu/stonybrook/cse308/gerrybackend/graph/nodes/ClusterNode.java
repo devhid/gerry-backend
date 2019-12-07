@@ -96,13 +96,24 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         this.aggregateStatistics();
     }
 
-    private void aggregateStatistics() {
+    public Set<C> clearAndReturnChildren() {
+        Set<C> children = this.children;
+        this.children = null;
+        return children;
+    }
+
+    public void aggregateStatistics() {
         ElectionData aggregateElections = null;
         DemographicData aggregateDemographics = null;
         for (C child : this.children) {
+            if (child instanceof ClusterNode) {
+                if (child.getElectionData() == null || child.getDemographicData() == null) {
+                    ((ClusterNode) child).aggregateStatistics();
+                }
+            }
             if (aggregateElections == null || aggregateDemographics == null) {
-                aggregateElections = child.getElectionData();
-                aggregateDemographics = child.getDemographicData();
+                aggregateElections = new ElectionData(child.getElectionData());
+                aggregateDemographics = new DemographicData(child.getDemographicData());
             } else {
                 try {
                     aggregateElections = ElectionData.combine(aggregateElections, child.getElectionData());
