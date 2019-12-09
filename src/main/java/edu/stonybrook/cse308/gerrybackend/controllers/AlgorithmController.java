@@ -52,14 +52,14 @@ public class AlgorithmController {
 
     @PostMapping("/phase0")
     public ResponseEntity<PhaseZeroReport> handlePhaseZero(@RequestBody PhaseZeroInputs inputs) {
-        inputs.setState(stateService.findOriginalStateByStateType(inputs.getStateType()));
+        inputs.setState(stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType()));
         final PhaseZeroReport report = (PhaseZeroReport) handle(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }
 
     @PostMapping("/phase1")
     public ResponseEntity<PhaseOneReport> handlePhaseOne(@RequestBody PhaseOneInputs inputs) {
-        inputs.setState(stateService.findOriginalStateByStateType(inputs.getStateType()));
+        inputs.setState(stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType()));
         PhaseOneReport report = (PhaseOneReport) handle(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

@@ -28,4 +28,13 @@ public enum ElectionType implements IntEnumInterface {
         return ElectionType.NOT_SET;
     }
 
+    public static ElectionType getMemberByName(String name) {
+        for (ElectionType electionType : ElectionType.values()) {
+            if (electionType.getName().equals(name)) {
+                return electionType;
+            }
+        }
+        return null;
+    }
+
 }

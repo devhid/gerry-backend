@@ -127,6 +127,7 @@ public class PopulateController {
         state.fillInTransientProperties();
         state.aggregateStatistics();
         this.populateDistrictEdges(state);
+        state.getMultiPolygon();
         createOrUpdateEntity(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }

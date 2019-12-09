@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stonybrook.cse308.gerrybackend.communication.GeoPrecinct;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
+import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
@@ -47,8 +48,10 @@ public class PrecinctSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
         LOGGER.info(String.format("Connected to session %s.", session.getId()));
         final String state = UriUtils.getStatePath(session.getUri());
+        final String election = UriUtils.getElectionType(session.getUri());
         StateType stateType = StateType.getMemberByName(state);
-        StateNode stateNode = stateService.findOriginalStateByStateType(stateType);
+        ElectionType electionType = ElectionType.getMemberByName(election);
+        StateNode stateNode = stateService.findOriginalState(stateType, electionType);
         CloseStatus closeStatus;
         if (stateNode == null) {
             closeStatus = new CloseStatus(CloseStatus.SERVER_ERROR.getCode(), "Invalid state selected.");

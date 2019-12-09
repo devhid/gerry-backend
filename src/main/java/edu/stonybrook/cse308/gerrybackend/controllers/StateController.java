@@ -1,6 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.controllers;
 
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
+import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,12 @@ public class StateController {
         return new ResponseEntity<>(list, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @GetMapping("/original/{stateType}")
-    public ResponseEntity<StateNode> getOriginalState(@PathVariable StateType stateType) {
-        StateNode originalState = stateService.findOriginalStateByStateType(stateType);
-        originalState.fillInTransientProperties();
+    @GetMapping("/original/{stateType}/{electionType}")
+    public ResponseEntity<StateNode> getOriginalState(@PathVariable StateType stateType, @PathVariable ElectionType electionType) {
+        StateNode originalState = stateService.findOriginalState(stateType, electionType);
+        if (originalState != null) {
+            originalState.fillInTransientProperties();
+        }
         return new ResponseEntity<>(originalState, new HttpHeaders(), HttpStatus.OK);
     }
 

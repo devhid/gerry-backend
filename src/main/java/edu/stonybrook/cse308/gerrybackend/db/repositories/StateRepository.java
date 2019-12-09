@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.db.repositories;
 
+import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
@@ -12,12 +13,16 @@ import java.util.Collection;
 
 @Repository
 public interface StateRepository extends JpaRepository<StateNode, String> {
-    @Query("SELECT s FROM StateNode s WHERE s.nodeType = :nodeType and s.stateType = :stateType")
-    Collection<StateNode> findStateByNodeTypeAndStateType(@Param("nodeType") NodeType nodeType,
-                                                          @Param("stateType") StateType stateType);
+    @Query("SELECT s FROM StateNode s WHERE s.nodeType = :nodeType and s.stateType = :stateType and s.electionData.electionType = :electionType")
+    Collection<StateNode> findOriginalStateHelper(@Param("nodeType") NodeType nodeType,
+                                                  @Param("stateType") StateType stateType,
+                                                  @Param("electionType") ElectionType electionType);
 
-    default StateNode findOriginalStateByStateType(StateType stateType) {
-        Collection<StateNode> stateNodes = findStateByNodeTypeAndStateType(NodeType.ORIGINAL, stateType);
+    default StateNode findOriginalState(StateType stateType, ElectionType electionType) {
+        Collection<StateNode> stateNodes = findOriginalStateHelper(NodeType.ORIGINAL, stateType, electionType);
+        if (stateNodes.size() == 0) {
+            return null;
+        }
         return stateNodes.iterator().next();
     }
 }

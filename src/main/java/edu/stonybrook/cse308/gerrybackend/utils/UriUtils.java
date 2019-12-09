@@ -4,11 +4,19 @@ import java.net.URI;
 
 public class UriUtils {
 
-    public static String getStatePath(final URI uri) {
+    public static String[] getPathFragmentsFromURI(final URI uri){
         final String path = uri.getPath();
-        final String[] pathFragments = path.split("/");
-        final String value = pathFragments[pathFragments.length - 1];
-        return value;
+        return path.split("/");
+    }
+
+    public static String getStatePath(final URI uri) {
+        final String[] pathFragments = UriUtils.getPathFragmentsFromURI(uri);
+        return pathFragments[pathFragments.length - 2];
+    }
+
+    public static String getElectionType(final URI uri) {
+        final String[] pathFragments = UriUtils.getPathFragmentsFromURI(uri);
+        return pathFragments[pathFragments.length - 1];
     }
 
 }
