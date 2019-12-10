@@ -14,10 +14,7 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "election")
 @JsonIgnoreProperties({"votesCopy"})
@@ -43,34 +40,31 @@ public class ElectionData {
 
     @Getter
     @NotNull
-    @Convert(converter = PoliticalPartyConverter.class)
-    @Column(name = "winner")
-    private PoliticalParty winner;
+//    @Fetch(FetchMode.SUBSELECT)   // DETERMINE IF NEEDED
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<PoliticalParty> winners;
 
     public ElectionData() {
         this.id = UUID.randomUUID().toString();
         this.electionType = ElectionType.getDefault();
         this.votes = new EnumMap<>(PoliticalParty.class);
-        this.winner = PoliticalParty.getDefault();
+        this.winners = new HashSet<>();
         MapUtils.initMap(this.votes, 0);
     }
 
-    public ElectionData(String id, ElectionType electionType, Map<PoliticalParty, Integer> votes, PoliticalParty winner) {
+    public ElectionData(String id, ElectionType electionType, Map<PoliticalParty, Integer> votes, Set<PoliticalParty> winners) {
         this.id = id;
         this.electionType = electionType;
         this.votes = votes;
-        this.winner = winner;
+        this.winners = winners;
     }
 
     public ElectionData(ElectionData obj) {
-        this(UUID.randomUUID().toString(), obj.electionType, obj.getVotesCopy(), obj.winner);
+        this(UUID.randomUUID().toString(), obj.electionType, obj.getVotesCopy(), obj.winners);
     }
 
     public int getPartyVotes(PoliticalParty party) {
-        if (party == PoliticalParty.NOT_SET) {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
-        return this.votes.get(party);
+        return this.votes.getOrDefault(party, 0);
     }
 
     public int getAllOtherPartyVotes(PoliticalParty party) {
@@ -95,19 +89,15 @@ public class ElectionData {
         return new EnumMap<>(this.votes);
     }
 
-    private static PoliticalParty determineWinner(Map<PoliticalParty, Integer> votes) {
-        int max = votes.values().stream().mapToInt(Integer::intValue).max().getAsInt();
-        long maxOccurrences = votes.entrySet().stream()
-                .filter(entry -> entry.getValue() == max)
-                .count();
-        PoliticalParty winner = PoliticalParty.TIE;
-        if (maxOccurrences == 1) {
-            winner = votes.entrySet().stream()
-                    .filter(entry -> entry.getValue() == max)
-                    .map(Map.Entry::getKey)
-                    .findFirst().get();
-        }
-        return winner;
+    private static Set<PoliticalParty> determineWinners(Map<PoliticalParty, Integer> votes) {
+        final int max = votes.values().stream().mapToInt(Integer::intValue).max().getAsInt();
+        final Set<PoliticalParty> winners = new HashSet<>();
+        votes.forEach((party, numVotes) -> {
+            if (numVotes == max){
+                winners.add(party);
+            }
+        });
+        return winners;
     }
 
     public static ElectionData combine(ElectionData e1, ElectionData e2) throws MismatchedElectionException {
@@ -132,8 +122,8 @@ public class ElectionData {
             }
             combinedVotes.put(partyType, e1Votes.get(partyType) + e2Votes.get(partyType));
         }
-        PoliticalParty winner = ElectionData.determineWinner(combinedVotes);
-        return new ElectionData(UUID.randomUUID().toString(), e1.electionType, combinedVotes, winner);
+        Set<PoliticalParty> winners = ElectionData.determineWinners(combinedVotes);
+        return new ElectionData(UUID.randomUUID().toString(), e1.electionType, combinedVotes, winners);
     }
 
     public void subtract(ElectionData subElectionData) throws MismatchedElectionException {
@@ -152,6 +142,6 @@ public class ElectionData {
             }
             this.votes.put(partyType, this.votes.get(partyType) - subVotes.get(partyType));
         }
-        this.winner = ElectionData.determineWinner(this.votes);
+        this.winners = ElectionData.determineWinners(this.votes);
     }
 }

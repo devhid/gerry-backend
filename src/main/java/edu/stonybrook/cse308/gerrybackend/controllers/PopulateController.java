@@ -184,20 +184,24 @@ public class PopulateController {
 
         votes1.put(PoliticalParty.DEMOCRATIC, 0);
         votes1.put(PoliticalParty.REPUBLICAN, 50);
-        votes1.put(PoliticalParty.INDEPENDENT, 0);
         votes1.put(PoliticalParty.OTHER, 0);
         votes2.put(PoliticalParty.DEMOCRATIC, 0);
         votes2.put(PoliticalParty.REPUBLICAN, 0);
-        votes2.put(PoliticalParty.INDEPENDENT, 100);
-        votes2.put(PoliticalParty.OTHER, 0);
+        votes2.put(PoliticalParty.OTHER, 100);
         votes3.put(PoliticalParty.DEMOCRATIC, 150);
         votes3.put(PoliticalParty.REPUBLICAN, 0);
-        votes3.put(PoliticalParty.INDEPENDENT, 0);
         votes3.put(PoliticalParty.OTHER, 0);
 
-        ElectionData election1 = new ElectionData(UUID.randomUUID().toString(), electionType, votes1, PoliticalParty.REPUBLICAN);
-        ElectionData election2 = new ElectionData(UUID.randomUUID().toString(), electionType, votes2, PoliticalParty.INDEPENDENT);
-        ElectionData election3 = new ElectionData(UUID.randomUUID().toString(), electionType, votes3, PoliticalParty.DEMOCRATIC);
+        Set<PoliticalParty> winners1 = new HashSet<>();
+        winners1.add(PoliticalParty.REPUBLICAN);
+        Set<PoliticalParty> winners2 = new HashSet<>();
+        winners2.add(PoliticalParty.OTHER);
+        Set<PoliticalParty> winners3 = new HashSet<>();
+        winners3.add(PoliticalParty.DEMOCRATIC);
+
+        ElectionData election1 = new ElectionData(UUID.randomUUID().toString(), electionType, votes1, winners1);
+        ElectionData election2 = new ElectionData(UUID.randomUUID().toString(), electionType, votes2, winners2);
+        ElectionData election3 = new ElectionData(UUID.randomUUID().toString(), electionType, votes3, winners3);
 
         // Create precincts
         PrecinctNode p1 = PrecinctNode.builder()

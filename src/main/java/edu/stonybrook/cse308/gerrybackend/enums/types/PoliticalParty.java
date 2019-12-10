@@ -7,10 +7,8 @@ import lombok.Getter;
 public enum PoliticalParty implements IntEnumInterface {
     DEMOCRATIC(0, "democratic"),
     REPUBLICAN(1, "republican"),
-    INDEPENDENT(2, "independent"),
-    OTHER(3, "other"),
-    TIE(4, "tie"),
-    NOT_SET(5, "not_set");
+    OTHER(2, "other"),
+    NOT_SET(3, "not_set");
 
     @Getter
     private final int value;

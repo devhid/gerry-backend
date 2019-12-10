@@ -13,9 +13,10 @@ public interface PoliticalFairnessMeasusre {
             int inefficientLosingVotes = 0;
             int totalVotes = 0;
             for (DistrictNode d : state.getChildren()) {
-                PoliticalParty winner = d.getElectionData().getWinner();
-                int winningVotes = d.getElectionData().getPartyVotes(winner);
-                int losingVotes = d.getElectionData().getAllOtherPartyVotes(winner);
+                // TODO: revisit and check if this is appropriate for more than 1 winner
+                PoliticalParty arbitraryWinner = d.getElectionData().getWinners().iterator().next();
+                int winningVotes = d.getElectionData().getPartyVotes(arbitraryWinner);
+                int losingVotes = d.getElectionData().getAllOtherPartyVotes(arbitraryWinner);
                 inefficientWinningVotes += (winningVotes - losingVotes);
                 inefficientLosingVotes += losingVotes;
                 totalVotes += (winningVotes + losingVotes);
@@ -26,7 +27,7 @@ public interface PoliticalFairnessMeasusre {
 
     class Gerrymander {
         static double computeFairnessScore(DistrictNode district, PoliticalParty party) {
-            if (party == PoliticalParty.NOT_SET || party == PoliticalParty.TIE) {
+            if (party == PoliticalParty.getDefault()){
                 throw new IllegalArgumentException("Replace this string later!");
             }
             int partyVotes = district.getElectionData().getPartyVotes(party);
@@ -80,7 +81,7 @@ public interface PoliticalFairnessMeasusre {
             for (DistrictNode d : state.getChildren()) {
                 totalVotes += d.getElectionData().getTotalVotes();
                 totalPartyVotes += d.getElectionData().getPartyVotes(party);
-                if (d.getElectionData().getWinner() == party) {
+                if (d.getElectionData().getWinners().contains(party)) {
                     totalPartyDistricts += 1;
                 }
             }

@@ -4,13 +4,16 @@ import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalCompetitivenes
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 
+import java.util.Set;
+
 public interface PoliticalCompetitivenessMeasure {
 
     class MarginOfVictory {
         public static double computeCompetitivenessScore(DistrictNode district) {
-            PoliticalParty winner = district.getElectionData().getWinner();
-            int winningVotes = district.getElectionData().getPartyVotes(winner);
-            int losingVotes = district.getElectionData().getAllOtherPartyVotes(winner);
+            // TODO: revisit and check if this is appropriate for more than 1 winner
+            PoliticalParty arbitraryWinner = district.getElectionData().getWinners().iterator().next();
+            int winningVotes = district.getElectionData().getPartyVotes(arbitraryWinner);
+            int losingVotes = district.getElectionData().getAllOtherPartyVotes(arbitraryWinner);
             return 1.0 - (((double) Math.abs(winningVotes - losingVotes)) / (winningVotes + losingVotes));
         }
     }

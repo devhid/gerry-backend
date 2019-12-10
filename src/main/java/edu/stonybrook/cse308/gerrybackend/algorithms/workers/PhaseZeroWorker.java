@@ -50,11 +50,16 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
         Map<PrecinctNode, VoteBloc> voteBlocs = new HashMap<>();
         demoBlocs.keySet().forEach(precinct -> {
             ElectionData precinctElectionData = precinct.getElectionData();
-            PoliticalParty winningParty = precinctElectionData.getWinner();
-            int winningVotes = precinctElectionData.getPartyVotes(winningParty);
-            int totalVotes = precinctElectionData.getTotalVotes();
-            if (((double) winningVotes / totalVotes) >= threshold) {
-                voteBlocs.put(precinct, new VoteBloc(winningParty, winningVotes, totalVotes));
+            Set<PoliticalParty> winningParties = precinctElectionData.getWinners();
+            for (PoliticalParty winningParty : winningParties){
+                int winningVotes = precinctElectionData.getPartyVotes(winningParty);
+                int totalVotes = precinctElectionData.getTotalVotes();
+                if (((double) winningVotes / totalVotes) >= threshold) {
+                    voteBlocs.put(precinct, new VoteBloc(winningParty, winningVotes, totalVotes));
+                }
+                else {
+                    return;
+                }
             }
         });
         return voteBlocs;
