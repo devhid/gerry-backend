@@ -172,9 +172,9 @@ public class PopulateController {
         pop3.put(DemographicType.NH_WHITE, 300);
         votingAgePop3.put(DemographicType.NH_WHITE, 150);
 
-        DemographicData demo1 = new DemographicData(UUID.randomUUID().toString(), pop1, votingAgePop1);
-        DemographicData demo2 = new DemographicData(UUID.randomUUID().toString(), pop2, votingAgePop2);
-        DemographicData demo3 = new DemographicData(UUID.randomUUID().toString(), pop3, votingAgePop3);
+        DemographicData demo1 = new DemographicData(pop1, votingAgePop1);
+        DemographicData demo2 = new DemographicData(pop2, votingAgePop2);
+        DemographicData demo3 = new DemographicData(pop3, votingAgePop3);
 
         // Create election data.
         ElectionType electionType = ElectionType.PRESIDENTIAL_2016;
@@ -199,9 +199,9 @@ public class PopulateController {
         Set<PoliticalParty> winners3 = new HashSet<>();
         winners3.add(PoliticalParty.DEMOCRATIC);
 
-        ElectionData election1 = new ElectionData(UUID.randomUUID().toString(), electionType, votes1, winners1);
-        ElectionData election2 = new ElectionData(UUID.randomUUID().toString(), electionType, votes2, winners2);
-        ElectionData election3 = new ElectionData(UUID.randomUUID().toString(), electionType, votes3, winners3);
+        ElectionData election1 = new ElectionData(electionType, votes1, winners1);
+        ElectionData election2 = new ElectionData(electionType, votes2, winners2);
+        ElectionData election3 = new ElectionData(electionType, votes3, winners3);
 
         // Create precincts
         PrecinctNode p1 = PrecinctNode.builder()

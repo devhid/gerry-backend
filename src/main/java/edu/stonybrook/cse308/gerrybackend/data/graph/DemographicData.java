@@ -15,14 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity(name = "demographic")
+@Embeddable
 @JsonIgnoreProperties({"populationCopy", "votingAgePopulationCopy"})
 public class DemographicData {
-
-    @Getter
-    @Id
-    @Column(name = "id")
-    private String id;
 
     @NotNull
     @Fetch(FetchMode.SUBSELECT) // IMPORTANT
@@ -39,22 +34,20 @@ public class DemographicData {
     private Map<DemographicType, Integer> votingAgePopulation;
 
     public DemographicData() {
-        this.id = UUID.randomUUID().toString();
         this.population = new EnumMap<>(DemographicType.class);
         this.votingAgePopulation = new EnumMap<>(DemographicType.class);
         MapUtils.initMap(this.population, 0);
         MapUtils.initMap(this.votingAgePopulation, 0);
     }
 
-    public DemographicData(String id, Map<DemographicType, Integer> population,
+    public DemographicData(Map<DemographicType, Integer> population,
                            Map<DemographicType, Integer> votingAgePopulation) {
-        this.id = id;
         this.population = population;
         this.votingAgePopulation = votingAgePopulation;
     }
 
     public DemographicData(DemographicData obj) {
-        this(UUID.randomUUID().toString(), obj.getPopulationCopy(), obj.getVotingAgePopulationCopy());
+        this(obj.getPopulationCopy(), obj.getVotingAgePopulationCopy());
     }
 
     public int getDemoPopulation(DemographicType demo) {
@@ -128,7 +121,7 @@ public class DemographicData {
             combinedPop.put(demoType, d1Pop.get(demoType) + d2Pop.get(demoType));
             combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
         }
-        return new DemographicData(UUID.randomUUID().toString(), combinedPop, combinedVotingAgePop);
+        return new DemographicData(combinedPop, combinedVotingAgePop);
     }
 
     public void subtract(DemographicData subDemoData) {

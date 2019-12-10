@@ -16,14 +16,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-@Entity(name = "election")
+@Embeddable
 @JsonIgnoreProperties({"votesCopy"})
 public class ElectionData {
-
-    @Getter
-    @Id
-    @Column(name = "id")
-    private String id;
 
     @Getter
     @NotNull
@@ -45,22 +40,20 @@ public class ElectionData {
     private Set<PoliticalParty> winners;
 
     public ElectionData() {
-        this.id = UUID.randomUUID().toString();
         this.electionType = ElectionType.getDefault();
         this.votes = new EnumMap<>(PoliticalParty.class);
         this.winners = new HashSet<>();
         MapUtils.initMap(this.votes, 0);
     }
 
-    public ElectionData(String id, ElectionType electionType, Map<PoliticalParty, Integer> votes, Set<PoliticalParty> winners) {
-        this.id = id;
+    public ElectionData(ElectionType electionType, Map<PoliticalParty, Integer> votes, Set<PoliticalParty> winners) {
         this.electionType = electionType;
         this.votes = votes;
         this.winners = winners;
     }
 
     public ElectionData(ElectionData obj) {
-        this(UUID.randomUUID().toString(), obj.electionType, obj.getVotesCopy(), obj.winners);
+        this(obj.electionType, obj.getVotesCopy(), obj.winners);
     }
 
     public int getPartyVotes(PoliticalParty party) {
@@ -123,7 +116,7 @@ public class ElectionData {
             combinedVotes.put(partyType, e1Votes.get(partyType) + e2Votes.get(partyType));
         }
         Set<PoliticalParty> winners = ElectionData.determineWinners(combinedVotes);
-        return new ElectionData(UUID.randomUUID().toString(), e1.electionType, combinedVotes, winners);
+        return new ElectionData(e1.electionType, combinedVotes, winners);
     }
 
     public void subtract(ElectionData subElectionData) throws MismatchedElectionException {

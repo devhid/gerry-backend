@@ -9,8 +9,6 @@ import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
@@ -50,16 +48,12 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     @Getter
     @NotNull
-    @Fetch(FetchMode.JOIN)
-    @OneToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "node_demo_id")
+    @Embedded
     protected DemographicData demographicData;
 
     @Getter
     @NotNull
-    @Fetch(FetchMode.JOIN)
-    @OneToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "node_election_id")
+    @Embedded
     protected ElectionData electionData;
 
     @Getter
