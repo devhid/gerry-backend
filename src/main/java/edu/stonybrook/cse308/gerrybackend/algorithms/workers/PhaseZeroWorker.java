@@ -81,7 +81,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
                 precinctBlocSummaries.put(voteBloc.getWinningParty(), demographicEntry);
             }
             final PrecinctBlocSummary precinctBlocSummary = demographicEntry.getOrDefault(demographicType,
-                    new PrecinctBlocSummary(voteBloc.getWinningParty(), demographicType));
+                    new PrecinctBlocSummary(demographicType));
 
             double votePercent = (1.0 * voteBloc.getWinningVotes()) / voteBloc.getTotalVotes();
             double demographicPercent = (1.0 * demoBloc.getDemographicPopulation()) / demoBloc.getTotalPop();
@@ -90,7 +90,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
             precinctBlocSummary.incrementVotingBlocCount();
             precinctBlocSummary.addPartyPercentage(votePercent);
             precinctBlocSummary.addDemographicPercentage(demographicPercent);
-            precinctBlocSummary.addCounty(precinctWithVoteBloc.getCounty());
+            precinctBlocSummary.addPrecinct(precinctWithVoteBloc);
 
             demographicEntry.put(demographicType, precinctBlocSummary);
         });
