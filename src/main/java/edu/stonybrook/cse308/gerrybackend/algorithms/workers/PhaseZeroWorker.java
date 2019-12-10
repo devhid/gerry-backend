@@ -77,7 +77,7 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
             final DemographicType demographicType = demoBloc.getDemographicType();
             final Map<DemographicType, PrecinctBlocSummary> demographicEntry =
                     precinctBlocSummaries.getOrDefault(voteBloc.getWinningParty(), new HashMap<>());
-            if (!precinctBlocSummaries.containsKey(voteBloc.getWinningParty())){
+            if (!precinctBlocSummaries.containsKey(voteBloc.getWinningParty())) {
                 precinctBlocSummaries.put(voteBloc.getWinningParty(), demographicEntry);
             }
             final PrecinctBlocSummary precinctBlocSummary = demographicEntry.getOrDefault(demographicType,

@@ -2,6 +2,7 @@ package edu.stonybrook.cse308.gerrybackend.db.services;
 
 import edu.stonybrook.cse308.gerrybackend.db.repositories.StateRepository;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class StateService extends EntityService<StateNode> {
     }
 
     public StateNode findOriginalState(StateType stateType, ElectionType electionType) {
-        return repo.findOriginalState(stateType, electionType);
+        return repo.queryFirstByNodeTypeAndStateTypeAndElectionData_ElectionType(NodeType.ORIGINAL, stateType, electionType);
     }
+
 }

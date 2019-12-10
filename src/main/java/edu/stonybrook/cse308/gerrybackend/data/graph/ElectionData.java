@@ -9,6 +9,8 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import lombok.Getter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -33,7 +35,8 @@ public class ElectionData {
     private ElectionType electionType;
 
     @NotNull
-    @ElementCollection
+    @Fetch(FetchMode.SUBSELECT) // IMPORTANT
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "votes")
     @JsonProperty("votes")
     private Map<PoliticalParty, Integer> votes;

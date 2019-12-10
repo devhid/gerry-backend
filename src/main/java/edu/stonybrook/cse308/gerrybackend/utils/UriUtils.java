@@ -4,7 +4,7 @@ import java.net.URI;
 
 public class UriUtils {
 
-    public static String[] getPathFragmentsFromURI(final URI uri){
+    public static String[] getPathFragmentsFromURI(final URI uri) {
         final String path = uri.getPath();
         return path.split("/");
     }

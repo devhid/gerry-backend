@@ -5,11 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import lombok.Getter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.EnumMap;
 import java.util.Map;
@@ -26,13 +25,15 @@ public class DemographicData {
     private String id;
 
     @NotNull
-    @ElementCollection
+    @Fetch(FetchMode.SUBSELECT) // IMPORTANT
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "population")
     @JsonProperty("population")
     private Map<DemographicType, Integer> population;
 
     @NotNull
-    @ElementCollection
+    @Fetch(FetchMode.SUBSELECT) // IMPORTANT
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "voting_age_population")
     @JsonProperty("voting_age_population")
     private Map<DemographicType, Integer> votingAgePopulation;
