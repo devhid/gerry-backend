@@ -24,15 +24,16 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
      * @return a map whose keys are precincts who have demographic blocs and values are POJOS
      */
     private static Map<PrecinctNode, DemoBloc> getDemoBlocs(StateNode state, double threshold) {
-        Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
         Map<PrecinctNode, DemoBloc> demoBlocs = new HashMap<>();
-        allPrecincts.forEach(p -> {
-            int precinctTotalPop = p.getDemographicData().getTotalPopulation();
-            EnumSet.allOf(DemographicType.class).forEach(demoType -> {
-                int precinctDemoPop = p.getDemographicData().getDemoPopulation(demoType);
-                if (((double) precinctDemoPop / precinctTotalPop) >= threshold) {
-                    demoBlocs.put(p, new DemoBloc(demoType, precinctDemoPop, precinctTotalPop));
-                }
+        state.getChildren().forEach(d -> {
+            d.getChildren().forEach(p -> {
+                int precinctTotalPop = p.getDemographicData().getTotalPopulation();
+                EnumSet.allOf(DemographicType.class).forEach(demoType -> {
+                    int precinctDemoPop = p.getDemographicData().getDemoPopulation(demoType);
+                    if (((double) precinctDemoPop / precinctTotalPop) >= threshold) {
+                        demoBlocs.put(p, new DemoBloc(demoType, precinctDemoPop, precinctTotalPop));
+                    }
+                });
             });
         });
         return demoBlocs;
@@ -76,6 +77,9 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
             final DemographicType demographicType = demoBloc.getDemographicType();
             final Map<DemographicType, PrecinctBlocSummary> demographicEntry =
                     precinctBlocSummaries.getOrDefault(voteBloc.getWinningParty(), new HashMap<>());
+            if (!precinctBlocSummaries.containsKey(voteBloc.getWinningParty())){
+                precinctBlocSummaries.put(voteBloc.getWinningParty(), demographicEntry);
+            }
             final PrecinctBlocSummary precinctBlocSummary = demographicEntry.getOrDefault(demographicType,
                     new PrecinctBlocSummary(voteBloc.getWinningParty(), demographicType));
 

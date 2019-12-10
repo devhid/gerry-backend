@@ -16,6 +16,7 @@ import org.locationtech.jts.io.geojson.GeoJsonReader;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -151,4 +152,16 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         return -1.0;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GerryNode)) return false;
+        GerryNode<?, ?> gerryNode = (GerryNode<?, ?>) o;
+        return id.equals(gerryNode.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
