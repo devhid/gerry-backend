@@ -105,7 +105,6 @@ public class PopulateController {
 
     @PostMapping("/echo-state")
     public ResponseEntity<StateNode> echoState(@RequestBody StateNode state) {
-        state.fillInTransientProperties();
         this.populateDistrictEdges(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
@@ -124,7 +123,6 @@ public class PopulateController {
 
     @PostMapping("/create-state")
     public ResponseEntity<StateNode> createState(@RequestBody StateNode state) {
-        state.fillInTransientProperties();
         state.aggregateStatistics();
         this.populateDistrictEdges(state);
         state.getMultiPolygon();
