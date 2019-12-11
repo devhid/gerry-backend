@@ -35,7 +35,7 @@ public class ElectionData {
 
     @Getter
     @NotNull
-//    @Fetch(FetchMode.SUBSELECT)   // DETERMINE IF NEEDED
+    @Fetch(FetchMode.SUBSELECT) // IMPORTANT
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<PoliticalParty> winners;
 

@@ -11,6 +11,8 @@ import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.locationtech.jts.algorithm.MinimumBoundingCircle;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -42,7 +44,8 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     protected Set<C> children;
 
     @Getter
-    @ElementCollection
+    @Fetch(FetchMode.SUBSELECT)
+    @ElementCollection(fetch = FetchType.EAGER)
     protected Set<String> counties;
 
     @Getter

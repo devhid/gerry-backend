@@ -81,9 +81,10 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * Make sure to call this method after deserialization of a StateNode.
      */
     private void fillInParentReferences() {
-        if (this.nodeType != NodeType.USER) {
-            return;
-        }
+//         TODO: is this check needed?
+//        if (this.nodeType != NodeType.USER) {
+//            return;
+//        }
         Set<DistrictNode> districts = this.getChildren();
         districts.forEach(d -> {
             d.setParent(this);
