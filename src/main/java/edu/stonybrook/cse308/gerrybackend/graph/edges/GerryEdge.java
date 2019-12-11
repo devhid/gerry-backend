@@ -49,8 +49,12 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         this.joinability = new Joinability(this.item1, this.item2);
     }
 
-    public double getJoinabilityValue(PoliticalParty party, Set<DemographicType> demoTypes) {
-        return this.joinability.getValue(party, demoTypes);
+    public double getJoinabilityValue(Set<PoliticalParty> parties, Set<DemographicType> demoTypes) {
+        return this.joinability.getValue(parties, demoTypes);
+    }
+
+    public double getJoinabilityValue(Set<PoliticalParty> parties) {
+        return this.joinability.getValueWithoutMinority(parties);
     }
 
     @Override

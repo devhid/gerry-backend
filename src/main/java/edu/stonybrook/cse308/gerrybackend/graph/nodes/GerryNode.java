@@ -105,6 +105,18 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         return adjNodes;
     }
 
+
+    public GerryEdge getEdge(GerryNode adjacentNode) {
+        for(GerryEdge edge: this.getAdjacentEdges()) {
+            if(edge.contains(adjacentNode)) {
+                return edge;
+            }
+        }
+
+        // Should never happen unless the input node is not actually adjacent to the 'this' node.
+        throw new IllegalArgumentException("Replace string with text later!");
+    }
+
     public void addEdge(E edge) throws InvalidEdgeException {
         if (this.adjacentEdges.contains(edge)) {
             throw new InvalidEdgeException("Replace this string later!");
