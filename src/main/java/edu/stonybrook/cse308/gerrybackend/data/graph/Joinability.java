@@ -60,7 +60,16 @@ public class Joinability {
         return minorityJoinability;
     }
 
-    public double getValue(PoliticalParty politicalParty, Set<DemographicType> demoTypes) {
+    public double getValueWithoutMinority(Set<PoliticalParty> politicalParties) {
+        double maxPoliticalJoinability = 0.0;
+        for (PoliticalParty party: politicalParties) {
+            maxPoliticalJoinability = Math.max(maxPoliticalJoinability, this.political.get(party));
+        }
+
+        return this.population + this.compactness + maxPoliticalJoinability;
+    }
+
+    public double getValue(Set<PoliticalParty> politicalParties, Set<DemographicType> demoTypes) {
         // fake math
         double minorityAvg = 0.0;
 
@@ -68,6 +77,11 @@ public class Joinability {
             minorityAvg += this.minority.get(demoType);
         }
 
-        return this.population + this.compactness + this.political.get(politicalParty) + minorityAvg;
+        double maxPoliticalJoinability = 0.0;
+        for (PoliticalParty party: politicalParties) {
+            maxPoliticalJoinability = Math.max(maxPoliticalJoinability, this.political.get(party));
+        }
+
+        return this.population + this.compactness + maxPoliticalJoinability + minorityAvg;
     }
 }
