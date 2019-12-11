@@ -99,12 +99,12 @@ public interface PhaseOneOtherPairsHeuristic {
 
             Map<DistrictNode, LikelyCandidatePair> likelyPairs = new HashMap<>();
 
-            while(!consideredDistricts.isEmpty()) {
+            while (!consideredDistricts.isEmpty()) {
                 DistrictNode d1 = consideredDistricts.poll();
 
                 Set<DistrictNode> adjNodes = GenericUtils.castSetOfObjects(d1.getAdjacentNodes(), DistrictNode.class);
 
-                for(DistrictNode d2: adjNodes) {
+                for (DistrictNode d2 : adjNodes) {
                     LikelyCandidatePair likelyPair = Standard.createLikelyCandidatePair(d1, d2);
                     LikelyType likelyType = likelyPair.getLikelyType();
 

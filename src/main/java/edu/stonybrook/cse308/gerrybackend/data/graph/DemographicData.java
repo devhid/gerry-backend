@@ -4,16 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
-import lombok.Getter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
 import javax.validation.constraints.NotNull;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @Embeddable
 @JsonIgnoreProperties({"populationCopy", "votingAgePopulationCopy"})

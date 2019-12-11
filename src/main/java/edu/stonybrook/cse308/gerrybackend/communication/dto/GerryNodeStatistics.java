@@ -26,7 +26,7 @@ public class GerryNodeStatistics {
         this.electionData = electionData;
     }
 
-    public static GerryNodeStatistics fromGerryNode(GerryNode node){
+    public static GerryNodeStatistics fromGerryNode(GerryNode node) {
         return new GerryNodeStatistics(node.getId(), node.getName(), node.getDemographicData(), node.getElectionData());
     }
 }

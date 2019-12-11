@@ -51,13 +51,12 @@ public class PhaseZeroWorker extends AlgPhaseWorker<PhaseZeroInputs, PhaseZeroRe
         demoBlocs.keySet().forEach(precinct -> {
             ElectionData precinctElectionData = precinct.getElectionData();
             Set<PoliticalParty> winningParties = precinctElectionData.getWinners();
-            for (PoliticalParty winningParty : winningParties){
+            for (PoliticalParty winningParty : winningParties) {
                 int winningVotes = precinctElectionData.getPartyVotes(winningParty);
                 int totalVotes = precinctElectionData.getTotalVotes();
                 if (((double) winningVotes / totalVotes) >= threshold) {
                     voteBlocs.put(precinct, new VoteBloc(winningParty, winningVotes, totalVotes));
-                }
-                else {
+                } else {
                     return;
                 }
             }

@@ -4,8 +4,6 @@ import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalCompetitivenes
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 
-import java.util.Set;
-
 public interface PoliticalCompetitivenessMeasure {
 
     class MarginOfVictory {

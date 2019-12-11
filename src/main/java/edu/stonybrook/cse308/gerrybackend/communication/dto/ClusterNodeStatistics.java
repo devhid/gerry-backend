@@ -21,9 +21,9 @@ public class ClusterNodeStatistics extends GerryNodeStatistics {
         this.children = children;
     }
 
-    public static ClusterNodeStatistics fromClusterNode(ClusterNode<GerryEdge,GerryNode> clusterNode) {
+    public static ClusterNodeStatistics fromClusterNode(ClusterNode<GerryEdge, GerryNode> clusterNode) {
         Set<GerryNodeStatistics> children = new HashSet<>();
-        for (GerryNode child : clusterNode.getChildren()){
+        for (GerryNode child : clusterNode.getChildren()) {
             children.add(GerryNodeStatistics.fromGerryNode(child));
         }
         return new ClusterNodeStatistics(clusterNode.getId(), clusterNode.getName(), clusterNode.getDemographicData(),

@@ -80,7 +80,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * As parent references are not stored in the DB, these wil have to be populated afterwards.
      * Make sure to call this method after deserialization of a StateNode.
      */
-    private void fillInParentReferences() {
+    public void fillInParentReferences() {
 //         TODO: is this check needed?
 //        if (this.nodeType != NodeType.USER) {
 //            return;
@@ -122,7 +122,7 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * As edge node references are NOT stored in the DB, these will have to be populated afterwards.
      * Make sure to call this method after deserialization of a StateNode.
      */
-    private void fillInEdgeNodeReferences() {
+    public void fillInEdgeNodeReferences() {
         Map<String, UnorderedPair<GerryNode>> edgeMap = new HashMap<>();
 
         // Load all districts & precincts.

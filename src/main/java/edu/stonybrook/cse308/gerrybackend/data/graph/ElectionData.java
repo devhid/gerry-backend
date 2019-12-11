@@ -3,7 +3,6 @@ package edu.stonybrook.cse308.gerrybackend.data.graph;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.ElectionTypeConverter;
-import edu.stonybrook.cse308.gerrybackend.enums.converters.PoliticalPartyConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
@@ -14,7 +13,10 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Embeddable
 @JsonIgnoreProperties({"votesCopy"})
@@ -86,7 +88,7 @@ public class ElectionData {
         final int max = votes.values().stream().mapToInt(Integer::intValue).max().getAsInt();
         final Set<PoliticalParty> winners = new HashSet<>();
         votes.forEach((party, numVotes) -> {
-            if (numVotes == max){
+            if (numVotes == max) {
                 winners.add(party);
             }
         });

@@ -27,7 +27,7 @@ public interface PoliticalFairnessMeasusre {
 
     class Gerrymander {
         static double computeFairnessScore(DistrictNode district, PoliticalParty party) {
-            if (party == PoliticalParty.getDefault()){
+            if (party == PoliticalParty.getDefault()) {
                 throw new IllegalArgumentException("Replace this string later!");
             }
             int partyVotes = district.getElectionData().getPartyVotes(party);

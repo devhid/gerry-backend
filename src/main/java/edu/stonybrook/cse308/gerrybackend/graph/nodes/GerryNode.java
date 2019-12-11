@@ -109,8 +109,8 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
 
     public GerryEdge getEdge(GerryNode adjacentNode) {
-        for(GerryEdge edge: this.getAdjacentEdges()) {
-            if(edge.contains(adjacentNode)) {
+        for (GerryEdge edge : this.getAdjacentEdges()) {
+            if (edge.contains(adjacentNode)) {
                 return edge;
             }
         }

@@ -62,7 +62,7 @@ public class Joinability {
 
     public double getValueWithoutMinority(Set<PoliticalParty> politicalParties) {
         double maxPoliticalJoinability = 0.0;
-        for (PoliticalParty party: politicalParties) {
+        for (PoliticalParty party : politicalParties) {
             maxPoliticalJoinability = Math.max(maxPoliticalJoinability, this.political.get(party));
         }
 
@@ -78,7 +78,7 @@ public class Joinability {
         }
 
         double maxPoliticalJoinability = 0.0;
-        for (PoliticalParty party: politicalParties) {
+        for (PoliticalParty party : politicalParties) {
             maxPoliticalJoinability = Math.max(maxPoliticalJoinability, this.political.get(party));
         }
 
