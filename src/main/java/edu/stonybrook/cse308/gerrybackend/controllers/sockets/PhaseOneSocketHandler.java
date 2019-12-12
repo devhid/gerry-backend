@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.controllers.sockets;
 
+import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,17 +10,20 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 @Component
-public class AlgorithmSocketHandler extends TextWebSocketHandler {
-    final static Logger LOGGER = LoggerFactory.getLogger(AlgorithmSocketHandler.class);
+public class PhaseOneSocketHandler extends TextWebSocketHandler {
+    final static Logger LOGGER = LoggerFactory.getLogger(PhaseOneSocketHandler.class);
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
-        LOGGER.info(String.format("Connected to session %s.", session.getId()));
+        LOGGER.info(String.format("Connected to session %s for Phase 1", session.getId()));
     }
 
     @Override
     public void handleTextMessage(final WebSocketSession session, final TextMessage json) throws Exception {
         LOGGER.info(String.format("Received message: %s", json.getPayload()));
+        PhaseOneInputs inputs = PhaseOneInputs.fromString(json.getPayload());
+
+        // TODO: Run algo?
     }
 
     @Override
