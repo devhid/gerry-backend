@@ -5,6 +5,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.IterativeA
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.logs.IterativeAlgPhaseLog;
 import edu.stonybrook.cse308.gerrybackend.data.reports.IterativeAlgPhaseDelta;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,17 +15,13 @@ import java.util.Queue;
 public abstract class IterativeAlgPhaseReport<D extends IterativeAlgPhaseDelta, B extends IterativeAlgPhaseLogBuilder<D>> extends AlgPhaseReport {
 
     @Getter
-    protected String newStateId;
-
-    @Getter
     protected Queue<D> deltas;
 
     @Getter
     @JsonIgnore
     protected B logBuilder;
 
-    IterativeAlgPhaseReport(String newStateId, Queue<D> deltas, B logBuilder) {
-        this.newStateId = newStateId;
+    IterativeAlgPhaseReport(Queue<D> deltas, B logBuilder) {
         this.deltas = deltas;
         this.logBuilder = logBuilder;
     }

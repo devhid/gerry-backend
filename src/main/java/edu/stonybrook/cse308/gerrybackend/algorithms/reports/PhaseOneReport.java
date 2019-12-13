@@ -1,51 +1,27 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.PhaseOneLogBuilder;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.phaseone.MergedDistrict;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
 public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, PhaseOneLogBuilder> {
 
-    private int nextNumericalId;
-
     @Getter
-    private Map<String, Integer> numericalDistrictIds;
+    @Setter
+    protected String jobId;
 
-    public PhaseOneReport(String newStateId, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder) {
-        super(newStateId, deltas, logBuilder);
-        this.numericalDistrictIds = new HashMap<>();
-        this.nextNumericalId = 1;
-    }
-
-    public PhaseOneReport(String newStateId, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder,
-                          Map<String, Integer> numericalDistrictIds, int nextNumericalId) {
-        super(newStateId, deltas, logBuilder);
-        this.numericalDistrictIds = numericalDistrictIds;
-        this.nextNumericalId = nextNumericalId;
-    }
-
-    private void setNextNumericalId(String newUUID) {
-        this.numericalDistrictIds.put(newUUID, this.nextNumericalId++);
-    }
-
-    public void updateNumericalDistrictIds() {
-        for (PhaseOneMergeDelta delta : this.deltas) {
-            Map<String, String> changedNodes = delta.getChangedNodes();
-            changedNodes.forEach((changedNodeId, newNodeId) -> {
-                if (!this.numericalDistrictIds.containsKey(changedNodeId)){
-                    this.setNextNumericalId(changedNodeId);
-                }
-                this.setNextNumericalId(newNodeId);
-            });
-        }
+    public PhaseOneReport(Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder, String jobId) {
+        super(deltas, logBuilder);
+        this.jobId = jobId;
     }
 
     @Override
     protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseOneMergeDelta> deltas) {
-        return new PhaseOneReport(this.newStateId, deltas, this.logBuilder, this.numericalDistrictIds, this.nextNumericalId);
+        return new PhaseOneReport(deltas, this.logBuilder, this.jobId);
     }
 
     public PhaseOneReport fetchNextReport(int num) {
@@ -62,9 +38,9 @@ public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, 
      * @param newDistricts              map whose key is a district id and value is a district
      */
     private void extractInitialPrecinctAssignments(Map<String, String> initialPrecinctAssignment,
-                                                   Map<String, DistrictNode> initialDistricts,
+                                                   Map<String, MergedDistrict> initialDistricts,
                                                    Map<String, List<String>> precinctAssignments,
-                                                   Map<String, DistrictNode> newDistricts) {
+                                                   Map<String, MergedDistrict> newDistricts) {
         initialPrecinctAssignment.forEach((precinctId, districtId) -> {
             List<String> precinctDistricts = new ArrayList<>();
             precinctDistricts.add(districtId);
@@ -82,14 +58,14 @@ public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, 
      * @return the number of iterations executed
      */
     private int trackDistrictMerges(Map<String, List<String>> precinctAssignments,
-                                    Map<String, DistrictNode> newDistricts) {
+                                    Map<String, MergedDistrict> newDistricts) {
         PhaseOneMergeDelta currDelta;
         int iteration = 0;
         while (!deltas.isEmpty()) {
             currDelta = deltas.poll();
             iteration = currDelta.getIteration();
             final Map<String, String> mergedDistricts = currDelta.getChangedNodes();
-            final Map<String, DistrictNode> newDeltaDistricts = currDelta.getNewDistricts();
+            final Map<String, MergedDistrict> newDeltaDistricts = currDelta.getNewDistricts();
             mergedDistricts.forEach((oldDistrictId, newDistrictId) -> {
                 List<String> precinctDistricts = precinctAssignments.get(oldDistrictId);
                 precinctDistricts.add(newDistrictId);
@@ -119,12 +95,12 @@ public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, 
         //           initialPrecinctADistrict.id -> same list as precinctA.id
         Map<String, List<String>> precinctAssignments = new HashMap<>();
         Map<String, String> changedNodes = new HashMap<>();
-        Map<String, DistrictNode> newDistricts = new HashMap<>();
+        Map<String, MergedDistrict> newDistricts = new HashMap<>();
 
         // Get the initial precinct to district mappings from the 0th delta.
         PhaseOneMergeDelta currDelta = deltas.poll();
         final Map<String, String> initialPrecinctAssignment = currDelta.getChangedNodes();
-        final Map<String, DistrictNode> initialDistricts = currDelta.getNewDistricts();
+        final Map<String, MergedDistrict> initialDistricts = currDelta.getNewDistricts();
         this.extractInitialPrecinctAssignments(initialPrecinctAssignment, initialDistricts, precinctAssignments, newDistricts);
 
         // For each new delta, track the merging of districts.

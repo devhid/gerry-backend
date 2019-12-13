@@ -7,13 +7,13 @@ import java.util.Queue;
 
 public class PhaseTwoReport extends IterativeAlgPhaseReport<PhaseTwoMoveDelta, PhaseTwoLogBuilder> {
 
-    public PhaseTwoReport(String newStateId, Queue<PhaseTwoMoveDelta> deltas, PhaseTwoLogBuilder logBuilder) {
-        super(newStateId, deltas, logBuilder);
+    public PhaseTwoReport(Queue<PhaseTwoMoveDelta> deltas, PhaseTwoLogBuilder logBuilder) {
+        super(deltas, logBuilder);
     }
 
     @Override
     protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseTwoMoveDelta> deltas) {
-        return new PhaseTwoReport(this.newStateId, deltas, this.logBuilder);
+        return new PhaseTwoReport(deltas, this.logBuilder);
     }
 
     public PhaseTwoReport fetchNextReport(int num) {

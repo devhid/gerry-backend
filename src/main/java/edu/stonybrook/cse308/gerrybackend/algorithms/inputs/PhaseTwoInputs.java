@@ -14,7 +14,7 @@ import java.util.Set;
 public class PhaseTwoInputs extends AlgPhaseInputs {
 
     @Getter
-    private String stateId;
+    private String phaseOneJobId;
 
     @Getter
     private Set<DemographicType> demographicTypes;
@@ -66,7 +66,7 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
 
     @Override
     protected boolean isValid() {
-        boolean valid = this.stateId != null;
+        boolean valid = this.phaseOneJobId != null;
         valid = valid && (this.demographicTypes != null) && (this.demographicTypes.size() > 0);
         valid = valid && (this.upperBound > this.lowerBound);
         valid = valid && (this.numRetries > 0);
@@ -77,4 +77,5 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
         valid = valid && (this.moveHeuristic != null);
         return valid;
     }
+
 }

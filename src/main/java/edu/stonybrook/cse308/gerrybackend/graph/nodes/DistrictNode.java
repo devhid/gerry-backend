@@ -11,6 +11,8 @@ import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.mapstruct.Named;
 
 import javax.persistence.*;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
+    @Getter
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "incumbent_name")),
@@ -41,6 +44,11 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     @Transient
     private Set<PrecinctNode> borderPrecincts;
+
+    @Getter
+    @Setter
+    @Column(name = "numerical_id")
+    private String numericalId; // for phase 1 to map colors properly
 
     public DistrictNode() {
         super();

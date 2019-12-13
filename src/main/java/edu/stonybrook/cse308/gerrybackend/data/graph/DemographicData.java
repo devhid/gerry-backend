@@ -63,6 +63,11 @@ public class DemographicData {
         return demoPop;
     }
 
+    public boolean constitutesMajority(Set<DemographicType> demoTypes) {
+        int demoPopulation = this.getDemoPopulation(demoTypes);
+        return (((double) demoPopulation) / this.getTotalPopulation()) > 0.5;
+    }
+
     public int getDemoPopulation(boolean canVote, DemographicType demo) {
         if (!canVote) {
             return this.population.get(demo) - this.votingAgePopulation.get(demo);

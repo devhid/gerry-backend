@@ -12,7 +12,10 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.workers.AlgPhaseWorker;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.PhaseOneWorker;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.PhaseTwoWorker;
 import edu.stonybrook.cse308.gerrybackend.algorithms.workers.PhaseZeroWorker;
+import edu.stonybrook.cse308.gerrybackend.data.jobs.Job;
+import edu.stonybrook.cse308.gerrybackend.db.services.JobService;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
+import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -28,11 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AlgorithmController {
 
     private final StateService stateService;
+    private final JobService jobService;
     private final double phaseTwoEpsilon;
 
     @Autowired
-    public AlgorithmController(StateService stateService, @Value("${gerry.phase-two.epsilon}") double phaseTwoEpsilon) {
+    public AlgorithmController(StateService stateService, JobService jobService,
+                               @Value("${gerry.phase-two.epsilon}") double phaseTwoEpsilon) {
         this.stateService = stateService;
+        this.jobService = jobService;
         this.phaseTwoEpsilon = phaseTwoEpsilon;
     }
 
@@ -61,15 +67,19 @@ public class AlgorithmController {
     public ResponseEntity<PhaseOneReport> handlePhaseOne(@RequestBody PhaseOneInputs inputs) {
         inputs.setState(stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType()));
         PhaseOneReport report = (PhaseOneReport) handle(inputs);
+        Job job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
+        jobService.createOrUpdateJob(job);
+        report.setJobId(job.getId());
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PostMapping("/phase2")
-    public ResponseEntity<PhaseTwoReport> handlePhaseTwo(@RequestBody PhaseTwoInputs inputs) {
-        inputs.setState(stateService.getStateById(inputs.getStateId()));
-        inputs.setEpsilon(this.phaseTwoEpsilon);
-        PhaseTwoReport report = (PhaseTwoReport) handle(inputs);
-        return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
-    }
+//    @PostMapping("/phase2")
+//    public ResponseEntity<PhaseTwoReport> handlePhaseTwo(@RequestBody PhaseTwoInputs inputs) {
+//        Job phaseOneJob = jobService.getJobById(inputs.getPhaseOneJobId());
+//        inputs.setState(phaseOneJob.getState());
+//        inputs.setEpsilon(this.phaseTwoEpsilon);
+//        PhaseTwoReport report = (PhaseTwoReport) handle(inputs);
+//        return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
+//    }
 
 }

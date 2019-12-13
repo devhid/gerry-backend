@@ -1,6 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.controllers;
 
-import edu.stonybrook.cse308.gerrybackend.communication.dto.ClusterNodeStatistics;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.statistics.ClusterNodeStatistics;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.statistics.StateNodeStatistics;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
@@ -42,10 +43,10 @@ public class StateController {
     }
 
     @GetMapping("/original/stats/{stateType}/{electionType}")
-    public ResponseEntity<ClusterNodeStatistics> getOriginalStateStats(@PathVariable StateType stateType,
-                                                                       @PathVariable ElectionType electionType) {
+    public ResponseEntity<StateNodeStatistics> getOriginalStateStats(@PathVariable StateType stateType,
+                                                                     @PathVariable ElectionType electionType) {
         StateNode originalState = stateService.findOriginalState(stateType, electionType);
-        ClusterNodeStatistics stateStats = ClusterNodeStatistics.fromClusterNode((ClusterNode) originalState);
+        StateNodeStatistics stateStats = StateNodeStatistics.fromStateNode(originalState);
         return new ResponseEntity<>(stateStats, new HttpHeaders(), HttpStatus.OK);
     }
 }

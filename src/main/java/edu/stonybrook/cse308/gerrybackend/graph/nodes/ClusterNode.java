@@ -5,11 +5,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.enums.converters.MeasuresConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.NodeTypeConverter;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.Measures;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -21,10 +24,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @MappedSuperclass
 @JsonTypeInfo(
@@ -51,6 +51,12 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
     @Getter
     @Convert(converter = NodeTypeConverter.class)
     protected NodeType nodeType;
+
+    @Getter
+    @Setter
+    @Fetch(FetchMode.SUBSELECT)
+    @ElementCollection(fetch = FetchType.LAZY)
+    protected Map<Measures, Double> measures;
 
     @Transient
     @JsonIgnore
