@@ -27,27 +27,6 @@ import java.util.stream.Collectors;
 
 public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneReport> {
 
-//    private final JobService jobService;
-//    private final PrecinctService precinctService;
-//    private final DistrictService districtService;
-//    private final StateService stateService;
-//
-//    @Autowired
-//    public PhaseOneWorker(JobService jobService, PrecinctService precinctService, DistrictService districtService,
-//                          StateService stateService) {
-//        this.jobService = jobService;
-//        this.precinctService = precinctService;
-//        this.districtService = districtService;
-//        this.stateService = stateService;
-//    }
-
-//    private void initializeJobData(PhaseOneInputs inputs) {
-//        if (inputs.getJobId() == null) {
-//            StateNode state = stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType());
-//
-//        }
-//    }
-
     /**
      * Creates an initial district for each precinct and populates an adjacency list for the newly created districts.
      * @param allPrecincts              the input StateNode

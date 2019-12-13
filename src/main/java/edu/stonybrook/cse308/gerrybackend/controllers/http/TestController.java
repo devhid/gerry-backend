@@ -1,4 +1,4 @@
-package edu.stonybrook.cse308.gerrybackend.controllers;
+package edu.stonybrook.cse308.gerrybackend.controllers.http;
 
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
