@@ -22,14 +22,14 @@ public class DemographicData {
 
     @NotNull
     @Fetch(FetchMode.SUBSELECT) // IMPORTANT
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @Column(name = "population")
     @JsonProperty("population")
     private Map<DemographicType, Integer> population;
 
     @NotNull
     @Fetch(FetchMode.SUBSELECT) // IMPORTANT
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @Column(name = "voting_age_population")
     @JsonProperty("voting_age_population")
     private Map<DemographicType, Integer> votingAgePopulation;

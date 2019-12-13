@@ -3,18 +3,49 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.PhaseOneLogBuilder;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
+import lombok.Getter;
 
 import java.util.*;
 
 public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, PhaseOneLogBuilder> {
 
+    private int nextNumericalId;
+
+    @Getter
+    private Map<String, Integer> numericalDistrictIds;
+
     public PhaseOneReport(String newStateId, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder) {
         super(newStateId, deltas, logBuilder);
+        this.numericalDistrictIds = new HashMap<>();
+        this.nextNumericalId = 1;
+    }
+
+    public PhaseOneReport(String newStateId, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder,
+                          Map<String, Integer> numericalDistrictIds, int nextNumericalId) {
+        super(newStateId, deltas, logBuilder);
+        this.numericalDistrictIds = numericalDistrictIds;
+        this.nextNumericalId = nextNumericalId;
+    }
+
+    private void setNextNumericalId(String newUUID) {
+        this.numericalDistrictIds.put(newUUID, this.nextNumericalId++);
+    }
+
+    public void updateNumericalDistrictIds() {
+        for (PhaseOneMergeDelta delta : this.deltas) {
+            Map<String, String> changedNodes = delta.getChangedNodes();
+            changedNodes.forEach((changedNodeId, newNodeId) -> {
+                if (!this.numericalDistrictIds.containsKey(changedNodeId)){
+                    this.setNextNumericalId(changedNodeId);
+                }
+                this.setNextNumericalId(newNodeId);
+            });
+        }
     }
 
     @Override
     protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseOneMergeDelta> deltas) {
-        return new PhaseOneReport(this.newStateId, deltas, this.logBuilder);
+        return new PhaseOneReport(this.newStateId, deltas, this.logBuilder, this.numericalDistrictIds, this.nextNumericalId);
     }
 
     public PhaseOneReport fetchNextReport(int num) {

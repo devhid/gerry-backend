@@ -18,4 +18,5 @@ public class PhaseOneMergeDelta extends IterativeAlgPhaseDelta {
         this.changedNodes = changedNodes;
         this.newDistricts = newDistricts;
     }
+
 }

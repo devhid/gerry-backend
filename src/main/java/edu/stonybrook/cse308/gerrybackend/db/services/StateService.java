@@ -40,4 +40,8 @@ public class StateService extends EntityService<StateNode> {
         return repo.queryFirstByNodeTypeAndStateTypeAndElectionData_ElectionType(NodeType.ORIGINAL, stateType, electionType);
     }
 
+    public StateNode findOriginalStateEntityGraph(StateType stateType, ElectionType electionType) {
+        return repo.getFirstByNodeTypeAndStateTypeAndElectionData_ElectionType(NodeType.ORIGINAL, stateType, electionType);
+    }
+
 }

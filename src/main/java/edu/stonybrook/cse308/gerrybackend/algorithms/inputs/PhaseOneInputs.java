@@ -53,7 +53,7 @@ public class PhaseOneInputs extends AlgPhaseInputs {
         valid = valid && (this.majMinPairsHeuristic != null);
         valid = valid && (this.otherPairsHeuristic != null);
         valid = valid && (this.stopHeuristic != null);
-        return true;
+        return valid;
     }
 
     public static PhaseOneInputs fromString(final String json) throws IOException {

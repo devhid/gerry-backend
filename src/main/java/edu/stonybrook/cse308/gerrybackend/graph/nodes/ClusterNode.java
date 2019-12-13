@@ -45,7 +45,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
 
     @Getter
     @Fetch(FetchMode.SUBSELECT)
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     protected Set<String> counties;
 
     @Getter

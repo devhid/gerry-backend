@@ -58,7 +58,7 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     protected ElectionData electionData;
 
     @Getter
-    @BatchSize(size = 50)
+    @BatchSize(size = 500)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     // one node has many edges, an edge has 2 (many) nodes
     protected Set<E> adjacentEdges;

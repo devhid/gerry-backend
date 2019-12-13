@@ -18,13 +18,37 @@ import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@NamedEntityGraph(
+        name = "state-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("id"),
+                @NamedAttributeNode("nodeType"),
+                @NamedAttributeNode("demographicData"),
+                @NamedAttributeNode("electionData"),
+                @NamedAttributeNode("adjacentEdges"),
+                @NamedAttributeNode(value = "children", subgraph = "children-subgraph"),
+                @NamedAttributeNode("counties")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "children-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("id"),
+                                @NamedAttributeNode("nodeType"),
+                                @NamedAttributeNode("demographicData"),
+                                @NamedAttributeNode("electionData"),
+                                @NamedAttributeNode("adjacentEdges"),
+                                @NamedAttributeNode("children"),
+                                @NamedAttributeNode("counties")
+                        }
+                )
+        }
+)
 @Entity
 public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 

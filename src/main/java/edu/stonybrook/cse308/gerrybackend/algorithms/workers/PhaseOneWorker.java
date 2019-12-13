@@ -114,6 +114,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         final Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList = new HashMap<>();
         final Set<PrecinctNode> allPrecincts = state.getAllPrecincts();
 
+        state.fillInTransientProperties();
         createInitialDistricts(allPrecincts, precinctToDistrict, newDistrictAdjList);
         createInitialEdges(newDistrictAdjList);
         createInitialDelta(precinctToDistrict, deltas, iteration);

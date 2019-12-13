@@ -30,7 +30,7 @@ public class ElectionData {
 
     @NotNull
     @Fetch(FetchMode.SUBSELECT) // IMPORTANT
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @Column(name = "votes")
     @JsonProperty("votes")
     private Map<PoliticalParty, Integer> votes;
@@ -38,7 +38,7 @@ public class ElectionData {
     @Getter
     @NotNull
     @Fetch(FetchMode.SUBSELECT) // IMPORTANT
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     private Set<PoliticalParty> winners;
 
     public ElectionData() {

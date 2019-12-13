@@ -23,7 +23,7 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
     @JsonValue
     protected String id;
 
-    @Embedded
+    @Transient
     private Joinability joinability;
 
     @Value("${gerry.hashcode.multiplier}")
@@ -50,10 +50,16 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
     }
 
     public double getJoinabilityValue(Set<PoliticalParty> parties, Set<DemographicType> demoTypes) {
+        if (this.joinability == null) {
+            this.computeNewJoinability();
+        }
         return this.joinability.getValue(parties, demoTypes);
     }
 
     public double getJoinabilityValue(Set<PoliticalParty> parties) {
+        if (this.joinability == null) {
+            this.computeNewJoinability();
+        }
         return this.joinability.getValueWithoutMinority(parties);
     }
 

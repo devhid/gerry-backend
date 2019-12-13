@@ -107,7 +107,7 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
                     }
                 }
             }
-            return null;
+            return new HashSet<>(likelyPairs.values());
         }
     }
 

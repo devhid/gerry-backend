@@ -11,11 +11,24 @@ import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Builder;
+import org.mapstruct.Named;
 
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@NamedEntityGraph(
+        name = "district-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("id"),
+                @NamedAttributeNode("nodeType"),
+                @NamedAttributeNode("demographicData"),
+                @NamedAttributeNode("electionData"),
+                @NamedAttributeNode("adjacentEdges"),
+                @NamedAttributeNode("children"),
+                @NamedAttributeNode("counties")
+        }
+)
 @Entity
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
@@ -34,7 +47,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     }
 
     @Builder(builderClassName = "DistrictNodeChildBuilder", builderMethodName = "childBuilder")
-    public DistrictNode(PrecinctNode child) {
+    public DistrictNode(PrecinctNode child, NodeType nodeType) {
         this();
         Set<PrecinctNode> precincts = new HashSet<>();
         precincts.add(child);
@@ -42,6 +55,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.demographicData = new DemographicData(child.demographicData);
         this.electionData = new ElectionData(child.electionData);
         this.counties.add(child.getCounty());
+        this.nodeType = nodeType;
     }
 
     @Builder
