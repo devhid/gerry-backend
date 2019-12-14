@@ -120,6 +120,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     private static PrecinctMove selectPrecinctMove(Map<PrecinctMove, StateNode> potentialMoves) {
         PrecinctMove bestMove = null;
         double bestMoveScore = 0.0;
+
         for (Map.Entry<PrecinctMove, StateNode> entry : potentialMoves.entrySet()) {
             double potentialMoveScore = computeObjectiveFunction(entry.getValue());
             if (bestMove == null || potentialMoveScore > bestMoveScore) {

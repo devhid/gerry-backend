@@ -3,11 +3,13 @@ package edu.stonybrook.cse308.gerrybackend.data.algorithm;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@AllArgsConstructor
 public class PrecinctMove {
 
     @Getter
