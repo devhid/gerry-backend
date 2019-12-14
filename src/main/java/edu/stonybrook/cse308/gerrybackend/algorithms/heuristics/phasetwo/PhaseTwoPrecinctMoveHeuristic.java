@@ -3,24 +3,20 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public interface PhaseTwoPrecinctMoveHeuristic {
 
     class Random {
-        private static int random(Collection collection) {
+        private static int randomIndex(Collection collection) {
             return (int) Math.floor(Math.random() * collection.size());
         }
 
         private static DistrictNode getRandomDistrict(Collection collection) throws IllegalArgumentException {
-            int districtIndex = random(collection);
+            int districtIndex = randomIndex(collection);
             int currentIndex = 0;
 
             for(Object district: collection) {
@@ -39,7 +35,7 @@ public interface PhaseTwoPrecinctMoveHeuristic {
             DistrictNode from = getRandomDistrict(state.getChildren());
             DistrictNode to = getRandomDistrict(from.getAdjacentNodes());
 
-            int precinctIndex = random(from.getBorderPrecincts());
+            int precinctIndex = randomIndex(from.getBorderPrecincts());
             int currentIndex = 0;
 
             PrecinctNode selected = null;

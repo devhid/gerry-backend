@@ -5,7 +5,7 @@ import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
-public interface PoliticalFairnessMeasusre {
+public interface PoliticalFairnessMeasure {
 
     class EfficiencyGap {
         static double computeFairnessScore(StateNode state) {
