@@ -69,9 +69,10 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     @Builder
     public StateNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                      ElectionData electionData, String geography, Set<DistrictNode> districts, Set<String> counties,
-                     StateType stateType) {
+                     StateType stateType, String redistrictingLegislation) {
         super(id, name, nodeType, demographicData, electionData, null, geography, districts, counties, null);
         this.stateType = stateType;
+        this.redistrictingLegislation = redistrictingLegislation;
     }
 
     @Override

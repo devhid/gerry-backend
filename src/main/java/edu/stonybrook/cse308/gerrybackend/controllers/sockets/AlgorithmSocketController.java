@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
@@ -86,14 +85,17 @@ public class AlgorithmSocketController {
     @Transactional(propagation = Propagation.REQUIRED)
     public PhaseOneReport handlePhaseOne(PhaseOneInputs inputs) {
         PhaseOneReport report;
+        Job job;
         if (inputs.getJobId() == null) {
             report = phaseOneStart(inputs);
-            Job job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
+            job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
             report.setJobId(job.getId());
         } else {
+            job = jobService.getJobById(inputs.getJobId());
+            inputs.setJob(job);
             report = phaseOneIterative(inputs);
         }
-        System.out.println("HELLOOO SENDING");
+        jobService.createOrUpdateJob(job);
         return report;
     }
 

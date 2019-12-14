@@ -130,6 +130,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                 .nodeType(NodeType.USER)
                 .stateType(inputs.getStateType())
                 .districts(new HashSet<>(precinctToDistrict.values()))
+                .redistrictingLegislation(originalState.getRedistrictingLegislation())
                 .build();
         inputs.setState(newState);
 
@@ -235,7 +236,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
         // Assign initial districts and produce the initial delta.
         if (inputs.getJob() == null) {
-            final PhaseOneMergeDelta initialDelta = assignInitialDistricts(inputs);
+            PhaseOneMergeDelta initialDelta = assignInitialDistricts(inputs);
             deltas.offer(initialDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
                 return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId());
