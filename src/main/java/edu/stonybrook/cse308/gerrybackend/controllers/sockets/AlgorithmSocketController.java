@@ -18,6 +18,7 @@ import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -32,11 +33,17 @@ public class AlgorithmSocketController {
 
     private StateService stateService;
     private JobService jobService;
+    private int initialIteration;
+    private double phaseTwoEpsilon;
 
     @Autowired
-    public AlgorithmSocketController(StateService stateService, JobService jobService) {
+    public AlgorithmSocketController(StateService stateService, JobService jobService,
+                                     @Value("${gerry.alg.initialIteration}") int initialIteration,
+                                     @Value("${gerry.phase-two.epsilon}") double phaseTwoEpsilon) {
         this.stateService = stateService;
         this.jobService = jobService;
+        this.initialIteration = initialIteration;
+        this.phaseTwoEpsilon = phaseTwoEpsilon;
     }
 
     private AlgPhaseReport handle(AlgPhaseInputs inputs) {
@@ -44,7 +51,7 @@ public class AlgorithmSocketController {
         if (inputs instanceof PhaseZeroInputs) {
             worker = new PhaseZeroWorker();
         } else if (inputs instanceof PhaseOneInputs) {
-            worker = new PhaseOneWorker();
+            worker = new PhaseOneWorker(initialIteration);
         } else if (inputs instanceof PhaseTwoInputs) {
             worker = new PhaseTwoWorker();
         } else {
@@ -86,6 +93,7 @@ public class AlgorithmSocketController {
         } else {
             report = phaseOneIterative(inputs);
         }
+        System.out.println("HELLOOO SENDING");
         return report;
     }
 

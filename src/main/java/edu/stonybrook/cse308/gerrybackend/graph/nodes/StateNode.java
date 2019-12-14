@@ -9,12 +9,11 @@ import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
-import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.StateEdge;
-import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -118,25 +117,51 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         });
     }
 
-    private void createPrecinctEdge(String id, PrecinctNode p1, PrecinctNode p2) {
-        PrecinctEdge edge = new PrecinctEdge(id, p1, p2);
-        try {
-            p1.addEdge(edge);
-            p2.addEdge(edge);
-        } catch (InvalidEdgeException e) {
-            // should never happen
-            e.printStackTrace();
+    public static void fillAdjacentNodes(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                         Set<? extends GerryNode> nodes) {
+        for (GerryNode node : nodes) {
+            Set<GerryEdge> nodeEdges = node.getAdjacentEdges();
+            for (GerryEdge nodeEdge : nodeEdges) {
+                if (!edgeMap.containsKey(nodeEdge.getId())) {
+                    UnorderedPair<GerryNode> edgeNodes = new UnorderedPair<>();
+                    edgeNodes.add(node);
+                    edgeMap.put(nodeEdge.getId(), edgeNodes);
+                } else {
+                    edgeMap.get(nodeEdge.getId()).add(node);
+                }
+            }
         }
     }
 
-    private void createDistrictEdge(String id, DistrictNode d1, DistrictNode d2) {
-        DistrictEdge edge = new DistrictEdge(id, d1, d2);
-        try {
-            d1.addEdge(edge);
-            d2.addEdge(edge);
-        } catch (InvalidEdgeException e) {
-            // should never happen
-            e.printStackTrace();
+    public static void fillDistrictEdgeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                                  Set<DistrictNode> nodes) {
+        for (DistrictNode n : nodes) {
+            for (DistrictEdge e : n.getAdjacentEdges()) {
+                if (e.size() == 0) {
+                    UnorderedPair<GerryNode> pair = edgeMap.get(e.getId());
+                    if (pair.size() < 2) {
+                        System.out.println("nani wat");
+                    }
+                    if (pair.getItem1() == null || pair.getItem2() == null) {
+                        System.out.println("nani wat 2");
+                    }
+                    e.add((DistrictNode) pair.getItem1());
+                    e.add((DistrictNode) pair.getItem2());
+                }
+            }
+        }
+    }
+
+    public static void fillPrecinctEdgeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                                  Set<PrecinctNode> nodes) {
+        for (PrecinctNode n : nodes) {
+            for (PrecinctEdge e : n.getAdjacentEdges()) {
+                if (e.size() == 0) {
+                    UnorderedPair<GerryNode> pair = edgeMap.get(e.getId());
+                    e.add((PrecinctNode) pair.getItem1());
+                    e.add((PrecinctNode) pair.getItem2());
+                }
+            }
         }
     }
 
@@ -147,32 +172,20 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * Make sure to call this method after deserialization of a StateNode.
      */
     public void fillInEdgeNodeReferences() {
-        Map<String, UnorderedPair<GerryNode>> edgeMap = new HashMap<>();
+        final Map<String, UnorderedPair<GerryNode>> edgeMap = new HashMap<>();
 
         // Load all districts & precincts.
-        Set<DistrictNode> districts = this.children;
-        Set<PrecinctNode> precincts = new HashSet<>();
+        final Set<DistrictNode> districts = this.children;
+        final Set<PrecinctNode> precincts = new HashSet<>();
         districts.forEach(d -> precincts.addAll(d.getChildren()));
 
-        // Load all edges.
-        MapUtils.populateEdgeNodeReferences(edgeMap, districts);
-        MapUtils.populateEdgeNodeReferences(edgeMap, precincts);
+        // Find all pairs of adjacent nodes.
+        StateNode.fillAdjacentNodes(edgeMap, districts);
+        StateNode.fillAdjacentNodes(edgeMap, precincts);
 
-        districts.forEach(GerryNode::clearEdges);
-        precincts.forEach(PrecinctNode::clearEdges);
-
-        // Update all node references in the edges.
-        edgeMap.forEach((edgeId, edgeNodes) -> {
-            if (edgeNodes.getItem1() instanceof PrecinctNode) {
-                PrecinctNode p1 = (PrecinctNode) edgeNodes.getItem1();
-                PrecinctNode p2 = (PrecinctNode) edgeNodes.getItem2();
-                createPrecinctEdge(edgeId, p1, p2);
-            } else if (edgeNodes.getItem2() instanceof DistrictNode) {
-                DistrictNode d1 = (DistrictNode) edgeNodes.getItem1();
-                DistrictNode d2 = (DistrictNode) edgeNodes.getItem2();
-                createDistrictEdge(edgeId, d1, d2);
-            }
-        });
+        // Fill all edge references.
+        StateNode.fillDistrictEdgeReferences(edgeMap, districts);
+        StateNode.fillPrecinctEdgeReferences(edgeMap, precincts);
     }
 
     @JsonIgnore

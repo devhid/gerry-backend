@@ -32,13 +32,16 @@ public class AlgorithmController {
 
     private final StateService stateService;
     private final JobService jobService;
+    private final int initialIteration;
     private final double phaseTwoEpsilon;
 
     @Autowired
     public AlgorithmController(StateService stateService, JobService jobService,
+                               @Value("${gerry.alg.initialIteration}") int initialIteration,
                                @Value("${gerry.phase-two.epsilon}") double phaseTwoEpsilon) {
         this.stateService = stateService;
         this.jobService = jobService;
+        this.initialIteration = initialIteration;
         this.phaseTwoEpsilon = phaseTwoEpsilon;
     }
 
@@ -47,7 +50,7 @@ public class AlgorithmController {
         if (inputs instanceof PhaseZeroInputs) {
             worker = new PhaseZeroWorker();
         } else if (inputs instanceof PhaseOneInputs) {
-            worker = new PhaseOneWorker();
+            worker = new PhaseOneWorker(initialIteration);
         } else if (inputs instanceof PhaseTwoInputs) {
             worker = new PhaseTwoWorker();
         } else {
@@ -68,7 +71,7 @@ public class AlgorithmController {
         inputs.setState(stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType()));
         PhaseOneReport report = (PhaseOneReport) handle(inputs);
         Job job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
-        jobService.createOrUpdateJob(job);
+//        jobService.createOrUpdateJob(job);
         report.setJobId(job.getId());
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

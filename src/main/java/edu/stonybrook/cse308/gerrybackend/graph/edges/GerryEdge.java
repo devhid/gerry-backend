@@ -69,9 +69,6 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         if (!returnVal) {
             return false;
         }
-        if (this.size() == 2) {
-            this.computeNewJoinability();
-        }
         return true;
     }
 
@@ -80,9 +77,6 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         boolean returnVal = super.addAll(c);
         if (!returnVal) {
             return false;
-        }
-        if (this.size() == 2) {
-            this.computeNewJoinability();
         }
         return true;
     }

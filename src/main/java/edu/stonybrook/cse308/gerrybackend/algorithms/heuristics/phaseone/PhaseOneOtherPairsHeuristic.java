@@ -16,20 +16,21 @@ public interface PhaseOneOtherPairsHeuristic {
 
     class Standard {
         private static LikelyType determineLikelyType(double joinability) {
-            if (joinability >= 0.0 && joinability <= 0.3) {
+            if (joinability >= 0.0 && joinability < 1.0) {
                 return LikelyType.NOT;
             }
 
-            if (joinability >= 0.4 && joinability <= 0.7) {
+            if (joinability >= 1.0 && joinability < 2.0) {
                 return LikelyType.KIND_OF;
             }
 
-            if (joinability >= 0.8 && joinability <= 1) {
+            if (joinability >= 2.0 && joinability <= 3.0) {
                 return LikelyType.VERY;
             }
 
-            // should never happen, because joinability should be <= 0 and <= 1, but added as a sanity check.
-            throw new IllegalArgumentException("Replace string with text later!");
+            // should never happen, because joinability without minority should be <= 0 and <= 3,
+            // but added as a sanity check.
+            throw new IllegalArgumentException("Replace string with text later! " + joinability);
         }
 
         private static LikelyCandidatePair createLikelyCandidatePair(DistrictNode d1, DistrictNode d2) {
@@ -134,7 +135,7 @@ public interface PhaseOneOtherPairsHeuristic {
                     }
                 }
             }
-            return null;
+            return new HashSet<>(likelyPairs.values());
         }
     }
 

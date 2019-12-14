@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -21,15 +22,15 @@ import java.util.Set;
 public class DemographicData {
 
     @NotNull
-    @Fetch(FetchMode.SUBSELECT) // IMPORTANT
-    @ElementCollection(fetch = FetchType.LAZY)
+    @BatchSize(size = 500)  // IMPORTANT
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "population")
     @JsonProperty("population")
     private Map<DemographicType, Integer> population;
 
     @NotNull
-    @Fetch(FetchMode.SUBSELECT) // IMPORTANT
-    @ElementCollection(fetch = FetchType.LAZY)
+    @BatchSize(size = 500)  // IMPORTANT
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "voting_age_population")
     @JsonProperty("voting_age_population")
     private Map<DemographicType, Integer> votingAgePopulation;

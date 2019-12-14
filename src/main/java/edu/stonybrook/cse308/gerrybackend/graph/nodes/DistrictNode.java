@@ -217,11 +217,12 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
      * <p>
      * This is mainly used for Phase 1 execution.
      *
-     * @param d1 first DistrictNode object to merge
-     * @param d2 second DistrictNode object to merge
+     * @param d1          first DistrictNode object to merge
+     * @param d2          second DistrictNode object to merge
+     * @param updateEdges whether to update external node edges
      * @return merged DistrictNode
      */
-    public static DistrictNode combine(DistrictNode d1, DistrictNode d2) throws MismatchedElectionException {
+    public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean updateEdges) throws MismatchedElectionException {
         if (!d1.getAdjacentNodes().contains(d2) || !d2.getAdjacentNodes().contains(d1)) {
             throw new IllegalArgumentException("Replace this string later!");
         }
@@ -253,16 +254,21 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         // Create new GerryEdge references to update internal references and joinability values.
         Map<DistrictNode, DistrictEdge> newAdjNodeEdges = new HashMap<>();
         for (DistrictNode adjNode : allAdjNodes) {
+            if (adjNode == null) {
+                System.out.println("nani");
+            }
             newAdjNodeEdges.put(adjNode, new DistrictEdge(UUID.randomUUID().toString(), mergedDistrict, adjNode));
         }
 
         // Fix each of the external, adjacent nodes' edges.
-        newAdjNodeEdges.forEach((adjNode, newEdge) -> {
-            Set<DistrictEdge> oldEdges = new HashSet<>(adjNode.adjacentEdges);
-            oldEdges.retainAll(allAdjEdges);    // oldEdges = 1 or 2 edges (if adj to only 1 or to both d1,d2)
-            adjNode.adjacentEdges.removeAll(oldEdges);
-            adjNode.adjacentEdges.add(newEdge);
-        });
+        if (updateEdges) {
+            newAdjNodeEdges.forEach((adjNode, newEdge) -> {
+                Set<DistrictEdge> oldEdges = new HashSet<>(adjNode.adjacentEdges);
+                oldEdges.retainAll(allAdjEdges);    // oldEdges = 1 or 2 edges (if adj to only 1 or to both d1,d2)
+                adjNode.adjacentEdges.removeAll(oldEdges);
+                adjNode.adjacentEdges.add(newEdge);
+            });
+        }
 
         // Set the new merged cluster's adjacent edges.
         mergedDistrict.adjacentEdges = new HashSet<>(newAdjNodeEdges.values());
