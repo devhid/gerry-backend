@@ -28,7 +28,7 @@ public class TestController {
         PhaseOneMergeDelta delta = new PhaseOneMergeDelta(0, changedNodes, newDistricts);
         Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
         deltas.offer(delta);
-        PhaseOneReport report = PhaseOneReportInitializer.initClass(deltas, "derp");
+        PhaseOneReport report = PhaseOneReportInitializer.initClass(deltas, "derp", null);
         report = report.fetchAggregateReport();
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

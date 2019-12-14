@@ -45,7 +45,7 @@ public class Joinability {
             DistrictNode d1 = (DistrictNode) node1;
             DistrictNode d2 = (DistrictNode) node2;
             try {
-                DistrictNode potentialMerge = DistrictNode.combine(d1, d2, false);
+                DistrictNode potentialMerge = DistrictNode.combineForStatisticsOnly(d1, d2);
                 return CompactnessMeasure.computeCompactnessScore(Compactness.CONVEX_HULL, potentialMerge);
             } catch (IllegalArgumentException e) {
               // do nothing

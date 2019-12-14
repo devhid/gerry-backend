@@ -1,11 +1,14 @@
 package edu.stonybrook.cse308.gerrybackend.data.jobs;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.statistics.StateNodeStatistics;
 import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import lombok.Getter;
 
 import javax.persistence.*;
 
+@JsonIgnoreProperties({"state"})
 @Entity
 public class Job {
 
@@ -30,11 +33,15 @@ public class Job {
         this.id = state.getId();
         this.algPhaseType = algPhaseType;
         this.state = state;
-        this.iteration = 0;
+        this.iteration = 1;
     }
 
     public int getNextIteration() {
         return this.iteration++;
+    }
+
+    public StateNodeStatistics getStateNodeStatistics() {
+        return StateNodeStatistics.fromStateNode(this.state);
     }
 
 }

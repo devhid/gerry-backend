@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
                 @NamedAttributeNode("nodeType"),
                 @NamedAttributeNode("demographicData"),
                 @NamedAttributeNode("electionData"),
-                @NamedAttributeNode("adjacentEdges"),
                 @NamedAttributeNode(value = "children", subgraph = "children-subgraph"),
                 @NamedAttributeNode("counties")
         },
@@ -142,9 +141,6 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
                     UnorderedPair<GerryNode> pair = edgeMap.get(e.getId());
                     if (pair.size() < 2) {
                         System.out.println("nani wat");
-                    }
-                    if (pair.getItem1() == null || pair.getItem2() == null) {
-                        System.out.println("nani wat 2");
                     }
                     e.add((DistrictNode) pair.getItem1());
                     e.add((DistrictNode) pair.getItem2());

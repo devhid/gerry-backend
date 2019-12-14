@@ -24,7 +24,7 @@ public interface PhaseOneOtherPairsHeuristic {
                 return LikelyType.KIND_OF;
             }
 
-            if (joinability >= 2.0 && joinability <= 3.0) {
+            if (joinability >= 2.0 && joinability <= 4.0) {
                 return LikelyType.VERY;
             }
 

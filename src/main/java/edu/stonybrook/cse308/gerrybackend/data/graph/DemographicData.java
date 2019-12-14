@@ -117,16 +117,14 @@ public class DemographicData {
         Map<DemographicType, Integer> d2Pop = d2.population;
         Map<DemographicType, Integer> d2VotingAgePop = d2.votingAgePopulation;
 
-        if (!(d1Pop.keySet().equals(d2Pop.keySet())) || !(d1VotingAgePop.keySet().equals(d2VotingAgePop.keySet()))) {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
-
         Set<DemographicType> demoTypes = d1Pop.keySet();
         Map<DemographicType, Integer> combinedPop = new EnumMap<>(DemographicType.class);
         Map<DemographicType, Integer> combinedVotingAgePop = new EnumMap<>(DemographicType.class);
         for (DemographicType demoType : demoTypes) {
-            combinedPop.put(demoType, d1Pop.get(demoType) + d2Pop.get(demoType));
-            combinedVotingAgePop.put(demoType, d1VotingAgePop.get(demoType) + d2VotingAgePop.get(demoType));
+            int sumDemoPop = d1Pop.getOrDefault(demoType, 0) + d2Pop.getOrDefault(demoType, 0);
+            int sumVotingAgeDemoPop = d1VotingAgePop.getOrDefault(demoType, 0) + d2VotingAgePop.getOrDefault(demoType, 0);
+            combinedPop.put(demoType, sumDemoPop);
+            combinedVotingAgePop.put(demoType, sumVotingAgeDemoPop);
         }
         return new DemographicData(combinedPop, combinedVotingAgePop);
     }
@@ -135,17 +133,17 @@ public class DemographicData {
         Map<DemographicType, Integer> subPop = subDemoData.population;
         Map<DemographicType, Integer> subVotingAgePop = subDemoData.votingAgePopulation;
 
-        if (!(this.population.keySet().equals(subPop.keySet())) ||
-                !(this.votingAgePopulation.keySet().equals(subVotingAgePop.keySet()))) {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
         for (DemographicType demoType : this.population.keySet()) {
-            if ((this.population.get(demoType) < subPop.get(demoType)) ||
-                    (this.votingAgePopulation.get(demoType) < subVotingAgePop.get(demoType))) {
+            int bigDemoPop = this.population.getOrDefault(demoType, 0);
+            int bigVotingAgeDemoPop = this.votingAgePopulation.getOrDefault(demoType, 0);
+            int smallDemoPop = subPop.getOrDefault(demoType, 0);
+            int smallVotingAgeDemoPop = subVotingAgePop.getOrDefault(demoType, 0);
+            if ((bigDemoPop < smallDemoPop) ||
+                    (bigVotingAgeDemoPop < smallVotingAgeDemoPop)) {
                 throw new IllegalArgumentException("Replace this string later!");
             }
-            this.population.put(demoType, this.population.get(demoType) - subPop.get(demoType));
-            this.votingAgePopulation.put(demoType, this.votingAgePopulation.get(demoType) - subVotingAgePop.get(demoType));
+            this.population.put(demoType, bigDemoPop - smallDemoPop);
+            this.votingAgePopulation.put(demoType, bigVotingAgeDemoPop - smallVotingAgeDemoPop);
         }
     }
 

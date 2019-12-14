@@ -45,7 +45,11 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         int nextNumericalId = 0;
         for (PrecinctNode p : allPrecincts) {
             if (!precinctToDistrict.containsKey(p)) {
-                DistrictNode newDistrict = DistrictNode.childBuilder().child(p).build();
+                DistrictNode newDistrict = DistrictNode.childBuilder()
+                        .child(p)
+                        .nodeType(NodeType.USER)
+                        .build();
+                newDistrict.setNew(true);
                 newDistrict.setNumericalId(Integer.toString(nextNumericalId++));
                 precinctToDistrict.put(p, newDistrict);
             }
@@ -57,7 +61,11 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             final Set<DistrictNode> adjacentNodes = newDistrictAdjList.get(district);
             for (PrecinctNode adjP : adjPrecincts) {
                 if (!precinctToDistrict.containsKey(adjP)) {
-                    DistrictNode newAdjDistrict = DistrictNode.childBuilder().child(adjP).build();
+                    DistrictNode newAdjDistrict = DistrictNode.childBuilder()
+                            .child(adjP)
+                            .nodeType(NodeType.USER)
+                            .build();
+                    newAdjDistrict.setNew(true);
                     newAdjDistrict.setNumericalId(Integer.toString(nextNumericalId++));
                     precinctToDistrict.put(adjP, newAdjDistrict);
                 }
@@ -82,6 +90,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                 }
                 createdEdges.add(districtIdPair);
                 DistrictEdge edge = new DistrictEdge(UUID.randomUUID().toString(), district, adjDistrict);
+                edge.setNew(true);
                 try {
                     district.addEdge(edge);
                     adjDistrict.addEdge(edge);
@@ -132,6 +141,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                 .districts(new HashSet<>(precinctToDistrict.values()))
                 .redistrictingLegislation(originalState.getRedistrictingLegislation())
                 .build();
+        newState.setNew(true);
         inputs.setState(newState);
 
         return createInitialDelta(precinctToDistrict, inputs.getDemographicTypes());
@@ -206,13 +216,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @return a PhaseOneMergeDelta object describing the merges that occurred
      */
     private static PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration,
-                                                         Set<DemographicType> demoTypes) {
+                                                         Set<DemographicType> demoTypes, Set<DistrictNode> remnantDistricts) {
         Map<DistrictNode, DistrictNode> mergedDistricts = new HashMap<>();
         for (LikelyCandidatePair pair : pairs.getAllPairs()) {
             try {
                 DistrictNode d1 = pair.getItem1();
                 DistrictNode d2 = pair.getItem2();
-                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true);
+                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts);
                 mergedDistricts.put(d1, newDistrict);
                 mergedDistricts.put(d2, newDistrict);
             } catch (MismatchedElectionException e) {
@@ -222,7 +232,8 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         }
         state.remapDistrictReferences(mergedDistricts);
         Map<String, String> mergedDistrictsById = MapUtils.transformMapEntriesToNumericalIds(mergedDistricts);
-        Map<String, MergedDistrict> newDistricts = mergedDistricts.values().stream()
+        Set<DistrictNode> newMergedDistricts = new HashSet<>(mergedDistricts.values());
+        Map<String, MergedDistrict> newDistricts = newMergedDistricts.stream()
                 .collect(Collectors.toMap(DistrictNode::getNumericalId, d -> MergedDistrict.fromDistrictNode(d, demoTypes)));
         return new PhaseOneMergeDelta(iteration, mergedDistrictsById, newDistricts);
     }
@@ -239,12 +250,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             PhaseOneMergeDelta initialDelta = assignInitialDistricts(inputs);
             deltas.offer(initialDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
-                return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId());
+                return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId(), new HashSet<>());
             }
         }
 
         // Iteratively merge the districts.
         final StateNode state = inputs.getState();
+        final Set<DistrictNode> remnantDistricts = new HashSet<>();
         while (state.getChildren().size() != numDistricts) {
             CandidatePairs pairs = determineCandidatePairs(inputs);
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
@@ -252,13 +264,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                 int numAllowedMerges = state.getChildren().size() - numDistricts;
                 filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }
-            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration, demoTypes);
+            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration, demoTypes, remnantDistricts);
             deltas.offer(iterationDelta);
             iteration = inputs.getJob().getNextIteration();
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
-                return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId());
+                return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId(), remnantDistricts);
             }
         }
-        return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId());
+        return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId(), remnantDistricts);
     }
 }
