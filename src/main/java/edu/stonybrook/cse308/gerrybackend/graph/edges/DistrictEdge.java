@@ -6,6 +6,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.serializers.DistrictEdgeJsonDeserializer;
 
 import javax.persistence.Entity;
+import java.util.UUID;
 
 @Entity
 @JsonIgnoreProperties({"item1", "item2"})

@@ -14,6 +14,7 @@ import java.util.Set;
 public class PhaseOneInputs extends AlgPhaseInputs {
 
     @Getter
+    @Setter
     private String jobId;
 
     @Getter

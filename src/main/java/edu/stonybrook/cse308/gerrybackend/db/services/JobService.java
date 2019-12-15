@@ -3,6 +3,9 @@ package edu.stonybrook.cse308.gerrybackend.db.services;
 import edu.stonybrook.cse308.gerrybackend.data.jobs.Job;
 import edu.stonybrook.cse308.gerrybackend.db.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,14 +24,18 @@ public class JobService extends EntityService<Job> {
         return this.getAllEntities(this.repo);
     }
 
+    @Cacheable(cacheNames="jobs")
     public Job getJobById(String id) {
         return this.getEntityById(this.repo, id);
     }
 
+    @CachePut(cacheNames="jobs", key="#job.id")
     public Job createOrUpdateJob(Job job) {
-        return this.createOrUpdateEntity(this.repo, job);
+        return job;
+//        return this.createOrUpdateEntity(this.repo, job);
     }
 
+    @CacheEvict(cacheNames="jobs")
     public boolean deleteJobById(String id) {
         return this.deleteEntityById(this.repo, id);
     }

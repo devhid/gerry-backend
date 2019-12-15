@@ -56,6 +56,12 @@ public class PopulateController {
         }
     }
 
+    private void deleteState(StateNode state) {
+        Set<DistrictNode> children = state.clearAndReturnChildren();
+        districtService.deleteAllDistricts(children);
+        stateService.deleteStateById(state.getId());
+    }
+
     private void populateAdjDistrictPairs(StateNode state, Set<UnorderedPair<DistrictNode>> adjDistricts) {
         state.getChildren().forEach(d -> {
             Set<PrecinctNode> borderPrecincts = d.getBorderPrecincts();
@@ -170,14 +176,20 @@ public class PopulateController {
     public ResponseEntity deleteStateById(@PathVariable String id) {
         StateNode state = stateService.getStateById(id);
         if (state != null) {
-            Set<DistrictNode> children = state.clearAndReturnChildren();
-            for (DistrictNode district : children) {
-                districtService.deleteDistrictById(district.getId());
-            }
-            stateService.deleteStateById(id);
+            this.deleteState(state);
         }
         return new ResponseEntity(new HttpHeaders(), HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete/state/{stateType}/{electionType}")
+    public ResponseEntity deleteStateById(@PathVariable StateType stateType, @PathVariable ElectionType electionType) {
+        StateNode state = stateService.findOriginalState(stateType, electionType);
+        if (state != null) {
+            this.deleteState(state);
+        }
+        return new ResponseEntity(new HttpHeaders(), HttpStatus.OK);
+    }
+
 
     @GetMapping("/new-test-state")
     public ResponseEntity<StateNode> getNewTestState() throws InvalidEdgeException {
