@@ -43,6 +43,10 @@ public class DistrictService extends EntityService<DistrictNode> {
         return this.deleteEntityById(this.districtRepo, id);
     }
 
+    public void deleteAllEdges(Collection<DistrictEdge> edges) {
+        districtEdgeRepo.deleteAll(edges);
+    }
+
     public void deleteAllDistricts(Collection<DistrictNode> districts) {
         districtRepo.deleteAll(districts);
     }

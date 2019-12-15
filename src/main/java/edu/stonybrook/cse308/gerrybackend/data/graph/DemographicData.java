@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -112,21 +110,22 @@ public class DemographicData {
     }
 
     public static DemographicData combine(DemographicData d1, DemographicData d2) {
-        Map<DemographicType, Integer> d1Pop = d1.population;
-        Map<DemographicType, Integer> d1VotingAgePop = d1.votingAgePopulation;
-        Map<DemographicType, Integer> d2Pop = d2.population;
-        Map<DemographicType, Integer> d2VotingAgePop = d2.votingAgePopulation;
+        DemographicData combined = new DemographicData(d1);
+        combined.add(d2);
+        return combined;
+    }
 
-        Set<DemographicType> demoTypes = d1Pop.keySet();
-        Map<DemographicType, Integer> combinedPop = new EnumMap<>(DemographicType.class);
-        Map<DemographicType, Integer> combinedVotingAgePop = new EnumMap<>(DemographicType.class);
+    public void add(DemographicData d) {
+        Map<DemographicType, Integer> dPop = d.population;
+        Map<DemographicType, Integer> dVotingAgePop = d.votingAgePopulation;
+
+        Set<DemographicType> demoTypes = dPop.keySet();
         for (DemographicType demoType : demoTypes) {
-            int sumDemoPop = d1Pop.getOrDefault(demoType, 0) + d2Pop.getOrDefault(demoType, 0);
-            int sumVotingAgeDemoPop = d1VotingAgePop.getOrDefault(demoType, 0) + d2VotingAgePop.getOrDefault(demoType, 0);
-            combinedPop.put(demoType, sumDemoPop);
-            combinedVotingAgePop.put(demoType, sumVotingAgeDemoPop);
+            int sumDemoPop = dPop.getOrDefault(demoType, 0) + this.population.getOrDefault(demoType, 0);
+            int sumVotingAgeDemoPop = dVotingAgePop.getOrDefault(demoType, 0) + this.votingAgePopulation.getOrDefault(demoType, 0);
+            this.population.put(demoType, sumDemoPop);
+            this.votingAgePopulation.put(demoType, sumVotingAgeDemoPop);
         }
-        return new DemographicData(combinedPop, combinedVotingAgePop);
     }
 
     public void subtract(DemographicData subDemoData) {

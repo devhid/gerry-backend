@@ -101,26 +101,29 @@ public class ElectionData {
     }
 
     public static ElectionData combine(ElectionData e1, ElectionData e2) throws MismatchedElectionException {
-        if (e1.electionType != e2.electionType) {
+        ElectionData combined = new ElectionData(e1.getElectionType(), e1.getVotesCopy(), e1.getWinnersCopy());
+        combined.add(e2);
+        return combined;
+    }
+
+    public void add(ElectionData e) throws MismatchedElectionException {
+        if (e.electionType != this.electionType) {
             throw new MismatchedElectionException("Replace this string later.");
         }
 
-        Map<PoliticalParty, Integer> e1Votes = e1.votes;
-        Map<PoliticalParty, Integer> e2Votes = e2.votes;
-        Set<PoliticalParty> partyTypes = e1Votes.keySet();
+        Map<PoliticalParty, Integer> eVotes = e.votes;
+        Set<PoliticalParty> partyTypes = eVotes.keySet();
 
-        Map<PoliticalParty, Integer> combinedVotes = new EnumMap<>(PoliticalParty.class);
         for (PoliticalParty partyType : partyTypes) {
-            Integer e1NumVotes = e1Votes.getOrDefault(partyType, 0);
-            Integer e2NumVotes = e2Votes.getOrDefault(partyType, 0);
+            Integer e1NumVotes = eVotes.getOrDefault(partyType, 0);
+            Integer e2NumVotes = this.votes.getOrDefault(partyType, 0);
             // Check if either map explicitly mapped this to null.
             if ((e1NumVotes == null) || (e2NumVotes == null)) {
                 throw new IllegalArgumentException("Replace this string later!");
             }
-            combinedVotes.put(partyType, e1NumVotes + e2NumVotes);
+            this.votes.put(partyType, e1NumVotes + e2NumVotes);
         }
-        Set<PoliticalParty> winners = ElectionData.determineWinners(combinedVotes);
-        return new ElectionData(e1.electionType, combinedVotes, winners);
+        this.winners = ElectionData.determineWinners(this.votes);
     }
 
     public void subtract(ElectionData subElectionData) throws MismatchedElectionException {

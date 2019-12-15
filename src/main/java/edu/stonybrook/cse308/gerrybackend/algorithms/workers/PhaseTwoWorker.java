@@ -184,7 +184,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
             iteration++;
             potentialMoves = computePotentialMoves(state, inputs.getDepthHeuristic(), inputs.getMoveHeuristic());
         }
-        return PhaseTwoReportInitializer.initClass(deltas);
+        return PhaseTwoReportInitializer.initClass(null, deltas);
     }
 
 }

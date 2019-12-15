@@ -139,9 +139,6 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
             for (DistrictEdge e : n.getAdjacentEdges()) {
                 if (e.size() == 0) {
                     UnorderedPair<GerryNode> pair = edgeMap.get(e.getId());
-                    if (pair.size() < 2) {
-                        System.out.println("nani wat");
-                    }
                     e.add((DistrictNode) pair.getItem1());
                     e.add((DistrictNode) pair.getItem2());
                 }

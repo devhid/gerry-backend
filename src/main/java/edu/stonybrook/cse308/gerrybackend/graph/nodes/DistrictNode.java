@@ -219,7 +219,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     }
 
     public static DistrictNode combineForStatisticsOnly(DistrictNode d1, DistrictNode d2) throws MismatchedElectionException {
-        return DistrictNode.combine(d1, d2, false, null);
+        return DistrictNode.combine(d1, d2, false, null, null);
     }
 
     /**
@@ -233,7 +233,8 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
      * @return merged DistrictNode
      */
     public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean updateEdges,
-                                       Set<DistrictNode> remnantDistricts) throws MismatchedElectionException {
+                                       Set<DistrictNode> remnantDistricts, Set<DistrictEdge> remnantEdges)
+            throws MismatchedElectionException {
         if (!d1.isAdjacentTo(d2) || !d2.isAdjacentTo(d1)) {
             throw new IllegalArgumentException("WOAH d1 id: " + d1.getId() + " d2 id: " + d2.getId());
 //            throw new IllegalArgumentException("Replace this string later!");
@@ -247,26 +248,26 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         mergedDistrict.counties.addAll(smallerDistrict.counties);
 
         // Merge DemographicData and ElectionData.
-        mergedDistrict.demographicData = DemographicData.combine(mergedDistrict.demographicData, smallerDistrict.demographicData);
-        mergedDistrict.electionData = ElectionData.combine(mergedDistrict.electionData, smallerDistrict.electionData);
+        mergedDistrict.demographicData.add(smallerDistrict.demographicData);
+        mergedDistrict.electionData.add(smallerDistrict.electionData);
 
         if (updateEdges) {
             // Get all adjacent edges (makes it easier to update external node edge references).
             Set<DistrictEdge> connectingEdge = new HashSet<>(d1.adjacentEdges);
             connectingEdge.retainAll(d2.adjacentEdges);     // should be only the edge connecting d1, d2
-            Set<DistrictEdge> allAdjEdges = mergedDistrict.adjacentEdges;
-            allAdjEdges.addAll(smallerDistrict.adjacentEdges);
-            allAdjEdges.removeAll(connectingEdge);          // allAdjEdges = d1Adj U d2Adj - connectingEdge
+            mergedDistrict.adjacentEdges.removeAll(connectingEdge);
+            smallerDistrict.adjacentEdges.removeAll(connectingEdge);
+            mergedDistrict.adjacentEdges.forEach(GerryEdge::clearJoinability);     // mark stale
 
-            remnantDistricts.add(smallerDistrict);      // mark as remnant to be deleted later
-            allAdjEdges.forEach(adjEdge -> {
-                if (adjEdge.contains(mergedDistrict)) {
-                    adjEdge.clearJoinability();         // clear joinability so it is recomputed on next access
-                } else if (adjEdge.contains(smallerDistrict)) {
-                    adjEdge.remove(smallerDistrict);
-                    adjEdge.add(mergedDistrict);
-                }
+            smallerDistrict.adjacentEdges.forEach(adjEdge -> {
+                adjEdge.remove(smallerDistrict);
+                adjEdge.add(mergedDistrict);
             });
+            mergedDistrict.adjacentEdges.addAll(smallerDistrict.adjacentEdges);
+
+            smallerDistrict.clearEdges();
+            remnantDistricts.add(smallerDistrict);          // mark as remnant to be deleted later
+            remnantEdges.addAll(connectingEdge);            // mark as remnant to be deleted later
         }
 
         return mergedDistrict;

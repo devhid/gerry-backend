@@ -48,11 +48,10 @@ public class JobController {
         StateNode state = job.getState();
         if (state != null) {
             Set<DistrictNode> children = state.clearAndReturnChildren();
-            for (DistrictNode district : children) {
-                districtService.deleteDistrictById(district.getId());
-            }
+            districtService.deleteAllDistricts(children);
             stateService.deleteStateById(id);
         }
+        jobService.deleteJobById(id);
         return new ResponseEntity(new HttpHeaders(), HttpStatus.OK);
     }
 

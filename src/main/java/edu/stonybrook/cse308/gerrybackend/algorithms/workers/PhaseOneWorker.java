@@ -12,6 +12,7 @@ import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
 import edu.stonybrook.cse308.gerrybackend.enums.types.AlgRunType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
@@ -216,13 +217,15 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      * @return a PhaseOneMergeDelta object describing the merges that occurred
      */
     private static PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration,
-                                                         Set<DemographicType> demoTypes, Set<DistrictNode> remnantDistricts) {
+                                                         Set<DemographicType> demoTypes,
+                                                         Set<DistrictNode> remnantDistricts,
+                                                         Set<DistrictEdge> remnantEdges) {
         Map<DistrictNode, DistrictNode> mergedDistricts = new HashMap<>();
         for (LikelyCandidatePair pair : pairs.getAllPairs()) {
             try {
                 DistrictNode d1 = pair.getItem1();
                 DistrictNode d2 = pair.getItem2();
-                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts);
+                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts, remnantEdges);
                 mergedDistricts.put(d1, newDistrict);
                 mergedDistricts.put(d2, newDistrict);
             } catch (MismatchedElectionException e) {
@@ -240,7 +243,6 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
 
     @Override
     public PhaseOneReport run(PhaseOneInputs inputs) {
-        int iteration = (inputs.getJob() == null) ? 0 : inputs.getJob().getNextIteration();
         final Set<DemographicType> demoTypes = inputs.getDemographicTypes();
         final int numDistricts = inputs.getNumDistricts();
         final Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
@@ -250,27 +252,33 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             PhaseOneMergeDelta initialDelta = assignInitialDistricts(inputs);
             deltas.offer(initialDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
-                return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId(), new HashSet<>());
+                return PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas, inputs.getJobId(),
+                        new HashSet<>(), new HashSet<>());
             }
         }
 
         // Iteratively merge the districts.
         final StateNode state = inputs.getState();
         final Set<DistrictNode> remnantDistricts = new HashSet<>();
+        final Set<DistrictEdge> remnantEdges = new HashSet<>();
+        StatusCode statusCode = StatusCode.IN_PROGRESS;
+        int iteration;
         while (state.getChildren().size() != numDistricts) {
+            iteration = inputs.getJob().getNextIteration();
             CandidatePairs pairs = determineCandidatePairs(inputs);
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
             if (lastIteration) {
+                statusCode = StatusCode.SUCCESS;
                 int numAllowedMerges = state.getChildren().size() - numDistricts;
                 filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }
-            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration, demoTypes, remnantDistricts);
+            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration, demoTypes,
+                    remnantDistricts, remnantEdges);
             deltas.offer(iterationDelta);
-            iteration = inputs.getJob().getNextIteration();
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
-                return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId(), remnantDistricts);
+                return PhaseOneReportInitializer.initClass(statusCode, deltas, inputs.getJobId(), remnantDistricts, remnantEdges);
             }
         }
-        return PhaseOneReportInitializer.initClass(deltas, inputs.getJobId(), remnantDistricts);
+        return PhaseOneReportInitializer.initClass(statusCode, deltas, inputs.getJobId(), remnantDistricts, remnantEdges);
     }
 }

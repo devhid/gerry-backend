@@ -2,8 +2,11 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.IterativeAlgPhaseLogBuilder;
+import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.PhaseTwoLogBuilder;
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.logs.IterativeAlgPhaseLog;
 import edu.stonybrook.cse308.gerrybackend.data.reports.IterativeAlgPhaseDelta;
+import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseTwoMoveDelta;
+import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +24,8 @@ public abstract class IterativeAlgPhaseReport<D extends IterativeAlgPhaseDelta, 
     @JsonIgnore
     protected B logBuilder;
 
-    IterativeAlgPhaseReport(Queue<D> deltas, B logBuilder) {
+    IterativeAlgPhaseReport(StatusCode statusCode, Queue<D> deltas, B logBuilder) {
+        super(statusCode);
         this.deltas = deltas;
         this.logBuilder = logBuilder;
     }

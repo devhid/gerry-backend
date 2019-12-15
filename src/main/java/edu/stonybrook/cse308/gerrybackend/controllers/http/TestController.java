@@ -4,6 +4,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.phaseone.MergedDistrict;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
+import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.initializers.PhaseOneReportInitializer;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,8 @@ public class TestController {
         PhaseOneMergeDelta delta = new PhaseOneMergeDelta(0, changedNodes, newDistricts);
         Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
         deltas.offer(delta);
-        PhaseOneReport report = PhaseOneReportInitializer.initClass(deltas, "derp", null);
+        PhaseOneReport report = PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas,
+                "derp", null, null);
         report = report.fetchAggregateReport();
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }
