@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     @Getter
+    @Setter
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "incumbent_name")),
