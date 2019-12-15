@@ -6,13 +6,11 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.phaseone.MergedDistrict;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
+import edu.stonybrook.cse308.gerrybackend.data.jobs.Job;
 import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedStringPair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseOneStop;
-import edu.stonybrook.cse308.gerrybackend.enums.types.AlgRunType;
-import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
-import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
-import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
+import edu.stonybrook.cse308.gerrybackend.enums.types.*;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
@@ -250,6 +248,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         // Assign initial districts and produce the initial delta.
         if (inputs.getJob() == null) {
             PhaseOneMergeDelta initialDelta = assignInitialDistricts(inputs);
+            Job job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
+            inputs.setJobId(job.getId());
+            inputs.setJob(job);
             deltas.offer(initialDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
                 return PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas, inputs.getJobId(),

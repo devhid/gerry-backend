@@ -109,8 +109,7 @@ public class AlgorithmController {
         Job job;
         if (inputs.getJobId() == null) {
             report = phaseOneStart(inputs);
-            job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
-            report.setJobId(job.getId());
+            job = inputs.getJob();
         } else {
             report = phaseOneIterative(inputs);
             job = inputs.getJob();
