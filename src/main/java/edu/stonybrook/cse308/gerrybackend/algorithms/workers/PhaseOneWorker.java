@@ -143,6 +143,10 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         newState.setNew(true);
         inputs.setState(newState);
 
+        Job job = new Job(AlgPhaseType.PHASE_ONE, newState);
+        inputs.setJobId(job.getId());
+        inputs.setJob(job);
+
         return createInitialDelta(precinctToDistrict, inputs.getDemographicTypes());
     }
 
@@ -244,12 +248,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         final int numDistricts = inputs.getNumDistricts();
         final Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
 
-        // Assign initial districts and produce the initial delta.
+        // Assign initial districts, modify inputs as appropriate, and produce the initial delta.
         if (inputs.getJob() == null) {
             PhaseOneMergeDelta initialDelta = assignInitialDistricts(inputs);
-            Job job = new Job(AlgPhaseType.PHASE_ONE, inputs.getState());
-            inputs.setJobId(job.getId());
-            inputs.setJob(job);
             deltas.offer(initialDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
                 return PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas, inputs.getJobId(), new HashSet<>());

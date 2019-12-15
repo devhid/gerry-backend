@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @MappedSuperclass
-@JsonIgnoreProperties({"adjacentNodes", "electionType", "populationDensity"})
+@JsonIgnoreProperties({"adjacentEdgesCopy", "adjacentNodes", "electionType", "populationDensity"})
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,

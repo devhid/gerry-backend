@@ -115,10 +115,9 @@ public class AlgorithmController {
             report = phaseOneIterative(inputs);
             job = inputs.getJob();
         }
-        // TODO: need to fix this method
-//        if (inputs.getAlgRunType() == AlgRunType.TO_COMPLETION) {
-//            report = report.fetchAggregateReport();
-//        }
+        if (inputs.getAlgRunType() == AlgRunType.TO_COMPLETION) {
+            report = report.fetchAggregateReport();
+        }
         stateService.createOrUpdateState(inputs.getState());
         jobService.createOrUpdateJob(job);
         return report;
