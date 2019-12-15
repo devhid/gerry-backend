@@ -3,7 +3,7 @@ package edu.stonybrook.cse308.gerrybackend.controllers.http;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
-import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbents;
+import edu.stonybrook.cse308.gerrybackend.communication.population.Incumbents;
 import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.db.services.DistrictService;
 import edu.stonybrook.cse308.gerrybackend.db.services.PrecinctService;
@@ -17,6 +17,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
+import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,50 @@ public class PopulateController {
         stateService.deleteStateById(state.getId());
     }
 
+    private void createPrecinctEdge(String id, PrecinctNode p1, PrecinctNode p2) {
+        PrecinctEdge edge = new PrecinctEdge(id, p1, p2);
+        try {
+            p1.addEdge(edge);
+            p2.addEdge(edge);
+        } catch (InvalidEdgeException e) {
+            // should never happen
+            e.printStackTrace();
+        }
+    }
+
+    public void populatePrecinctEdges(Map<String, UnorderedPair<PrecinctNode>> edgeMap,
+                                             Set<PrecinctNode> nodes) {
+        for (PrecinctNode node : nodes) {
+            for (PrecinctEdge nodeEdge : node.getAdjacentEdges()) {
+                if (!edgeMap.containsKey(nodeEdge.getId())) {
+                    UnorderedPair<PrecinctNode> edgeNodes = new UnorderedPair<>();
+                    edgeNodes.add(node);
+                    edgeMap.put(nodeEdge.getId(), edgeNodes);
+                } else {
+                    edgeMap.get(nodeEdge.getId()).add(node);
+                }
+            }
+        }
+    }
+
+    private void populatePrecinctEdges(StateNode state) {
+        Map<String, UnorderedPair<PrecinctNode>> edgeMap = new HashMap<>();
+
+        // Load all precincts.
+        Set<PrecinctNode> precincts = state.getAllPrecincts();
+
+        // Load all edges.
+        populatePrecinctEdges(edgeMap, precincts);
+        precincts.forEach(PrecinctNode::clearEdges);
+
+        // Update all node references in the edges.
+        edgeMap.forEach((edgeId, edgeNodes) -> {
+            PrecinctNode p1 = edgeNodes.getItem1();
+            PrecinctNode p2 = edgeNodes.getItem2();
+            createPrecinctEdge(edgeId, p1, p2);
+        });
+    }
+
     private void populateAdjDistrictPairs(StateNode state, Set<UnorderedPair<DistrictNode>> adjDistricts) {
         state.getChildren().forEach(d -> {
             Set<PrecinctNode> borderPrecincts = d.getBorderPrecincts();
@@ -95,10 +140,23 @@ public class PopulateController {
     }
 
     private void populateDistrictEdges(StateNode state) {
+        populatePrecinctEdges(state);
         state.fillInTransientProperties();
         Set<UnorderedPair<DistrictNode>> adjDistricts = new HashSet<>();
         this.populateAdjDistrictPairs(state, adjDistricts);
         this.createDistrictEdgeRefs(adjDistricts);
+    }
+
+    private void markNewState(StateNode state) {
+        state.getChildren().forEach(d -> {
+            d.setNew(true);
+            d.getChildren().forEach(p -> {
+               p.setNew(true);
+               p.getAdjacentEdges().forEach(e -> e.setNew(true));
+            });
+            d.getAdjacentEdges().forEach(e -> e.setNew(true));
+        });
+        state.setNew(true);
     }
 
     private void updateIncumbent(Map<String, Incumbent> incumbentMap, StateType stateType, ElectionType electionType) {
@@ -146,8 +204,8 @@ public class PopulateController {
     public ResponseEntity<StateNode> createState(@RequestBody StateNode state) {
         state.aggregateStatistics();
         this.populateDistrictEdges(state);
-        state.getMultiPolygon();
-        createOrUpdateEntity(state);
+        this.markNewState(state);
+        this.createOrUpdateEntity(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
     }
 

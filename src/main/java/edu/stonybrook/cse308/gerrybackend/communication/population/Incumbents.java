@@ -1,5 +1,6 @@
-package edu.stonybrook.cse308.gerrybackend.data.graph;
+package edu.stonybrook.cse308.gerrybackend.communication.population;
 
+import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.PoliticalPartyConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
