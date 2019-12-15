@@ -58,12 +58,17 @@ public class StateService extends EntityService<StateNode> {
     @Cacheable(cacheNames="states")
     public StateNode findOriginalState(StateType stateType, ElectionType electionType) {
         StateNode state = stateRepo.queryFirstByNodeTypeAndStateTypeAndElectionData_ElectionType(NodeType.ORIGINAL, stateType, electionType);
+        state.getCounties().size();
+        state.getMeasures().size();
         state.getChildren().forEach(d -> {
             d.getChildren().forEach(p -> {
                 p.getAdjacentEdges().size();
-                p.getGeoJson();
+                p.getGeoJson().length();
             });
             d.getAdjacentEdges().size();
+            d.getCounties().size();
+            d.getMeasures().size();
+            d.getIncumbent();
         });
         return state;
     }

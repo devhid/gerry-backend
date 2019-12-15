@@ -219,13 +219,14 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     }
 
     public static DistrictNode combineForStatisticsOnly(DistrictNode d1, DistrictNode d2) throws MismatchedElectionException {
-        return DistrictNode.combine(d1, d2, false, null, null);
+        return DistrictNode.combine(d1, d2, false, null);
     }
 
     /**
      * Merges two disjoint DistrictNode objects (they do not share any internal nodes).
      * <p>
-     * This is mainly used for Phase 1 execution.
+     * This is mainly used for Phase 1 execution. Note that this is only intended to be used for DistrictNodes NOT
+     * persisted to the backing database, hence we don't have to worry about orphan removal and the like.
      *
      * @param d1          first DistrictNode object to merge
      * @param d2          second DistrictNode object to merge
@@ -233,11 +234,10 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
      * @return merged DistrictNode
      */
     public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean updateEdges,
-                                       Set<DistrictNode> remnantDistricts, Set<DistrictEdge> remnantEdges)
+                                       Set<DistrictNode> remnantDistricts)
             throws MismatchedElectionException {
         if (!d1.isAdjacentTo(d2) || !d2.isAdjacentTo(d1)) {
-            throw new IllegalArgumentException("WOAH d1 id: " + d1.getId() + " d2 id: " + d2.getId());
-//            throw new IllegalArgumentException("Replace this string later!");
+            throw new IllegalArgumentException("Replace this string later!");
         }
         DistrictNode biggerDistrict = (d1.size() > d2.size()) ? d1 : d2;
         DistrictNode smallerDistrict = (biggerDistrict == d1) ? d2 : d1;
@@ -267,7 +267,6 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
             smallerDistrict.clearEdges();
             remnantDistricts.add(smallerDistrict);          // mark as remnant to be deleted later
-            remnantEdges.addAll(connectingEdge);            // mark as remnant to be deleted later
         }
 
         return mergedDistrict;

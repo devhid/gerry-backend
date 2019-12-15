@@ -216,14 +216,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
      */
     private static PhaseOneMergeDelta joinCandidatePairs(StateNode state, CandidatePairs pairs, int iteration,
                                                          Set<DemographicType> demoTypes,
-                                                         Set<DistrictNode> remnantDistricts,
-                                                         Set<DistrictEdge> remnantEdges) {
+                                                         Set<DistrictNode> remnantDistricts) {
         Map<DistrictNode, DistrictNode> mergedDistricts = new HashMap<>();
         for (LikelyCandidatePair pair : pairs.getAllPairs()) {
             try {
                 DistrictNode d1 = pair.getItem1();
                 DistrictNode d2 = pair.getItem2();
-                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts, remnantEdges);
+                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts);
                 mergedDistricts.put(d1, newDistrict);
                 mergedDistricts.put(d2, newDistrict);
             } catch (MismatchedElectionException e) {
@@ -253,19 +252,18 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             inputs.setJob(job);
             deltas.offer(initialDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
-                return PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas, inputs.getJobId(),
-                        new HashSet<>(), new HashSet<>());
+                return PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas, inputs.getJobId(), new HashSet<>());
             }
         }
 
         // Iteratively merge the districts.
         final StateNode state = inputs.getState();
         final Set<DistrictNode> remnantDistricts = new HashSet<>();
-        final Set<DistrictEdge> remnantEdges = new HashSet<>();
         StatusCode statusCode = StatusCode.IN_PROGRESS;
         int iteration;
         while (state.getChildren().size() != numDistricts) {
             iteration = inputs.getJob().getNextIteration();
+            remnantDistricts.clear();
             CandidatePairs pairs = determineCandidatePairs(inputs);
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
             if (lastIteration) {
@@ -273,13 +271,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                 int numAllowedMerges = state.getChildren().size() - numDistricts;
                 filterLastIterationPairs(inputs.getStopHeuristic(), pairs, numAllowedMerges);
             }
-            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration, demoTypes,
-                    remnantDistricts, remnantEdges);
+            PhaseOneMergeDelta iterationDelta = joinCandidatePairs(state, pairs, iteration, demoTypes, remnantDistricts);
+            state.getChildren().removeAll(remnantDistricts);
             deltas.offer(iterationDelta);
             if (inputs.getAlgRunType() == AlgRunType.BY_STEP) {
-                return PhaseOneReportInitializer.initClass(statusCode, deltas, inputs.getJobId(), remnantDistricts, remnantEdges);
+                return PhaseOneReportInitializer.initClass(statusCode, deltas, inputs.getJobId(), remnantDistricts);
             }
         }
-        return PhaseOneReportInitializer.initClass(statusCode, deltas, inputs.getJobId(), remnantDistricts, remnantEdges);
+        return PhaseOneReportInitializer.initClass(statusCode, deltas, inputs.getJobId(), remnantDistricts);
     }
 }

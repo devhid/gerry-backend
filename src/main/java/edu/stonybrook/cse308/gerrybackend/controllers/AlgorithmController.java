@@ -17,6 +17,7 @@ import edu.stonybrook.cse308.gerrybackend.db.services.DistrictService;
 import edu.stonybrook.cse308.gerrybackend.db.services.JobService;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
 import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.AlgRunType;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
@@ -114,10 +115,10 @@ public class AlgorithmController {
             report = phaseOneIterative(inputs);
             job = inputs.getJob();
         }
-        // NOT NEEDED FOR CACHING
-//        inputs.getState().getChildren().removeAll(report.getRemnantDistricts());
-//        districtService.deleteAllEdges(report.getRemnantEdges());
-//        districtService.deleteAllDistricts(report.getRemnantDistricts());
+        // TODO: need to fix this method
+//        if (inputs.getAlgRunType() == AlgRunType.TO_COMPLETION) {
+//            report = report.fetchAggregateReport();
+//        }
         stateService.createOrUpdateState(inputs.getState());
         jobService.createOrUpdateJob(job);
         return report;

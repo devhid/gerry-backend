@@ -30,7 +30,7 @@ public class TestController {
         Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
         deltas.offer(delta);
         PhaseOneReport report = PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas,
-                "derp", null, null);
+                "derp", null);
         report = report.fetchAggregateReport();
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

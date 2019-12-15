@@ -27,16 +27,15 @@ public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, 
     private Set<DistrictEdge> remnantEdges;
 
     public PhaseOneReport(StatusCode statusCode, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder,
-                          String jobId, Set<DistrictNode> remnantDistricts, Set<DistrictEdge> remnantEdges) {
+                          String jobId, Set<DistrictNode> remnantDistricts) {
         super(statusCode, deltas, logBuilder);
         this.jobId = jobId;
         this.remnantDistricts = remnantDistricts;
-        this.remnantEdges = remnantEdges;
     }
 
     @Override
     protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseOneMergeDelta> deltas) {
-        return new PhaseOneReport(this.statusCode, deltas, this.logBuilder, this.jobId, new HashSet<>(), new HashSet<>());
+        return new PhaseOneReport(this.statusCode, deltas, this.logBuilder, this.jobId, new HashSet<>());
     }
 
     public PhaseOneReport fetchNextReport(int num) {

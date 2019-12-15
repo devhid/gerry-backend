@@ -23,9 +23,8 @@ public class PhaseOneReportInitializer {
     }
 
     public static PhaseOneReport initClass(StatusCode statusCode, Queue<PhaseOneMergeDelta> deltas, String jobId,
-                                           Set<DistrictNode> remnantDistricts, Set<DistrictEdge> remnantEdges) {
-        return new PhaseOneReport(statusCode, deltas, PhaseOneReportInitializer.logBuilder, jobId, remnantDistricts,
-                remnantEdges);
+                                           Set<DistrictNode> remnantDistricts) {
+        return new PhaseOneReport(statusCode, deltas, PhaseOneReportInitializer.logBuilder, jobId, remnantDistricts);
     }
 
 }
