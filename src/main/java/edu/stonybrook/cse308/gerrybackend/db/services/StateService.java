@@ -44,10 +44,10 @@ public class StateService extends EntityService<StateNode> {
 
     @CachePut(cacheNames="states", key="#state.id")
     public StateNode createOrUpdateState(StateNode state) {
-        List<DistrictNode> allDistricts = new ArrayList<>(state.getChildren());
-        districtRepo.saveAll(allDistricts);
-        return this.createOrUpdateEntity(this.stateRepo, state);
-//        return state;
+//        List<DistrictNode> allDistricts = new ArrayList<>(state.getChildren());
+//        districtRepo.saveAll(allDistricts);
+//        return this.createOrUpdateEntity(this.stateRepo, state);
+        return state;
     }
 
     @CacheEvict(cacheNames="states")
