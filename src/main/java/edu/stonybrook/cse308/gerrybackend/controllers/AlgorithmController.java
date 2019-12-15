@@ -79,9 +79,10 @@ public class AlgorithmController {
 
     private PhaseOneReport phaseOneIterative(PhaseOneInputs inputs) {
         Job job = jobService.getJobById(inputs.getJobId());
-        job.getState().fillInTransientProperties();
+        StateNode state = stateService.getStateById(inputs.getJobId());
+        state.fillInTransientProperties();
         inputs.setJob(job);
-        inputs.setState(job.getState());
+        inputs.setState(state);
         return (PhaseOneReport) this.handle(inputs);
     }
 
@@ -114,9 +115,10 @@ public class AlgorithmController {
             report = phaseOneIterative(inputs);
             job = inputs.getJob();
         }
-        inputs.getState().getChildren().removeAll(report.getRemnantDistricts());
-        districtService.deleteAllEdges(report.getRemnantEdges());
-        districtService.deleteAllDistricts(report.getRemnantDistricts());
+        // NOT NEEDED FOR CACHING
+//        inputs.getState().getChildren().removeAll(report.getRemnantDistricts());
+//        districtService.deleteAllEdges(report.getRemnantEdges());
+//        districtService.deleteAllDistricts(report.getRemnantDistricts());
         stateService.createOrUpdateState(inputs.getState());
         jobService.createOrUpdateJob(job);
         return report;
