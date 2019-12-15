@@ -7,12 +7,14 @@ import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
+import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,6 +22,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @MappedSuperclass
 @JsonIgnoreProperties({"adjacentNodes", "electionType", "populationDensity"})
@@ -36,7 +39,7 @@ import java.util.UUID;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )
-public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
+public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> implements Persistable {
 
     @Getter
     @Id
@@ -59,7 +62,10 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     @Getter
     @BatchSize(size = 500)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)  // one node has many edges, an edge has 2 (many) nodes
+    @ManyToMany(    // one node has many edges, an edge has 2 (many) nodes
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
+    )
     protected Set<E> adjacentEdges;
 
     @Lob
@@ -76,6 +82,10 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     @Transient
     @JsonIgnore
     private Geometry geometry;
+
+    @Setter
+    @Transient
+    private boolean isNew = false;
 
     protected GerryNode() {
         this.id = UUID.randomUUID().toString();
@@ -97,6 +107,11 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
         this.geoJson = geoJson;
     }
 
+    public Set<E> getAdjacentEdgesCopy() {
+        Set newEdges = this.adjacentEdges.stream().map(GerryEdge::copy).collect(Collectors.toSet());
+        return (Set<E>) newEdges;
+    }
+
     public Set<GerryNode> getAdjacentNodes() {
         Set<GerryNode> adjNodes = new HashSet<>();
         for (E edge : adjacentEdges) {
@@ -104,6 +119,12 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
             adjNodes.add(adjNode);
         }
         return adjNodes;
+    }
+
+    public boolean isAdjacentTo(GerryNode other) {
+        Set<E> edges = new HashSet<>(this.adjacentEdges);
+        edges.retainAll(other.adjacentEdges);
+        return (edges.size() > 0);
     }
 
 
@@ -175,5 +196,10 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
     }
 }

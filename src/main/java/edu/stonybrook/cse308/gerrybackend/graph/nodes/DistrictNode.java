@@ -76,8 +76,14 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
     public DistrictNode(DistrictNode obj) {
         this(UUID.randomUUID().toString(), obj.getName(), obj.nodeType, new DemographicData(obj.demographicData),
-                new ElectionData(obj.electionData), new HashSet<>(obj.adjacentEdges), null, new HashSet<>(obj.children),
+                new ElectionData(obj.electionData), obj.getAdjacentEdgesCopy(), null, new HashSet<>(obj.children),
                 new HashSet<>(obj.counties), obj.parent, obj.incumbent);
+        this.adjacentEdges.forEach(e -> {
+            DistrictNode originalNode = (e.getItem1() == obj) ? e.getItem1() : e.getItem2();
+            e.remove(originalNode);
+            e.add(this);
+        });
+        this.numericalId = obj.getNumericalId();
     }
 
     @Override
@@ -212,6 +218,10 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
         this.markGeometriesStale();
     }
 
+    public static DistrictNode combineForStatisticsOnly(DistrictNode d1, DistrictNode d2) throws MismatchedElectionException {
+        return DistrictNode.combine(d1, d2, false, null, null);
+    }
+
     /**
      * Merges two disjoint DistrictNode objects (they do not share any internal nodes).
      * <p>
@@ -222,56 +232,44 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
      * @param updateEdges whether to update external node edges
      * @return merged DistrictNode
      */
-    public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean updateEdges) throws MismatchedElectionException {
-        if (!d1.getAdjacentNodes().contains(d2) || !d2.getAdjacentNodes().contains(d1)) {
-            throw new IllegalArgumentException("Replace this string later!");
+    public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean updateEdges,
+                                       Set<DistrictNode> remnantDistricts, Set<DistrictEdge> remnantEdges)
+            throws MismatchedElectionException {
+        if (!d1.isAdjacentTo(d2) || !d2.isAdjacentTo(d1)) {
+            throw new IllegalArgumentException("WOAH d1 id: " + d1.getId() + " d2 id: " + d2.getId());
+//            throw new IllegalArgumentException("Replace this string later!");
         }
         DistrictNode biggerDistrict = (d1.size() > d2.size()) ? d1 : d2;
         DistrictNode smallerDistrict = (biggerDistrict == d1) ? d2 : d1;
-        DistrictNode mergedDistrict = new DistrictNode(biggerDistrict);
+        DistrictNode mergedDistrict = (updateEdges && remnantDistricts != null) ? biggerDistrict : new DistrictNode(biggerDistrict);
 
         // Add all nodes and update counties.
         mergedDistrict.children.addAll(smallerDistrict.children);
         mergedDistrict.counties.addAll(smallerDistrict.counties);
 
         // Merge DemographicData and ElectionData.
-        mergedDistrict.demographicData = DemographicData.combine(mergedDistrict.demographicData, smallerDistrict.demographicData);
-        mergedDistrict.electionData = ElectionData.combine(mergedDistrict.electionData, smallerDistrict.electionData);
+        mergedDistrict.demographicData.add(smallerDistrict.demographicData);
+        mergedDistrict.electionData.add(smallerDistrict.electionData);
 
-        // Get all adjacent nodes.
-        Set<DistrictNode> allAdjNodes = GenericUtils.castSetOfObjects(d1.getAdjacentNodes(), DistrictNode.class);
-        allAdjNodes.addAll(GenericUtils.castSetOfObjects(d2.getAdjacentNodes(), DistrictNode.class));
-        allAdjNodes.remove(d1);     // from d2.getAdjacentNodes()
-        allAdjNodes.remove(d2);     // from d1.getAdjacentNodes()
-
-        // Get all adjacent edges (makes this easier to update external node edge references).
-        Set<DistrictEdge> connectingEdge = new HashSet<>(d1.adjacentEdges);
-        connectingEdge.retainAll(d2.adjacentEdges);     // should be only the edge connecting d1, d2
-        Set<DistrictEdge> allAdjEdges = new HashSet<>(d1.adjacentEdges);
-        allAdjEdges.addAll(d2.adjacentEdges);
-        allAdjEdges.removeAll(connectingEdge);          // allAdjEdges = d1Adj U d2Adj - connectingEdge
-
-        // Create new GerryEdge references to update internal references and joinability values.
-        Map<DistrictNode, DistrictEdge> newAdjNodeEdges = new HashMap<>();
-        for (DistrictNode adjNode : allAdjNodes) {
-            if (adjNode == null) {
-                System.out.println("nani");
-            }
-            newAdjNodeEdges.put(adjNode, new DistrictEdge(UUID.randomUUID().toString(), mergedDistrict, adjNode));
-        }
-
-        // Fix each of the external, adjacent nodes' edges.
         if (updateEdges) {
-            newAdjNodeEdges.forEach((adjNode, newEdge) -> {
-                Set<DistrictEdge> oldEdges = new HashSet<>(adjNode.adjacentEdges);
-                oldEdges.retainAll(allAdjEdges);    // oldEdges = 1 or 2 edges (if adj to only 1 or to both d1,d2)
-                adjNode.adjacentEdges.removeAll(oldEdges);
-                adjNode.adjacentEdges.add(newEdge);
+            // Get all adjacent edges (makes it easier to update external node edge references).
+            Set<DistrictEdge> connectingEdge = new HashSet<>(d1.adjacentEdges);
+            connectingEdge.retainAll(d2.adjacentEdges);     // should be only the edge connecting d1, d2
+            mergedDistrict.adjacentEdges.removeAll(connectingEdge);
+            smallerDistrict.adjacentEdges.removeAll(connectingEdge);
+            mergedDistrict.adjacentEdges.forEach(GerryEdge::clearJoinability);     // mark stale
+
+            smallerDistrict.adjacentEdges.forEach(adjEdge -> {
+                adjEdge.remove(smallerDistrict);
+                adjEdge.add(mergedDistrict);
             });
+            mergedDistrict.adjacentEdges.addAll(smallerDistrict.adjacentEdges);
+
+            smallerDistrict.clearEdges();
+            remnantDistricts.add(smallerDistrict);          // mark as remnant to be deleted later
+            remnantEdges.addAll(connectingEdge);            // mark as remnant to be deleted later
         }
 
-        // Set the new merged cluster's adjacent edges.
-        mergedDistrict.adjacentEdges = new HashSet<>(newAdjNodeEdges.values());
         return mergedDistrict;
     }
 }

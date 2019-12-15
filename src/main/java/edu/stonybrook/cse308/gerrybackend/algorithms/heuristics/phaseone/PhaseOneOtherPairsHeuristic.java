@@ -24,11 +24,11 @@ public interface PhaseOneOtherPairsHeuristic {
                 return LikelyType.KIND_OF;
             }
 
-            if (joinability >= 2.0 && joinability <= 3.0) {
+            if (joinability >= 2.0 && joinability <= 4.0) {
                 return LikelyType.VERY;
             }
 
-            // should never happen, because joinability without minority should be <= 0 and <= 3,
+            // should never happen, because joinability without minority should be <= 0 and <= 4,
             // but added as a sanity check.
             throw new IllegalArgumentException("Replace string with text later! " + joinability);
         }
@@ -93,22 +93,18 @@ public interface PhaseOneOtherPairsHeuristic {
                     .collect(Collectors.toSet());
 
             // consider districts that are non-majority-minority
-            Set<DistrictNode> allDistricts = new HashSet<>(inputs.getState().getChildren());
-            allDistricts.removeAll(usedDistricts);
-
-            Queue<DistrictNode> consideredDistricts = new LinkedList<>(allDistricts);
+            Set<DistrictNode> remainingDistricts = new HashSet<>(inputs.getState().getChildren());
+            remainingDistricts.removeAll(usedDistricts);
+            Queue<DistrictNode> districtsToConsider = new LinkedList<>(remainingDistricts);
 
             Map<DistrictNode, LikelyCandidatePair> likelyPairs = new HashMap<>();
-
-            while (!consideredDistricts.isEmpty()) {
-                DistrictNode d1 = consideredDistricts.poll();
-
+            while (!districtsToConsider.isEmpty()) {
+                DistrictNode d1 = districtsToConsider.poll();
                 Set<DistrictNode> adjNodes = GenericUtils.castSetOfObjects(d1.getAdjacentNodes(), DistrictNode.class);
-
+                adjNodes.retainAll(remainingDistricts);
                 for (DistrictNode d2 : adjNodes) {
                     LikelyCandidatePair likelyPair = Standard.createLikelyCandidatePair(d1, d2);
                     LikelyType likelyType = likelyPair.getLikelyType();
-
                     if (likelyType == LikelyType.NOT) {
                         continue;
                     }
@@ -121,12 +117,12 @@ public interface PhaseOneOtherPairsHeuristic {
                             if (likelyPairs.get(d1) == likelyPair) {
                                 continue;
                             } else {
-                                takePair = Standard.checkBothDistrictsPaired(likelyPair, likelyPairs, consideredDistricts);
+                                takePair = Standard.checkBothDistrictsPaired(likelyPair, likelyPairs, districtsToConsider);
                             }
                         } else if (d1Paired) {
-                            takePair = Standard.checkOnlyOneDistrictPaired(d1, likelyType, likelyPairs, consideredDistricts);
+                            takePair = Standard.checkOnlyOneDistrictPaired(d1, likelyType, likelyPairs, districtsToConsider);
                         } else {
-                            takePair = Standard.checkOnlyOneDistrictPaired(d2, likelyType, likelyPairs, consideredDistricts);
+                            takePair = Standard.checkOnlyOneDistrictPaired(d2, likelyType, likelyPairs, districtsToConsider);
                         }
                     }
                     if (takePair) {

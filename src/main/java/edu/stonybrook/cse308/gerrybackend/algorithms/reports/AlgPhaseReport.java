@@ -1,12 +1,17 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
-import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class AlgPhaseReport {
 
-    private AlgPhaseType algPhaseType;
-    private StatusCode statusCode;
-    private int iteration;
+    @Getter
+    @Setter
+    protected StatusCode statusCode;
+
+    protected AlgPhaseReport(StatusCode statusCode) {
+        this.statusCode = statusCode;
+    }
 
 }

@@ -1,8 +1,12 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.PhaseOneLogBuilder;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.phaseone.MergedDistrict;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
+import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,14 +18,25 @@ public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, 
     @Setter
     protected String jobId;
 
-    public PhaseOneReport(Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder, String jobId) {
-        super(deltas, logBuilder);
+    @Getter
+    @JsonIgnore
+    private Set<DistrictNode> remnantDistricts;
+
+    @Getter
+    @JsonIgnore
+    private Set<DistrictEdge> remnantEdges;
+
+    public PhaseOneReport(StatusCode statusCode, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder,
+                          String jobId, Set<DistrictNode> remnantDistricts, Set<DistrictEdge> remnantEdges) {
+        super(statusCode, deltas, logBuilder);
         this.jobId = jobId;
+        this.remnantDistricts = remnantDistricts;
+        this.remnantEdges = remnantEdges;
     }
 
     @Override
     protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseOneMergeDelta> deltas) {
-        return new PhaseOneReport(deltas, this.logBuilder, this.jobId);
+        return new PhaseOneReport(this.statusCode, deltas, this.logBuilder, this.jobId, new HashSet<>(), new HashSet<>());
     }
 
     public PhaseOneReport fetchNextReport(int num) {

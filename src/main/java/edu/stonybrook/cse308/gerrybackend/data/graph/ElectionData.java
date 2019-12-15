@@ -56,7 +56,7 @@ public class ElectionData {
     }
 
     public ElectionData(ElectionData obj) {
-        this(obj.electionType, obj.getVotesCopy(), obj.winners);
+        this(obj.electionType, obj.getVotesCopy(), obj.getWinnersCopy());
     }
 
     public int getPartyVotes(PoliticalParty party) {
@@ -85,6 +85,10 @@ public class ElectionData {
         return new EnumMap<>(this.votes);
     }
 
+    public Set<PoliticalParty> getWinnersCopy() {
+        return new HashSet<>(this.winners);
+    }
+
     private static Set<PoliticalParty> determineWinners(Map<PoliticalParty, Integer> votes) {
         final int max = votes.values().stream().mapToInt(Integer::intValue).max().getAsInt();
         final Set<PoliticalParty> winners = new HashSet<>();
@@ -97,29 +101,29 @@ public class ElectionData {
     }
 
     public static ElectionData combine(ElectionData e1, ElectionData e2) throws MismatchedElectionException {
-        if (e1.electionType != e2.electionType) {
+        ElectionData combined = new ElectionData(e1.getElectionType(), e1.getVotesCopy(), e1.getWinnersCopy());
+        combined.add(e2);
+        return combined;
+    }
+
+    public void add(ElectionData e) throws MismatchedElectionException {
+        if (e.electionType != this.electionType) {
             throw new MismatchedElectionException("Replace this string later.");
         }
 
-        Map<PoliticalParty, Integer> e1Votes = e1.votes;
-        Map<PoliticalParty, Integer> e2Votes = e2.votes;
-        Set<PoliticalParty> partyTypes = e1Votes.keySet();
-        if (!partyTypes.equals(e2Votes.keySet())) {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
+        Map<PoliticalParty, Integer> eVotes = e.votes;
+        Set<PoliticalParty> partyTypes = eVotes.keySet();
 
-        Map<PoliticalParty, Integer> combinedVotes = new EnumMap<>(PoliticalParty.class);
         for (PoliticalParty partyType : partyTypes) {
-            Integer e1NumVotes = e1Votes.get(partyType);
-            Integer e2NumVotes = e2Votes.get(partyType);
+            Integer e1NumVotes = eVotes.getOrDefault(partyType, 0);
+            Integer e2NumVotes = this.votes.getOrDefault(partyType, 0);
             // Check if either map explicitly mapped this to null.
             if ((e1NumVotes == null) || (e2NumVotes == null)) {
                 throw new IllegalArgumentException("Replace this string later!");
             }
-            combinedVotes.put(partyType, e1Votes.get(partyType) + e2Votes.get(partyType));
+            this.votes.put(partyType, e1NumVotes + e2NumVotes);
         }
-        Set<PoliticalParty> winners = ElectionData.determineWinners(combinedVotes);
-        return new ElectionData(e1.electionType, combinedVotes, winners);
+        this.winners = ElectionData.determineWinners(this.votes);
     }
 
     public void subtract(ElectionData subElectionData) throws MismatchedElectionException {
@@ -128,15 +132,14 @@ public class ElectionData {
         }
 
         Map<PoliticalParty, Integer> subVotes = subElectionData.votes;
-        if (!this.votes.keySet().equals(subVotes.keySet())) {
-            throw new IllegalArgumentException("Replace this string later!");
-        }
 
         for (PoliticalParty partyType : this.votes.keySet()) {
-            if (this.votes.get(partyType) < subVotes.get(partyType)) {
+            int bigPartyVotes = this.votes.getOrDefault(partyType, 0);
+            int smallPartyVotes = subVotes.getOrDefault(partyType, 0);
+            if (bigPartyVotes < smallPartyVotes) {
                 throw new IllegalArgumentException("Replace this string later!");
             }
-            this.votes.put(partyType, this.votes.get(partyType) - subVotes.get(partyType));
+            this.votes.put(partyType, bigPartyVotes - smallPartyVotes);
         }
         this.winners = ElectionData.determineWinners(this.votes);
     }

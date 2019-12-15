@@ -2,6 +2,7 @@ package edu.stonybrook.cse308.gerrybackend.data.algorithm;
 
 import lombok.Getter;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class CandidatePairs {
         return allPairs;
     }
 
-    public void filterPairs(Set<LikelyCandidatePair> filteredPairs) {
+    public void filterPairs(Collection<LikelyCandidatePair> filteredPairs) {
         this.majorityMinorityPairs.retainAll(filteredPairs);
         this.otherPairs.retainAll(filteredPairs);
     }

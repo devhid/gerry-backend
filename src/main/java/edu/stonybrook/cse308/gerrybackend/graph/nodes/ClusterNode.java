@@ -39,8 +39,8 @@ import java.util.*;
 public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> extends GerryNode<E, StateNode> {
 
     @Getter
-    @BatchSize(size = 50)
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
+    @BatchSize(size = 500)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     protected Set<C> children;
 
     @Getter
