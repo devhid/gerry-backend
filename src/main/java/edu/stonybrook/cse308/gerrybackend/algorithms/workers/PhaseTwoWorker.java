@@ -1,19 +1,20 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 
+import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTwoPrecinctMoveHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
+import edu.stonybrook.cse308.gerrybackend.algorithms.measures.InputMeasures;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseTwoMoveDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureInterface;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.Measures;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.initializers.PhaseTwoReportInitializer;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoReport> {
 
@@ -64,8 +65,17 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      */
     private static Map<PrecinctMove, StateNode> computePotentialMovesStandard(StateNode state,
                                                                               PhaseTwoPrecinctMove moveHeuristic) {
-        // TODO: fill in
         Map<PrecinctMove, StateNode> potentialMoves = new HashMap<>();
+        PrecinctMove move = PhaseTwoPrecinctMoveHeuristic.selectPrecinct(moveHeuristic, state);
+
+        StateNode result = null;
+        try {
+            result = state.copyAndExecuteMove(move);
+        } catch (MismatchedElectionException e) {
+            e.printStackTrace();
+        }
+
+        potentialMoves.put(move, result);
         return potentialMoves;
     }
 
@@ -101,14 +111,20 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     }
 
     /**
-     * Computes the objective funcction score for a given StateNode graph.
+     * Computes the objective function score for a given StateNode graph.
      *
      * @param state the given StateNode graph
      * @return a value in the range [0,1]
      */
     private static double computeObjectiveFunction(StateNode state) {
-        // TODO: fill in
-        return -1.0;
+        double score = -1.0;
+//        return state.getChildren()
+//                .stream()
+//                .map(district -> Measures.allMeasures()
+//                        .stream()
+//                        .map(measure -> InputMeasures.computeScore(measure, district) * weights.get(measure))
+//        ).reduce((score1, score2) -> score1 + score2);
+        return score;
     }
 
     /**
@@ -120,6 +136,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     private static PrecinctMove selectPrecinctMove(Map<PrecinctMove, StateNode> potentialMoves) {
         PrecinctMove bestMove = null;
         double bestMoveScore = 0.0;
+
         for (Map.Entry<PrecinctMove, StateNode> entry : potentialMoves.entrySet()) {
             double potentialMoveScore = computeObjectiveFunction(entry.getValue());
             if (bestMove == null || potentialMoveScore > bestMoveScore) {
