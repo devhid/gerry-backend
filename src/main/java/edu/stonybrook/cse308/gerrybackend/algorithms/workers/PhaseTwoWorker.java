@@ -15,6 +15,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.initializers.PhaseTwoReportInitializer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoReport> {
 
@@ -116,15 +117,13 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * @param state the given StateNode graph
      * @return a value in the range [0,1]
      */
-    private static double computeObjectiveFunction(StateNode state) {
-        double score = -1.0;
-//        return state.getChildren()
-//                .stream()
-//                .map(district -> Measures.allMeasures()
-//                        .stream()
-//                        .map(measure -> InputMeasures.computeScore(measure, district) * weights.get(measure))
-//        ).reduce((score1, score2) -> score1 + score2);
-        return score;
+    private static double computeObjectiveFunction(StateNode state, Map<MeasureInterface, Double> weights) {
+         return state.getChildren()
+                .stream()
+                .flatMap(district -> weights.keySet()
+                        .stream()
+                        .map(measure -> InputMeasures.computeScore(measure, district) * weights.get(measure)))
+                .reduce(0.0, Double::sum);
     }
 
     /**
@@ -133,12 +132,12 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * @param potentialMoves map whose key is a potential move and value is the resulting StateNode graph
      * @return the best PrecinctMove (one with the highest objective function score)
      */
-    private static PrecinctMove selectPrecinctMove(Map<PrecinctMove, StateNode> potentialMoves) {
+    private static PrecinctMove selectPrecinctMove(Map<PrecinctMove, StateNode> potentialMoves, Map<MeasureInterface, Double> weights) {
         PrecinctMove bestMove = null;
         double bestMoveScore = 0.0;
 
         for (Map.Entry<PrecinctMove, StateNode> entry : potentialMoves.entrySet()) {
-            double potentialMoveScore = computeObjectiveFunction(entry.getValue());
+            double potentialMoveScore = computeObjectiveFunction(entry.getValue(), weights);
             if (bestMove == null || potentialMoveScore > bestMoveScore) {
                 bestMove = entry.getKey();
                 bestMoveScore = potentialMoveScore;
@@ -178,7 +177,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         final PhaseTwoPrecinctMove moveHeuristic = inputs.getMoveHeuristic();
         Map<PrecinctMove, StateNode> potentialMoves = computePotentialMoves(state, depthHeuristic, moveHeuristic);
         while (!shouldStop(state, potentialMoves)) {
-            PrecinctMove move = selectPrecinctMove(potentialMoves);
+            PrecinctMove move = selectPrecinctMove(potentialMoves, inputs.getWeightMap());
             PhaseTwoMoveDelta iterationDelta = executePrecinctMove(state, move, iteration);
             deltas.offer(iterationDelta);
             iteration++;
