@@ -2,6 +2,8 @@ package edu.stonybrook.cse308.gerrybackend.controllers.http;
 
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
+import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbents;
 import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.db.services.DistrictService;
 import edu.stonybrook.cse308.gerrybackend.db.services.PrecinctService;
@@ -93,6 +95,19 @@ public class PopulateController {
         this.createDistrictEdgeRefs(adjDistricts);
     }
 
+    private void updateIncumbent(Map<String, Incumbent> incumbentMap, StateType stateType, ElectionType electionType) {
+        // For each StateNode with the specified StateType, retrieve its children and update the incumbent name and party fields
+        StateNode originalState = stateService.findOriginalState(stateType, electionType);
+        Set<DistrictNode> districts = originalState.getChildren();
+        for(DistrictNode district: districts) {
+            String districtName = district.getName();
+            Incumbent incumbent = incumbentMap.get(districtName);
+            district.setIncumbent(incumbent);
+            createOrUpdateEntity(district);
+        }
+    }
+
+
     @PostMapping("/echo-precinct")
     public ResponseEntity<PrecinctNode> echoPrecinct(@RequestBody PrecinctNode precinct) {
         return new ResponseEntity<>(precinct, new HttpHeaders(), HttpStatus.OK);
@@ -128,6 +143,15 @@ public class PopulateController {
         state.getMultiPolygon();
         createOrUpdateEntity(state);
         return new ResponseEntity<>(state, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @PostMapping("add-incumbent")
+    public ResponseEntity<Incumbents> addIncumbent(@RequestBody Incumbents incumbents) {
+        Map<String, Incumbent> incumbentMap = incumbents.getIncumbentMap();
+        updateIncumbent(incumbentMap, incumbents.getStateType(), ElectionType.PRESIDENTIAL_2016);
+        updateIncumbent(incumbentMap, incumbents.getStateType(), ElectionType.CONGRESSIONAL_2016);
+        updateIncumbent(incumbentMap, incumbents.getStateType(), ElectionType.CONGRESSIONAL_2018);
+        return new ResponseEntity<>(incumbents, new HttpHeaders(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/precinct/{id}")
