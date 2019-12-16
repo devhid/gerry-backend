@@ -135,6 +135,7 @@ public class AlgorithmController {
         Job phaseOneJob = jobService.getJobById(inputs.getJobId());
         StateNode state = phaseOneJob.getState();
         state.fillInTransientProperties();
+        inputs.setJob(phaseOneJob);
         inputs.setState(state);
         inputs.setEpsilon(this.phaseTwoEpsilon);
         return (PhaseTwoReport) handle(inputs);

@@ -184,7 +184,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     }
 
     public PhaseTwoReport run(PhaseTwoInputs inputs) {
-        int iteration = inputs.get;
+        int iteration = inputs.getJob().getNextPhaseTwoIteration();
         final Queue<PhaseTwoMoveDelta> deltas = new LinkedList<>();
         final StateNode state = inputs.getState();
 
@@ -193,7 +193,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
             PrecinctMove move = selectPrecinctMove(inputs, potentialMoves);
             PhaseTwoMoveDelta iterationDelta = executePrecinctMove(state, move, iteration);
             deltas.offer(iterationDelta);
-            iteration++;
+            iteration = inputs.getJob().getNextPhaseTwoIteration();
             potentialMoves = computePotentialMoves(state, inputs);
         }
         return PhaseTwoReportInitializer.initClass(null, deltas);

@@ -1,6 +1,7 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.inputs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import edu.stonybrook.cse308.gerrybackend.data.jobs.Job;
 import edu.stonybrook.cse308.gerrybackend.data.weights.*;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
@@ -18,6 +19,10 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
 
     @Getter
     private String jobId;
+
+    @Getter
+    @Setter
+    private Job job;
 
     @Getter
     private Set<DemographicType> demographicTypes;
