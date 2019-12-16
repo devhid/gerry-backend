@@ -139,7 +139,9 @@ public class AlgorithmController {
     @PostMapping("/phase2")
     public ResponseEntity<PhaseTwoReport> handlePhaseTwo(@RequestBody PhaseTwoInputs inputs) {
         Job phaseOneJob = jobService.getJobById(inputs.getPhaseOneJobId());
-        inputs.setState(phaseOneJob.getState());
+        StateNode state = phaseOneJob.getState();
+        state.fillInTransientProperties();
+        inputs.setState(state);
         inputs.setEpsilon(this.phaseTwoEpsilon);
         PhaseTwoReport report = (PhaseTwoReport) handle(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);

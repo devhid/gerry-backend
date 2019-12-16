@@ -8,28 +8,42 @@ import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseTwoMoveDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
-import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureInterface;
-import edu.stonybrook.cse308.gerrybackend.enums.measures.Measures;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.initializers.PhaseTwoReportInitializer;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoReport> {
 
     /**
      * Determines whether or not the worker should finish the simulated annealing.
      *
-     * @param state          the current StateNode graph
+     * @param inputs          phase two inputs
      * @param potentialMoves map whose key is a potential move and value is the resulting StateNode graph
      * @return a boolean value describing whether the worker should stop
      */
-    private static boolean shouldStop(StateNode state, Map<PrecinctMove, StateNode> potentialMoves) {
-        // TODO: fill in
-        //  check potentialMoves - if all potential moves lead to an OF that is lower, then we should recompute
-        //  a few times before we stop
+    private static boolean shouldStop(PhaseTwoInputs inputs, Map<PrecinctMove, StateNode> potentialMoves) {
+        // current OF
+        double currentScore = computeObjectiveFunction(inputs);
+
+        // compute OF for each move
+        for(StateNode state: potentialMoves.values()) {
+            double newScore = computeObjectiveFunction(inputs);
+
+            // if we find a better OF, don't stop
+            if (currentScore < newScore) {
+                return false;
+            }
+        }
+
+        // check if we want to compute more potential moves
+        if(inputs.getNumRetries() != 0) {
+            // decrement number of retries
+            inputs.setNumRetries(inputs.getNumRetries() - 1);
+            return false;
+        }
+
         return true;
     }
 
@@ -37,19 +51,19 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * Computes the potential PrecinctMoves on a given StateNode graph according to the heuristics specified.
      *
      * @param state          the current StateNode graph
-     * @param depthHeuristic the depth to which potential moves should be explored
-     * @param moveHeuristic  the manner in which a precinct shall be selected to be part of a move
+     * @param inputs        the phase two inputs
      * @return map whose key is a potential move and value is the resulting StateNode graph
      */
-    private static Map<PrecinctMove, StateNode> computePotentialMoves(StateNode state, PhaseTwoDepth depthHeuristic,
-                                                                      PhaseTwoPrecinctMove moveHeuristic) {
-        Map<PrecinctMove, StateNode> potentialMoves;
+    private static Map<PrecinctMove, StateNode> computePotentialMoves(StateNode state, PhaseTwoInputs inputs) {
+        Map<PrecinctMove, StateNode> potentialMoves = null;
+        PhaseTwoDepth depthHeuristic = inputs.getDepthHeuristic();
+
         if (depthHeuristic == PhaseTwoDepth.STANDARD) {
-            potentialMoves = computePotentialMovesStandard(state, moveHeuristic);
+            potentialMoves = computePotentialMovesStandard(state, inputs);
         } else if (depthHeuristic == PhaseTwoDepth.LEVEL) {
-            potentialMoves = computePotentialMovesLevel(state, moveHeuristic);
+//            potentialMoves = computePotentialMovesLevel(state, moveHeuristic);
         } else if (depthHeuristic == PhaseTwoDepth.TREE) {
-            potentialMoves = computePotentialMovesTree(state, moveHeuristic);
+//            potentialMoves = computePotentialMovesTree(state, moveHeuristic);
         } else {
             throw new IllegalArgumentException("Replace this string later!");
         }
@@ -61,13 +75,13 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * This computes a single PrecinctMove.
      *
      * @param state         the current StateNode graph
-     * @param moveHeuristic the manner in which a precinct shall be selected to be part of a move
+     * @param inputs        the phase two inputs
      * @return map whose key is a potential move and value is the resulting StateNode graph
      */
     private static Map<PrecinctMove, StateNode> computePotentialMovesStandard(StateNode state,
-                                                                              PhaseTwoPrecinctMove moveHeuristic) {
+                                                                              PhaseTwoInputs inputs) {
         Map<PrecinctMove, StateNode> potentialMoves = new HashMap<>();
-        PrecinctMove move = PhaseTwoPrecinctMoveHeuristic.selectPrecinct(moveHeuristic, state);
+        PrecinctMove move = PhaseTwoPrecinctMoveHeuristic.selectPrecinct(inputs.getMoveHeuristic(), state, inputs);
 
         StateNode result = null;
         try {
@@ -114,15 +128,15 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     /**
      * Computes the objective function score for a given StateNode graph.
      *
-     * @param state the given StateNode graph
+     * @param inputs the properties involved in computing the objective function
      * @return a value in the range [0,1]
      */
-    private static double computeObjectiveFunction(StateNode state, Map<MeasureInterface, Double> weights) {
-         return state.getChildren()
+    private static double computeObjectiveFunction(PhaseTwoInputs inputs) {
+         return inputs.getState().getChildren()
                 .stream()
-                .flatMap(district -> weights.keySet()
+                .flatMap(district -> inputs.getWeightMap().keySet()
                         .stream()
-                        .map(measure -> InputMeasures.computeScore(measure, district) * weights.get(measure)))
+                        .map(measure -> InputMeasures.computeScore(measure, district) * inputs.getWeightMap().get(measure)))
                 .reduce(0.0, Double::sum);
     }
 
@@ -132,12 +146,12 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * @param potentialMoves map whose key is a potential move and value is the resulting StateNode graph
      * @return the best PrecinctMove (one with the highest objective function score)
      */
-    private static PrecinctMove selectPrecinctMove(Map<PrecinctMove, StateNode> potentialMoves, Map<MeasureInterface, Double> weights) {
+    private static PrecinctMove selectPrecinctMove(PhaseTwoInputs inputs, Map<PrecinctMove, StateNode> potentialMoves) {
         PrecinctMove bestMove = null;
         double bestMoveScore = 0.0;
 
         for (Map.Entry<PrecinctMove, StateNode> entry : potentialMoves.entrySet()) {
-            double potentialMoveScore = computeObjectiveFunction(entry.getValue(), weights);
+            double potentialMoveScore = computeObjectiveFunction(inputs);
             if (bestMove == null || potentialMoveScore > bestMoveScore) {
                 bestMove = entry.getKey();
                 bestMoveScore = potentialMoveScore;
@@ -173,15 +187,14 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         int iteration = 0;
         final Queue<PhaseTwoMoveDelta> deltas = new LinkedList<>();
         final StateNode state = inputs.getState();
-        final PhaseTwoDepth depthHeuristic = inputs.getDepthHeuristic();
-        final PhaseTwoPrecinctMove moveHeuristic = inputs.getMoveHeuristic();
-        Map<PrecinctMove, StateNode> potentialMoves = computePotentialMoves(state, depthHeuristic, moveHeuristic);
-        while (!shouldStop(state, potentialMoves)) {
-            PrecinctMove move = selectPrecinctMove(potentialMoves, inputs.getWeightMap());
+
+        Map<PrecinctMove, StateNode> potentialMoves = computePotentialMoves(state, inputs);
+        while (!shouldStop(inputs, potentialMoves)) {
+            PrecinctMove move = selectPrecinctMove(inputs, potentialMoves);
             PhaseTwoMoveDelta iterationDelta = executePrecinctMove(state, move, iteration);
             deltas.offer(iterationDelta);
             iteration++;
-            potentialMoves = computePotentialMoves(state, inputs.getDepthHeuristic(), inputs.getMoveHeuristic());
+            potentialMoves = computePotentialMoves(state, inputs);
         }
         return PhaseTwoReportInitializer.initClass(null, deltas);
     }
