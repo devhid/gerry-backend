@@ -2,11 +2,15 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone;
 
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
+import edu.stonybrook.cse308.gerrybackend.data.graph.Joinability;
+import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.LikelyType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
+import edu.stonybrook.cse308.gerrybackend.utils.LikelyUtils;
+import edu.stonybrook.cse308.gerrybackend.utils.MathUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,36 +19,40 @@ import java.util.stream.Stream;
 public interface PhaseOneOtherPairsHeuristic {
 
     class Standard {
-        private static LikelyType determineLikelyType(double joinability) {
-            if (joinability >= 0.0 && joinability < 1.0) {
-                return LikelyType.NOT;
-            }
-
-            if (joinability >= 1.0 && joinability < 2.0) {
-                return LikelyType.KIND_OF;
-            }
-
-            if (joinability >= 2.0 && joinability <= 4.0) {
-                return LikelyType.VERY;
-            }
-
-            // should never happen, because joinability without minority should be <= 0 and <= 4,
-            // but added as a sanity check.
-            throw new IllegalArgumentException("Replace string with text later! " + joinability);
-        }
-
-        private static LikelyCandidatePair createLikelyCandidatePair(DistrictNode d1, DistrictNode d2) {
+        private static LikelyCandidatePair createLikelyCandidatePair(DistrictNode d1, DistrictNode d2, Set<DemographicType> demoTypes) {
             // Find the edge that is shared by both districts.
             DistrictEdge shared = (DistrictEdge) d1.getEdge(d2);
 
-            // Compute its joinability.
-            Set<PoliticalParty> parties = d2.getElectionData().getWinners();
-            double joinability = shared.getJoinabilityValue(parties);
+            // Get the joinability factors.
+            Joinability joinability = shared.getJoinability();
+            double populationJoinability = joinability.getPopulation(); // [0,2]
+            double compactnessJoinability = joinability.getCompactness();   // [0,1]
+//            double minorityJoinability = joinability.getMinority(demoTypes);
+//            double politicalJoinability = joinability.getPolitical(d1.getElectionData().getWinners());  // [0,1]
+//            politicalJoinability = (politicalJoinability + joinability.getPolitical(d2.getElectionData().getWinners()));
+//            politicalJoinability = politicalJoinability / 2;
 
-            // Determine the likely type based off joinability.
-            LikelyType likelyType = determineLikelyType(joinability);
+//            // Override the population joinability likeliness if the merge would get too big.
+//            double d1TotalPop = d1.getDemographicData().getTotalPopulation();
+//            double d2TotalPop = d2.getDemographicData().getTotalPopulation();
+//            double totalPop = d1TotalPop + d2TotalPop;
+//            double idealPop = d1.getParent().getDemographicData().getTotalPopulation();
+//            if (totalPop > 1.07 * idealPop) {
+//                double popPercentDiff = MathUtils.calculatePercentDifference(d1TotalPop, d2TotalPop);
+//                if (popPercentDiff > 1.0) {
+//                    populationJoinability *= 1.5;
+//                } else if (popPercentDiff > 0.5 && popPercentDiff <= 1.0){
+//                    populationJoinability *= 0.5;
+//                } else {
+//                    populationJoinability = 0.0;
+//                }
+//            }
 
-            return new LikelyCandidatePair(d1, d2, likelyType);
+            // Determine how likely we are to make this pairing.
+            double joinabilityScore = populationJoinability + compactnessJoinability;
+            LikelyType likelyType = LikelyUtils.getLikelyTypeFromJoinabilityWithoutMinority(joinabilityScore);
+
+            return new LikelyCandidatePair(d1, d2, likelyType, joinabilityScore);
         }
 
         // Maybe more into a PhaseOneUtils class.
@@ -103,7 +111,7 @@ public interface PhaseOneOtherPairsHeuristic {
                 Set<DistrictNode> adjNodes = GenericUtils.castSetOfObjects(d1.getAdjacentNodes(), DistrictNode.class);
                 adjNodes.retainAll(remainingDistricts);
                 for (DistrictNode d2 : adjNodes) {
-                    LikelyCandidatePair likelyPair = Standard.createLikelyCandidatePair(d1, d2);
+                    LikelyCandidatePair likelyPair = Standard.createLikelyCandidatePair(d1, d2, inputs.getDemographicTypes());
                     LikelyType likelyType = likelyPair.getLikelyType();
                     if (likelyType == LikelyType.NOT) {
                         continue;

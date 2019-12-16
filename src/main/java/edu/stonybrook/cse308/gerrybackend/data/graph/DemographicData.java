@@ -12,6 +12,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.validation.constraints.NotNull;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,7 +120,8 @@ public class DemographicData {
         Map<DemographicType, Integer> dPop = d.population;
         Map<DemographicType, Integer> dVotingAgePop = d.votingAgePopulation;
 
-        Set<DemographicType> demoTypes = dPop.keySet();
+        Set<DemographicType> demoTypes = new HashSet<>(dPop.keySet());
+        demoTypes.addAll(new HashSet<>(dVotingAgePop.keySet()));
         for (DemographicType demoType : demoTypes) {
             int sumDemoPop = dPop.getOrDefault(demoType, 0) + this.population.getOrDefault(demoType, 0);
             int sumVotingAgeDemoPop = dVotingAgePop.getOrDefault(demoType, 0) + this.votingAgePopulation.getOrDefault(demoType, 0);

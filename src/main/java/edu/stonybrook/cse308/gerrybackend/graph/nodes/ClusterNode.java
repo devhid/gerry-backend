@@ -121,7 +121,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
                     ((ClusterNode) child).aggregateStatistics();
                 }
             }
-            if (aggregateElections == null || aggregateDemographics == null) {
+            if (aggregateElections == null) {
                 aggregateElections = new ElectionData(child.getElectionData());
                 aggregateDemographics = new DemographicData(child.getDemographicData());
             } else {

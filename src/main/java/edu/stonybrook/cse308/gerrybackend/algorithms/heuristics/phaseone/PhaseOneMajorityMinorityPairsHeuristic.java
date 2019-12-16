@@ -33,6 +33,13 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
                 likelyType = ((inputs.getLowerBound() <= potentialRatio) &&
                         (potentialRatio <= inputs.getUpperBound())) ? LikelyType.KIND_OF : LikelyType.NOT;
             }
+            if (likelyType == LikelyType.VERY || likelyType == LikelyType.KIND_OF) {
+                double totalPop = d1TotalPop + d2TotalPop;
+                double idealPop = ((double) inputs.getState().getDemographicData().getTotalPopulation()) / inputs.getNumDistricts();
+                if (totalPop > 1.07 * idealPop) {
+                    likelyType = LikelyType.NOT;
+                }
+            }
             return new LikelyCandidatePair(d1, d2, likelyType);
         }
 

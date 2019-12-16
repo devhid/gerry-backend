@@ -3,13 +3,14 @@ package edu.stonybrook.cse308.gerrybackend.data.graph;
 import edu.stonybrook.cse308.gerrybackend.algorithms.measures.CompactnessMeasure;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.Compactness;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
+import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.ClusterNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.utils.MathUtils;
+import lombok.Getter;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -17,10 +18,17 @@ import java.util.Set;
 
 public class Joinability {
 
-    private double compactness;
-    private double population;
-    private Map<DemographicType, Double> minority;
-    private Map<PoliticalParty, Double> political;
+    @Getter
+    private double county;                          // 0 or 1
+
+    @Getter
+    private double compactness;                     // [0,1]
+
+    @Getter
+    private double population;                      // [0,2]
+
+    private Map<DemographicType, Double> minority;  // [0,1] for each
+    private Map<PoliticalParty, Double> political;  // [0,1] for each
 
     public Joinability() {
     }
@@ -30,17 +38,44 @@ public class Joinability {
     }
 
     private void computeJoinability(GerryNode node1, GerryNode node2) {
+        this.county = Joinability.computeCountyJoinability(node1, node2);
         this.compactness = Joinability.computeCompactnessJoinability(node1, node2);
         this.political = Joinability.computePoliticalJoinability(node1, node2);
         this.minority = Joinability.computeMinorityJoinability(node1, node2);
         this.population = Joinability.computePopulationJoinability(node1, node2);
     }
 
-    private static double computeCompactnessJoinability(GerryNode node1, GerryNode node2) {
+    private static double computeCountyJoinability(GerryNode node1, GerryNode node2) {
         if (node1 instanceof PrecinctNode && node2 instanceof PrecinctNode) {
             PrecinctNode p1 = (PrecinctNode) node1;
             PrecinctNode p2 = (PrecinctNode) node2;
             return (p1.getCounty().equals(p2.getCounty())) ? 1.0 : 0.0;
+        } else if (node1 instanceof DistrictNode && node2 instanceof DistrictNode) {
+            DistrictNode d1 = (DistrictNode) node1;
+            DistrictNode d2 = (DistrictNode) node2;
+            if (d1.getCounties().equals(d2.getCounties())) {
+                return 1.0;
+            } else {
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
+
+    private static double computeCompactnessJoinability(GerryNode node1, GerryNode node2) {
+        if (node1 instanceof PrecinctNode && node2 instanceof PrecinctNode) {
+            PrecinctNode p1 = (PrecinctNode) node1;
+            PrecinctNode p2 = (PrecinctNode) node2;
+            DistrictNode potentialMerge = DistrictNode.childBuilder()
+                    .child(p1)
+                    .nodeType(NodeType.USER)
+                    .build();
+            try {
+                potentialMerge.addBorderPrecinct(p2);
+                return CompactnessMeasure.computeCompactnessScore(Compactness.CONVEX_HULL, potentialMerge);
+            } catch (MismatchedElectionException e) {
+                e.printStackTrace();
+            }
         } else if (node1 instanceof DistrictNode && node2 instanceof DistrictNode) {
             DistrictNode d1 = (DistrictNode) node1;
             DistrictNode d2 = (DistrictNode) node2;
@@ -95,28 +130,27 @@ public class Joinability {
         return politicalJoinability;
     }
 
-    public double getValueWithoutMinority(Set<PoliticalParty> politicalParties) {
+    public double getMinority(Set<DemographicType> demoTypes) {
+        double minorityAvg = 0.0;
+        for (DemographicType demoType : demoTypes) {
+            minorityAvg += this.minority.get(demoType);
+        }
+        return minorityAvg / demoTypes.size();
+    }
+
+    public double getPolitical(Set<PoliticalParty> politicalParties) {
         double maxPoliticalJoinability = 0.0;
         for (PoliticalParty party : politicalParties) {
             maxPoliticalJoinability = Math.max(maxPoliticalJoinability, this.political.get(party));
         }
-        double sum = this.compactness + this.population + maxPoliticalJoinability;
-        if (sum < 0) {
-            throw new IllegalArgumentException("woah");
-        }
-        return sum;
-//        return this.compactness + this.population + maxPoliticalJoinability;
+        return maxPoliticalJoinability;
+    }
+
+    public double getValueWithoutMinority(Set<PoliticalParty> politicalParties) {
+        return this.county + this.compactness + this.population + this.getPolitical(politicalParties);
     }
 
     public double getValue(Set<PoliticalParty> politicalParties, Set<DemographicType> demoTypes) {
-        double minority = 0.0;
-        double maxPoliticalJoinability = 0.0;
-        for (DemographicType demoType : demoTypes) {
-            minority += this.minority.get(demoType);
-        }
-        for (PoliticalParty party : politicalParties) {
-            maxPoliticalJoinability = Math.max(maxPoliticalJoinability, this.political.get(party));
-        }
-        return this.compactness + this.population + maxPoliticalJoinability + minority;
+        return this.getValueWithoutMinority(politicalParties) + this.getMinority(demoTypes);
     }
 }

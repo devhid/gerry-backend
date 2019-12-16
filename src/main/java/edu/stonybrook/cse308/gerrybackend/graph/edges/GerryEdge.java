@@ -61,19 +61,26 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> im
         this.joinability = new Joinability(this.item1, this.item2);
     }
 
-    public double getJoinabilityValue(Set<PoliticalParty> parties, Set<DemographicType> demoTypes) {
+    public Joinability getJoinability() {
         if (this.joinability == null) {
             this.computeNewJoinability();
         }
-        return this.joinability.getValue(parties, demoTypes);
+        return this.joinability;
     }
 
-    public double getJoinabilityValue(Set<PoliticalParty> parties) {
-        if (this.joinability == null) {
-            this.computeNewJoinability();
-        }
-        return this.joinability.getValueWithoutMinority(parties);
-    }
+//    public double getJoinabilityValue(Set<PoliticalParty> parties, Set<DemographicType> demoTypes) {
+//        if (this.joinability == null) {
+//            this.computeNewJoinability();
+//        }
+//        return this.joinability.getValue(parties, demoTypes);
+//    }
+//
+//    public double getJoinabilityValueWithoutMinority(Set<PoliticalParty> parties) {
+//        if (this.joinability == null) {
+//            this.computeNewJoinability();
+//        }
+//        return this.joinability.getValueWithoutMinority(parties);
+//    }
 
     public GerryEdge copy() {
         if (this instanceof PrecinctEdge) {

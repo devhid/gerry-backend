@@ -26,7 +26,9 @@ public class PhaseOneLogBuilder implements IterativeAlgPhaseLogBuilder<PhaseOneM
             absorbedNodes.append(String.format(absorbTemplate, smallerNodeId, largerNodeId));
             absorbedNodes.append(absorbSeparator);
         });
-        absorbedNodes.setLength(absorbedNodes.length() - 1);
+        if (absorbedNodes.length() > 0) {
+            absorbedNodes.setLength(absorbedNodes.length() - 1);
+        }
         return new PhaseOneLog(phaseOneProperties.getDeltaTemplate(), delta.getIteration(), absorbedNodes.toString());
     }
 

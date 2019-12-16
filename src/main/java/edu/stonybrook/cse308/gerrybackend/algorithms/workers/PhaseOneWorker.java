@@ -6,6 +6,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseOneReport;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.phaseone.MergedDistrict;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
+import edu.stonybrook.cse308.gerrybackend.data.comparators.SmallestLikelyPairsComparator;
 import edu.stonybrook.cse308.gerrybackend.data.jobs.Job;
 import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedStringPair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
@@ -20,6 +21,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.initializers.PhaseOneReportInitializer;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
+import edu.stonybrook.cse308.gerrybackend.utils.MathUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,8 +43,11 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
     private void createInitialDistricts(Set<PrecinctNode> allPrecincts,
                                         Map<PrecinctNode, DistrictNode> precinctToDistrict,
                                         Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
-        int nextNumericalId = 0;
+        int nextNumericalId = 1;
         for (PrecinctNode p : allPrecincts) {
+//            if (p.getId().equals("4b738f1d-b4cb-4632-b823-9bec59beaf91")) {
+//                System.out.println("its the precinct");
+//            }
             if (!precinctToDistrict.containsKey(p)) {
                 DistrictNode newDistrict = DistrictNode.childBuilder()
                         .child(p)
@@ -209,6 +214,40 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         Heuristics.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
+    private static void filterBigDistricts(PhaseOneInputs inputs, CandidatePairs pairs) {
+        Set<LikelyCandidatePair> allPairs = pairs.getAllPairs();
+        List<LikelyCandidatePair> removedPairs = new ArrayList<>();
+        double idealPop = ((double) inputs.getState().getDemographicData().getTotalPopulation()) / inputs.getNumDistricts();
+        for (LikelyCandidatePair pair : allPairs) {
+            DistrictNode d1 = pair.getItem1();
+            DistrictNode d2 = pair.getItem2();
+            double d1TotalPop = d1.getDemographicData().getTotalPopulation();
+            double d2TotalPop = d2.getDemographicData().getTotalPopulation();
+            if (d1TotalPop + d2TotalPop > 1.15 * idealPop || d1TotalPop > idealPop || d2TotalPop > idealPop) {
+//                removedPairs.add(pair);
+                double popPercentDiff = MathUtils.calculatePercentDifference(d1TotalPop, d2TotalPop);
+                if (popPercentDiff > 1.0) {
+                    continue;
+                }
+                DistrictNode smallerDistrict = (d1TotalPop > d2TotalPop) ? d1 : d2;
+                if (smallerDistrict.getAdjacentEdges().size() > 1) {
+                    removedPairs.add(pair);
+                }
+            }
+//            else if (d1TotalPop > 1.00 * idealPop || d2TotalPop > 1.00 * idealPop) {
+//                if (smallerDistrict.getAdjacentEdges().size() > 1) {
+//                    removedPairs.add(pair);
+//                }
+//            }
+        }
+        pairs.getMajorityMinorityPairs().removeAll(removedPairs);
+        pairs.getOtherPairs().removeAll(removedPairs);
+        if (pairs.size() == 0) {
+            removedPairs.sort(new SmallestLikelyPairsComparator());
+            pairs.getOtherPairs().addAll(removedPairs.subList(0, 1));
+        }
+    }
+
     /**
      * Joins the identified candidate pairs for this iteration and produces a delta describing the merges.
      *
@@ -227,6 +266,9 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                 DistrictNode d1 = pair.getItem1();
                 DistrictNode d2 = pair.getItem2();
                 DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts);
+                if (newDistrict.getDemographicData().getTotalPopulation() == 0){
+                    System.out.println("woah");
+                }
                 mergedDistricts.put(d1, newDistrict);
                 mergedDistricts.put(d2, newDistrict);
             } catch (MismatchedElectionException e) {
@@ -266,6 +308,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             iteration = inputs.getJob().getNextIteration();
             remnantDistricts.clear();
             CandidatePairs pairs = determineCandidatePairs(inputs);
+            filterBigDistricts(inputs, pairs);
             boolean lastIteration = isLastIteration(state, pairs, numDistricts);
             if (lastIteration) {
                 statusCode = StatusCode.SUCCESS;
