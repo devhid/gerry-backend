@@ -16,10 +16,7 @@ import edu.stonybrook.cse308.gerrybackend.data.jobs.Job;
 import edu.stonybrook.cse308.gerrybackend.db.services.DistrictService;
 import edu.stonybrook.cse308.gerrybackend.db.services.JobService;
 import edu.stonybrook.cse308.gerrybackend.db.services.StateService;
-import edu.stonybrook.cse308.gerrybackend.enums.types.AlgPhaseType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.AlgRunType;
-import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +31,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Set;
 
 @RestController
 @RequestMapping("/algorithm")
@@ -72,21 +67,6 @@ public class AlgorithmController {
         return worker.run(inputs);
     }
 
-    private PhaseOneReport phaseOneStart(PhaseOneInputs inputs) {
-        StateNode stateNode = stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType());
-        inputs.setState(stateNode);
-        return (PhaseOneReport) this.handle(inputs);
-    }
-
-    private PhaseOneReport phaseOneIterative(PhaseOneInputs inputs) {
-        Job job = jobService.getJobById(inputs.getJobId());
-        StateNode state = stateService.getStateById(inputs.getJobId());
-        state.fillInTransientProperties();
-        inputs.setJob(job);
-        inputs.setState(state);
-        return (PhaseOneReport) this.handle(inputs);
-    }
-
     private PhaseZeroReport handlePhaseZeroHelper(PhaseZeroInputs inputs) {
         inputs.setState(stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType()));
         return (PhaseZeroReport) handle(inputs);
@@ -103,6 +83,21 @@ public class AlgorithmController {
     @Transactional(propagation = Propagation.REQUIRED)
     public PhaseZeroReport handlePhaseZeroWS(PhaseZeroInputs inputs) {
         return handlePhaseZeroHelper(inputs);
+    }
+
+    private PhaseOneReport phaseOneStart(PhaseOneInputs inputs) {
+        StateNode stateNode = stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType());
+        inputs.setState(stateNode);
+        return (PhaseOneReport) this.handle(inputs);
+    }
+
+    private PhaseOneReport phaseOneIterative(PhaseOneInputs inputs) {
+        Job job = jobService.getJobById(inputs.getJobId());
+        StateNode state = stateService.getStateById(inputs.getJobId());
+        state.fillInTransientProperties();
+        inputs.setJob(job);
+        inputs.setState(state);
+        return (PhaseOneReport) this.handle(inputs);
     }
 
     public PhaseOneReport handlePhaseOneHelper(PhaseOneInputs inputs) {
@@ -136,15 +131,26 @@ public class AlgorithmController {
         return handlePhaseOneHelper(inputs);
     }
 
-    @PostMapping("/phase2")
-    public ResponseEntity<PhaseTwoReport> handlePhaseTwo(@RequestBody PhaseTwoInputs inputs) {
-        Job phaseOneJob = jobService.getJobById(inputs.getPhaseOneJobId());
+    public PhaseTwoReport handlePhaseTwoHelper(PhaseTwoInputs inputs) {
+        Job phaseOneJob = jobService.getJobById(inputs.getJobId());
         StateNode state = phaseOneJob.getState();
         state.fillInTransientProperties();
         inputs.setState(state);
         inputs.setEpsilon(this.phaseTwoEpsilon);
-        PhaseTwoReport report = (PhaseTwoReport) handle(inputs);
+        return (PhaseTwoReport) handle(inputs);
+    }
+
+    @PostMapping("/phase2")
+    public ResponseEntity<PhaseTwoReport> handlePhaseTwoHTTP(@RequestBody PhaseTwoInputs inputs) {
+        PhaseTwoReport report = handlePhaseTwoHelper(inputs);
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @MessageMapping("/phase2")
+    @SendToUser("/queue/reports/phase2")
+    @Transactional(propagation = Propagation.REQUIRED)
+    public PhaseTwoReport handlePhaseTwoWS(PhaseTwoInputs inputs) {
+        return handlePhaseTwoHelper(inputs);
     }
 
 }

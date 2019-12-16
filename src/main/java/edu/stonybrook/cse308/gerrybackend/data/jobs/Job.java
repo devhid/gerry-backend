@@ -25,7 +25,9 @@ public class Job {
     @MapsId
     private StateNode state;
 
-    private int iteration;
+    private int phaseOneIteration;
+
+    private int phaseTwoIteration;
 
     public Job() { }
 
@@ -33,11 +35,16 @@ public class Job {
         this.id = state.getId();
         this.algPhaseType = algPhaseType;
         this.state = state;
-        this.iteration = 1;
+        this.phaseOneIteration = 1;
+        this.phaseTwoIteration = 1;
     }
 
-    public int getNextIteration() {
-        return this.iteration++;
+    public int getNextPhaseOneIteration() {
+        return this.phaseOneIteration++;
+    }
+
+    public int getNextPhaseTwoIteration() {
+        return this.phaseTwoIteration++;
     }
 
     public StateNodeStatistics getStateNodeStatistics() {

@@ -184,7 +184,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     }
 
     public PhaseTwoReport run(PhaseTwoInputs inputs) {
-        int iteration = 0;
+        int iteration = inputs.get;
         final Queue<PhaseTwoMoveDelta> deltas = new LinkedList<>();
         final StateNode state = inputs.getState();
 

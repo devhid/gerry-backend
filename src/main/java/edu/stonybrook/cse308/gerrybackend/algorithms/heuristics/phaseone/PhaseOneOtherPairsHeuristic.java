@@ -5,12 +5,9 @@ import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Joinability;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.LikelyType;
-import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
-import edu.stonybrook.cse308.gerrybackend.utils.LikelyUtils;
-import edu.stonybrook.cse308.gerrybackend.utils.MathUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,6 +16,18 @@ import java.util.stream.Stream;
 public interface PhaseOneOtherPairsHeuristic {
 
     class Standard {
+        public static LikelyType getLikelyTypeFromJoinabilityWithoutMinority(double joinability) {
+            if (joinability < 0.5) {
+                return LikelyType.NOT;
+            }
+
+            if (joinability >= 0.5 && joinability < 1.5) {
+                return LikelyType.KIND_OF;
+            }
+
+            return LikelyType.VERY;
+        }
+
         private static LikelyCandidatePair createLikelyCandidatePair(DistrictNode d1, DistrictNode d2, Set<DemographicType> demoTypes) {
             // Find the edge that is shared by both districts.
             DistrictEdge shared = (DistrictEdge) d1.getEdge(d2);
@@ -50,7 +59,7 @@ public interface PhaseOneOtherPairsHeuristic {
 
             // Determine how likely we are to make this pairing.
             double joinabilityScore = populationJoinability + compactnessJoinability;
-            LikelyType likelyType = LikelyUtils.getLikelyTypeFromJoinabilityWithoutMinority(joinabilityScore);
+            LikelyType likelyType = Standard.getLikelyTypeFromJoinabilityWithoutMinority(joinabilityScore);
 
             return new LikelyCandidatePair(d1, d2, likelyType, joinabilityScore);
         }

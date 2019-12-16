@@ -305,7 +305,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         StatusCode statusCode = StatusCode.IN_PROGRESS;
         int iteration;
         while (state.getChildren().size() != numDistricts) {
-            iteration = inputs.getJob().getNextIteration();
+            iteration = inputs.getJob().getNextPhaseOneIteration();
             remnantDistricts.clear();
             CandidatePairs pairs = determineCandidatePairs(inputs);
             filterBigDistricts(inputs, pairs);
