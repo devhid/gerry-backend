@@ -1,13 +1,10 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.inputs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.stonybrook.cse308.gerrybackend.algorithms.measures.CompactnessMeasure;
 import edu.stonybrook.cse308.gerrybackend.data.weights.*;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
-import edu.stonybrook.cse308.gerrybackend.enums.measures.Compactness;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureInterface;
-import edu.stonybrook.cse308.gerrybackend.enums.measures.PoliticalCompetitiveness;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +29,7 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
     private double lowerBound;
 
     @Getter
+    @Setter
     private int numRetries;
 
     @Getter

@@ -5,6 +5,7 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOn
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phaseone.PhaseOneStopHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTwoPrecinctMoveHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseOneInputs;
+import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.LikelyCandidatePair;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
@@ -29,8 +30,8 @@ public abstract class Heuristics {
         PhaseOneStopHeuristic.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
-    public static PrecinctMove selectPrecinct(PhaseTwoPrecinctMove heuristic, StateNode state) {
-        return PhaseTwoPrecinctMoveHeuristic.selectPrecinct(heuristic, state);
+    public static PrecinctMove selectPrecinct(PhaseTwoPrecinctMove heuristic, StateNode state, PhaseTwoInputs inputs) {
+        return PhaseTwoPrecinctMoveHeuristic.selectPrecinct(heuristic, state, inputs);
     }
 
 }

@@ -2,7 +2,9 @@ package edu.stonybrook.cse308.gerrybackend.data.weights;
 
 import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureInterface;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public abstract class MeasureWeight<M extends MeasureInterface> {
 
     @Getter
