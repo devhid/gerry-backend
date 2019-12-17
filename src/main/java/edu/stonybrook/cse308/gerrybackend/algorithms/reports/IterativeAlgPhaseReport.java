@@ -18,14 +18,19 @@ import java.util.Queue;
 public abstract class IterativeAlgPhaseReport<D extends IterativeAlgPhaseDelta, B extends IterativeAlgPhaseLogBuilder<D>> extends AlgPhaseReport {
 
     @Getter
+    @Setter
+    protected String jobId;
+
+    @Getter
     protected Queue<D> deltas;
 
     @Getter
     @JsonIgnore
     protected B logBuilder;
 
-    IterativeAlgPhaseReport(StatusCode statusCode, Queue<D> deltas, B logBuilder) {
+    IterativeAlgPhaseReport(StatusCode statusCode, String jobId, Queue<D> deltas, B logBuilder) {
         super(statusCode);
+        this.jobId = jobId;
         this.deltas = deltas;
         this.logBuilder = logBuilder;
     }

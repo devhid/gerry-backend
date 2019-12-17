@@ -1,41 +1,21 @@
 package edu.stonybrook.cse308.gerrybackend.algorithms.reports;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.stonybrook.cse308.gerrybackend.algorithms.logging.builders.PhaseOneLogBuilder;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.phaseone.MergedDistrict;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
-import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
-import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.*;
 
 public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, PhaseOneLogBuilder> {
 
-    @Getter
-    @Setter
-    protected String jobId;
-
-    @Getter
-    @JsonIgnore
-    private Set<DistrictNode> remnantDistricts;
-
-    @Getter
-    @JsonIgnore
-    private Set<DistrictEdge> remnantEdges;
-
-    public PhaseOneReport(StatusCode statusCode, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder,
-                          String jobId, Set<DistrictNode> remnantDistricts) {
-        super(statusCode, deltas, logBuilder);
-        this.jobId = jobId;
-        this.remnantDistricts = remnantDistricts;
+    public PhaseOneReport(StatusCode statusCode, String jobId, Queue<PhaseOneMergeDelta> deltas, PhaseOneLogBuilder logBuilder) {
+        super(statusCode, jobId, deltas, logBuilder);
     }
 
     @Override
     protected IterativeAlgPhaseReport createNextReportFromDeltas(Queue<PhaseOneMergeDelta> deltas) {
-        return new PhaseOneReport(this.statusCode, deltas, this.logBuilder, this.jobId, new HashSet<>());
+        return new PhaseOneReport(this.statusCode, this.jobId, deltas, this.logBuilder);
     }
 
     public PhaseOneReport fetchNextReport(int num) {
@@ -131,7 +111,12 @@ public class PhaseOneReport extends IterativeAlgPhaseReport<PhaseOneMergeDelta, 
         // Retrieve the final districts each precinct belongs to.
         changedNodes = this.createPrecinctToFinalDistrictMapping(precinctAssignments);
 
-        PhaseOneMergeDelta aggregateDelta = new PhaseOneMergeDelta(iteration, changedNodes, newDistricts);
+        // Set the number of majority-minority districts as well as the total number of districts generated.
+        int numMajMinDistricts = (int) newDistricts.values().stream().filter(MergedDistrict::isMajMin).count();
+        int numDistricts = newDistricts.size();
+
+        PhaseOneMergeDelta aggregateDelta = new PhaseOneMergeDelta(iteration, changedNodes, newDistricts,
+                numMajMinDistricts, numDistricts);
         this.deltas.offer(aggregateDelta);
         return this;
     }

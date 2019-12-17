@@ -21,8 +21,8 @@ public class PhaseTwoReportInitializer {
         PhaseTwoReportInitializer.logBuilder = logBuilder;
     }
 
-    public static PhaseTwoReport initClass(StatusCode statusCode, Queue<PhaseTwoMoveDelta> deltas, String jobId) {
-        return new PhaseTwoReport(statusCode, deltas, PhaseTwoReportInitializer.logBuilder, jobId);
+    public static PhaseTwoReport initClass(StatusCode statusCode, String jobId, Queue<PhaseTwoMoveDelta> deltas) {
+        return new PhaseTwoReport(statusCode, jobId, deltas, PhaseTwoReportInitializer.logBuilder);
     }
 
 }

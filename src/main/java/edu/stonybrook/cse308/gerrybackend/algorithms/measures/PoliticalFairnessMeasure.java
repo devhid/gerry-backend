@@ -23,6 +23,19 @@ public interface PoliticalFairnessMeasure {
             }
             return 1.0 - ((Math.abs(inefficientWinningVotes - inefficientLosingVotes) * 1.0) / totalVotes);
         }
+
+        static double computeFairnessScore(DistrictNode district) {
+            int inefficientWinningVotes = 0;
+            int inefficientLosingVotes = 0;
+            int totalVotes = 0;
+            PoliticalParty arbitraryWinner = district.getElectionData().getWinners().iterator().next();
+            int winningVotes = district.getElectionData().getPartyVotes(arbitraryWinner);
+            int losingVotes = district.getElectionData().getAllOtherPartyVotes(arbitraryWinner);
+            inefficientWinningVotes += (winningVotes - losingVotes);
+            inefficientLosingVotes += losingVotes;
+            totalVotes += (winningVotes + losingVotes);
+            return 1.0 - ((Math.abs(inefficientWinningVotes - inefficientLosingVotes) * 1.0) / totalVotes);
+        }
     }
 
     class Gerrymander {
@@ -109,6 +122,9 @@ public interface PoliticalFairnessMeasure {
     static double computeFairnessScore(PoliticalFairness measure, DistrictNode district) {
         double fairnessScore;
         switch (measure) {
+            case EFFICIENCY_GAP:
+                fairnessScore = EfficiencyGap.computeFairnessScore(district);
+                break;
             case GERRYMANDER_DEMOCRAT:
                 fairnessScore = GerrymanderDemocrat.computeFairnessScore(district);
                 break;

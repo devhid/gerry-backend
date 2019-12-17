@@ -227,9 +227,9 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
             PrecinctMove move = selectPrecinctMove(inputs, potentialMoves, computedScores);
             PhaseTwoMoveDelta iterationDelta = executePrecinctMove(state, move, iteration);
             deltas.offer(iterationDelta);
-            return PhaseTwoReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas, inputs.getJobId());
+            return PhaseTwoReportInitializer.initClass(StatusCode.IN_PROGRESS, inputs.getJobId(), deltas);
         }
-        return PhaseTwoReportInitializer.initClass(StatusCode.SUCCESS, deltas, inputs.getJobId());
+        return PhaseTwoReportInitializer.initClass(StatusCode.SUCCESS, inputs.getJobId(), deltas);
     }
 
 }

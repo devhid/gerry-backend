@@ -7,6 +7,7 @@ import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
+import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
@@ -201,11 +202,6 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         return allPrecincts.stream().collect(Collectors.toMap(Function.identity(), GerryNode::getParent));
     }
 
-    public PhaseOneMergeDelta executeDistrictMerge(CandidatePairs pairs) {
-        // TODO: fill in
-        return null;
-    }
-
     public void executeMove(PrecinctMove move) throws MismatchedElectionException {
         DistrictNode oldDistrict = move.getOldDistrict();
         DistrictNode newDistrict = move.getNewDistrict();
@@ -229,6 +225,16 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
                 .collect(Collectors.toSet());
         newState.children.forEach(d -> d.setParent(newState));
         return newState;
+    }
+
+    public int getNumMajMinDistricts(Set<DemographicType> demoTypes) {
+        int numMajMinDistricts = 0;
+        for (DistrictNode d : this.children) {
+            if (d.getDemographicData().constitutesMajority(demoTypes)) {
+                numMajMinDistricts++;
+            }
+        }
+        return numMajMinDistricts;
     }
 
 

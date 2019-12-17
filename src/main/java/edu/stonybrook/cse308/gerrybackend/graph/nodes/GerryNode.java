@@ -11,6 +11,8 @@ import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
@@ -61,9 +63,10 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> impl
     protected ElectionData electionData;
 
     @Getter
+    @Fetch(FetchMode.JOIN)
     @BatchSize(size = 500)
     @ManyToMany(    // one node has many edges, an edge has 2 (many) nodes
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
     )
     protected Set<E> adjacentEdges;

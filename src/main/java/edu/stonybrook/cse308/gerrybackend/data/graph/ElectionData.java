@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Embeddable
-@JsonIgnoreProperties({"votesCopy"})
+@JsonIgnoreProperties({"votesCopy", "winnersCopy"})
 public class ElectionData {
 
     @Getter

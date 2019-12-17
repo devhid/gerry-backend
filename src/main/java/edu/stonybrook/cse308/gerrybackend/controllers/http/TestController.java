@@ -26,11 +26,10 @@ public class TestController {
         newDistrict.setNumericalId("0");
         changedNodes.put("Precinct#County", newDistrict.getNumericalId());
         newDistricts.put(newDistrict.getNumericalId(), MergedDistrict.fromDistrictNode(new DistrictNode(), new HashSet<>()));
-        PhaseOneMergeDelta delta = new PhaseOneMergeDelta(0, changedNodes, newDistricts);
+        PhaseOneMergeDelta delta = new PhaseOneMergeDelta(0, changedNodes, newDistricts, 0, 0);
         Queue<PhaseOneMergeDelta> deltas = new LinkedList<>();
         deltas.offer(delta);
-        PhaseOneReport report = PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, deltas,
-                "derp", null);
+        PhaseOneReport report = PhaseOneReportInitializer.initClass(StatusCode.IN_PROGRESS, "jobId", deltas);
         report = report.fetchAggregateReport();
         return new ResponseEntity<>(report, new HttpHeaders(), HttpStatus.OK);
     }

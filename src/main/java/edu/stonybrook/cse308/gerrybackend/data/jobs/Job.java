@@ -18,22 +18,20 @@ public class Job {
     private String id;  // same as state id b/c of @MapsId
 
     @Getter
-    private AlgPhaseType algPhaseType;
-
-    @Getter
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @MapsId
     private StateNode state;
 
     private int phaseOneIteration;
 
+    private int numMajMinDistricts;
+
     private int phaseTwoIteration;
 
     public Job() { }
 
-    public Job(AlgPhaseType algPhaseType, StateNode state) {
+    public Job(StateNode state) {
         this.id = state.getId();
-        this.algPhaseType = algPhaseType;
         this.state = state;
         this.phaseOneIteration = 1;
         this.phaseTwoIteration = 1;

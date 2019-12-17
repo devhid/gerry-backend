@@ -229,7 +229,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
     }
 
     public static DistrictNode combineForStatisticsOnly(DistrictNode d1, DistrictNode d2) throws MismatchedElectionException {
-        return DistrictNode.combine(d1, d2, false, false, null);
+        return DistrictNode.combine(d1, d2, false, false);
     }
 
     /**
@@ -243,8 +243,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
      * @param updateEdges whether to update external node edges
      * @return merged DistrictNode
      */
-    public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean checkSymmetric, boolean updateEdges,
-                                       Set<DistrictNode> remnantDistricts)
+    public static DistrictNode combine(DistrictNode d1, DistrictNode d2, boolean checkSymmetric, boolean updateEdges)
             throws MismatchedElectionException {
         if (checkSymmetric) {
             if (!d1.isAdjacentTo(d2) || !d2.isAdjacentTo(d1)) {
@@ -254,7 +253,7 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
 
         DistrictNode biggerDistrict = (d1.size() > d2.size()) ? d1 : d2;
         DistrictNode smallerDistrict = (biggerDistrict == d1) ? d2 : d1;
-        DistrictNode mergedDistrict = (updateEdges && remnantDistricts != null) ? biggerDistrict : new DistrictNode(biggerDistrict);
+        DistrictNode mergedDistrict = (updateEdges) ? biggerDistrict : new DistrictNode(biggerDistrict);
 
         // Add all nodes and update counties.
         mergedDistrict.children.addAll(smallerDistrict.children);
@@ -279,7 +278,6 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
             mergedDistrict.adjacentEdges.addAll(smallerDistrict.adjacentEdges);
 
             smallerDistrict.clearEdges();
-            remnantDistricts.add(smallerDistrict);          // mark as remnant to be deleted later
         }
 
         return mergedDistrict;
