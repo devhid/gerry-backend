@@ -45,9 +45,6 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
                                         Map<DistrictNode, Set<DistrictNode>> newDistrictAdjList) {
         int nextNumericalId = 1;
         for (PrecinctNode p : allPrecincts) {
-//            if (p.getId().equals("4b738f1d-b4cb-4632-b823-9bec59beaf91")) {
-//                System.out.println("its the precinct");
-//            }
             if (!precinctToDistrict.containsKey(p)) {
                 DistrictNode newDistrict = DistrictNode.childBuilder()
                         .child(p)

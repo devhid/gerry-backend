@@ -58,7 +58,7 @@ public interface PhaseOneMajorityMinorityPairsHeuristic {
                 return false;
             }
             DistrictNode d3 = (oldD1Pair.getItem1() == d1) ? oldD1Pair.getItem2() : oldD1Pair.getItem1();
-            DistrictNode d4 = (oldD2Pair.getItem1() == d2) ? oldD1Pair.getItem2() : oldD1Pair.getItem1();
+            DistrictNode d4 = (oldD2Pair.getItem1() == d2) ? oldD2Pair.getItem2() : oldD2Pair.getItem1();
             likelyPairs.remove(d3);
             likelyPairs.remove(d4);
             districtsToConsider.add(d3);
