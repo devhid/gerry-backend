@@ -17,6 +17,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.StateEdge;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.*;
@@ -59,6 +60,11 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     @Column(name = "redistricting_legislation", columnDefinition = "TEXT")
     private String redistrictingLegislation;
 
+    @Transient
+    @Setter
+    @JsonIgnore
+    private Map<DistrictNode, DistrictNode> proposedNewDistricts;
+
     public StateNode() {
         super();
         this.adjacentEdges = null;
@@ -84,6 +90,12 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     public void remapDistrictReferences(Map<DistrictNode, DistrictNode> changedDistricts) {
         this.children = this.children.stream()
                 .map(d -> changedDistricts.getOrDefault(d, d))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<DistrictNode> getProposedDistricts() {
+        return this.children.stream()
+                .map(d -> this.proposedNewDistricts.getOrDefault(d, d))
                 .collect(Collectors.toSet());
     }
 

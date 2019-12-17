@@ -104,31 +104,38 @@ public interface PhaseTwoPrecinctMoveHeuristic {
             PrecinctNode selected = null;
             int fromPop = 0;
 
-            Set<DistrictNode> bigDistricts = new HashSet<>();
-            double idealPop = ((double) state.getDemographicData().getTotalPopulation()) / state.getChildren().size();
+//            Set<DistrictNode> bigDistricts = new HashSet<>(state.getChildren());
+//            Set<DistrictNode> bigDistricts = new HashSet<>();
+//            double idealPop = ((double) state.getDemographicData().getTotalPopulation()) / state.getChildren().size();
             for (DistrictNode d : state.getChildren()) {
                 int dPop = d.getDemographicData().getTotalPopulation();
-                if (dPop > 1.05 * idealPop) {
-                    bigDistricts.add(d);
+                if (dPop > fromPop) {
+                    from = d;
+                    fromPop = dPop;
                 }
             }
-            if (bigDistricts.size() == 0) {
+            if (from == null) {
                 return null;
             }
-            from = RandomUtils.getRandomElement(bigDistricts);
-            fromPop = from.getDemographicData().getTotalPopulation();
+//            if (bigDistricts.size() == 0) {
+//                return null;
+//            }
+//            from = RandomUtils.getRandomElement(bigDistricts);
+//            fromPop = from.getDemographicData().getTotalPopulation();
 
-            Set<DistrictNode> smallerDistricts = new HashSet<>();
+            Set<DistrictNode> smallerDistricts = GenericUtils.castSetOfObjects(from.getAdjacentNodes(), DistrictNode.class);
 
-            for (DistrictNode adjDistrict : GenericUtils.castSetOfObjects(from.getAdjacentNodes(), DistrictNode.class)) {
-                int adjDistrictPop = adjDistrict.getDemographicData().getTotalPopulation();
-                if (adjDistrictPop < fromPop) {
-                    smallerDistricts.add(adjDistrict);
-                }
-            }
-            if (smallerDistricts.size() == 0) {
-                return null;
-            }
+//            Set<DistrictNode> smallerDistricts = new HashSet<>();
+//
+//            for (DistrictNode adjDistrict : GenericUtils.castSetOfObjects(from.getAdjacentNodes(), DistrictNode.class)) {
+//                int adjDistrictPop = adjDistrict.getDemographicData().getTotalPopulation();
+//                if (adjDistrictPop < fromPop) {
+//                    smallerDistricts.add(adjDistrict);
+//                }
+//            }
+//            if (smallerDistricts.size() == 0) {
+//                return null;
+//            }
 
             to = RandomUtils.getRandomElement(smallerDistricts);
             Set<PrecinctNode> fromBorderPrecincts = from.getBorderPrecincts();

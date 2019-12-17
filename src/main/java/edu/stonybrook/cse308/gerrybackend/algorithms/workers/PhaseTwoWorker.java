@@ -3,6 +3,7 @@ package edu.stonybrook.cse308.gerrybackend.algorithms.workers;
 import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTwoPrecinctMoveHeuristic;
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.measures.InputMeasures;
+import edu.stonybrook.cse308.gerrybackend.algorithms.measures.PopulationEqualityMeasure;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.DistrictScores;
 import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.StateScores;
@@ -11,6 +12,7 @@ import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseTwoMoveDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoPrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.MeasureInterface;
+import edu.stonybrook.cse308.gerrybackend.enums.measures.PopulationEquality;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StatusCode;
 import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
@@ -41,6 +43,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         for (PrecinctMove precinctMove : potentialMoves) {
             try {
                 Map<DistrictNode, DistrictNode> changedDistricts = precinctMove.getNewDistricts();
+                inputs.getState().setProposedNewDistricts(changedDistricts);
                 double currentScore = computeObjectiveFunction(changedDistricts.keySet(), weightMap, computedScores);
                 double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores);
                 if (currentScore + inputs.getEpsilon() < potentialScore) {
@@ -137,6 +140,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
                 .map(measure -> {
                     double measureScore = InputMeasures.computeScore(measure, district) * weightMap.get(measure);
                     scoreMap.put(measure, measureScore);
+                    measureScore += PopulationEqualityMeasure.computeProposedPopulationEqualityScore(PopulationEquality.MOST_TO_LEAST, district.getParent());
                     return measureScore;
                 })
                 .reduce(0.0, Double::sum);
@@ -263,9 +267,9 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
 
         inputs.getOriginalState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores));
         Set<Map.Entry<DistrictNode, DistrictScores>> oldDistrictScores = computedScores.entrySet().stream()
-                .filter(e -> inputs.getState().getChildren().contains(e.getKey())).collect(Collectors.toSet());
+                .filter(e -> inputs.getOriginalState().getChildren().contains(e.getKey())).collect(Collectors.toSet());
         Map<String, DistrictScores> oldDistrictScoresTransformed = oldDistrictScores.stream()
-                .collect(Collectors.toMap(e -> e.getKey().getNumericalId(), e -> e.getValue()));
+                .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()));
         StateScores oldStateScores = StateScores.fromDistrictScoresAndState(oldDistrictScores, inputs.getOriginalState());
 
         return PhaseTwoReportInitializer.initClass(StatusCode.SUCCESS, inputs.getJobId(), deltas,

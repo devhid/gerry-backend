@@ -230,7 +230,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
             this.childPolygons.remove(polygon);
         }
         if (this.multiPolygon != null || this.boundingCircle != null || this.convexHull != null) {
-            this.multiPolygon = this.multiPolygon.difference(polygon);
+            this.multiPolygon = null;
             this.boundingCircle = null;
             this.convexHull = null;
         }

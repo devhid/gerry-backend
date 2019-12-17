@@ -5,19 +5,27 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.utils.MathUtils;
 
+import java.util.Set;
+
 public interface PopulationEqualityMeasure {
 
     class MostToLeast {
         public static double computePopulationEqualityScore(StateNode state) {
-            DistrictNode mostPopulated = getMostPopulatedDistrict(state);
-            DistrictNode leastPopulated = getLeastPopulatedDistrict(state);
+            DistrictNode mostPopulated = getMostPopulatedDistrict(state.getChildren());
+            DistrictNode leastPopulated = getLeastPopulatedDistrict(state.getChildren());
             return computePercentDifference(mostPopulated, leastPopulated);
         }
 
-        private static DistrictNode getExtremePopulationDistrict(StateNode state, boolean mostPopulated) {
+        public static double computeProposedPopulationEqualityScore(StateNode state) {
+            DistrictNode mostPopulated = getMostPopulatedDistrict(state.getProposedDistricts());
+            DistrictNode leastPopulated = getLeastPopulatedDistrict(state.getProposedDistricts());
+            return computePercentDifference(mostPopulated, leastPopulated);
+        }
+
+        private static DistrictNode getExtremePopulationDistrict(Set<DistrictNode> districts, boolean mostPopulated) {
             DistrictNode extremeDistrict = null;
             int currentExtremePop = (mostPopulated) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-            for (DistrictNode d : state.getChildren()) {
+            for (DistrictNode d : districts) {
                 int districtPop = d.getDemographicData().getTotalPopulation();
                 if (mostPopulated) {
                     extremeDistrict = (districtPop > currentExtremePop) ? d : extremeDistrict;
@@ -30,12 +38,12 @@ public interface PopulationEqualityMeasure {
             return extremeDistrict;
         }
 
-        private static DistrictNode getMostPopulatedDistrict(StateNode state) {
-            return MostToLeast.getExtremePopulationDistrict(state, true);
+        private static DistrictNode getMostPopulatedDistrict(Set<DistrictNode> districts) {
+            return MostToLeast.getExtremePopulationDistrict(districts, true);
         }
 
-        private static DistrictNode getLeastPopulatedDistrict(StateNode state) {
-            return MostToLeast.getExtremePopulationDistrict(state, false);
+        private static DistrictNode getLeastPopulatedDistrict(Set<DistrictNode> districts) {
+            return MostToLeast.getExtremePopulationDistrict(districts, false);
         }
 
         private static double computePercentDifference(DistrictNode mostPopulated, DistrictNode leastPopulated) {
@@ -69,6 +77,18 @@ public interface PopulationEqualityMeasure {
     }
 
     static double computePopulationEqualityScore(PopulationEquality measure, StateNode state) {
+        double popEqualityScore;
+        switch (measure) {
+            case MOST_TO_LEAST:
+                popEqualityScore = MostToLeast.computePopulationEqualityScore(state);
+                break;
+            default:
+                throw new IllegalArgumentException("Replace this string later!");
+        }
+        return popEqualityScore;
+    }
+
+    static double computeProposedPopulationEqualityScore(PopulationEquality measure, StateNode state) {
         double popEqualityScore;
         switch (measure) {
             case MOST_TO_LEAST:

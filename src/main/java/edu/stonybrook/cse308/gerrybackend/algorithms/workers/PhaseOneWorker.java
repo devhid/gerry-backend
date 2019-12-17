@@ -241,9 +241,13 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
         }
         pairs.getMajorityMinorityPairs().removeAll(removedPairs);
         pairs.getOtherPairs().removeAll(removedPairs);
-        if (pairs.size() == 0) {
+        if (pairs.size() == 0 && removedPairs.size() > 0) {
             removedPairs.sort(new SmallestLikelyPairsComparator());
-            pairs.getOtherPairs().addAll(removedPairs.subList(0, 1));
+            try {
+                pairs.getOtherPairs().addAll(removedPairs.subList(0, 1));
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
         }
     }
 
