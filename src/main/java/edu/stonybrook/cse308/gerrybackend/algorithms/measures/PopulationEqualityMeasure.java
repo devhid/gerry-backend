@@ -19,7 +19,7 @@ public interface PopulationEqualityMeasure {
         public static double computeProposedPopulationEqualityScore(StateNode state) {
             DistrictNode mostPopulated = getMostPopulatedDistrict(state.getProposedDistricts());
             DistrictNode leastPopulated = getLeastPopulatedDistrict(state.getProposedDistricts());
-            return computePercentDifference(mostPopulated, leastPopulated);
+            return 1.0 - computePercentDifference(mostPopulated, leastPopulated);
         }
 
         private static DistrictNode getExtremePopulationDistrict(Set<DistrictNode> districts, boolean mostPopulated) {
@@ -92,7 +92,7 @@ public interface PopulationEqualityMeasure {
         double popEqualityScore;
         switch (measure) {
             case MOST_TO_LEAST:
-                popEqualityScore = MostToLeast.computePopulationEqualityScore(state);
+                popEqualityScore = MostToLeast.computeProposedPopulationEqualityScore(state);
                 break;
             default:
                 throw new IllegalArgumentException("Replace this string later!");

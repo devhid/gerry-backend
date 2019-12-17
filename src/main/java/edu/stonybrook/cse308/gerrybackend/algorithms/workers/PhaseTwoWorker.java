@@ -44,8 +44,8 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
             try {
                 Map<DistrictNode, DistrictNode> changedDistricts = precinctMove.getNewDistricts();
                 inputs.getState().setProposedNewDistricts(changedDistricts);
-                double currentScore = computeObjectiveFunction(changedDistricts.keySet(), weightMap, computedScores);
-                double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores);
+                double currentScore = computeObjectiveFunction(changedDistricts.keySet(), weightMap, computedScores, true);
+                double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores, true);
                 if (currentScore + inputs.getEpsilon() < potentialScore) {
                     stop = false;
                     break;
@@ -130,7 +130,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     }
 
     private static double computeObjectiveFunction(DistrictNode district, Map<MeasureInterface, Double> weightMap,
-                                                   Map<DistrictNode, DistrictScores> computedScores) {
+                                                   Map<DistrictNode, DistrictScores> computedScores, boolean addMostToLeast) {
         if (computedScores.containsKey(district)) {
             return computedScores.get(district).getSum();
         }
@@ -140,7 +140,9 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
                 .map(measure -> {
                     double measureScore = InputMeasures.computeScore(measure, district) * weightMap.get(measure);
                     scoreMap.put(measure, measureScore);
-                    measureScore += PopulationEqualityMeasure.computeProposedPopulationEqualityScore(PopulationEquality.MOST_TO_LEAST, district.getParent());
+                    if (addMostToLeast) {
+                        measureScore += PopulationEqualityMeasure.computeProposedPopulationEqualityScore(PopulationEquality.MOST_TO_LEAST, district.getParent());
+                    }
                     return measureScore;
                 })
                 .reduce(0.0, Double::sum);
@@ -152,9 +154,9 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * Computes the objective function score for a collection of DistrictNodes.
      */
     private static double computeObjectiveFunction(Collection<DistrictNode> districts, Map<MeasureInterface, Double> weightMap,
-                                                   Map<DistrictNode, DistrictScores> computedScores) {
+                                                   Map<DistrictNode, DistrictScores> computedScores, boolean addMostToLeast) {
         return districts.stream()
-                .map(d -> computeObjectiveFunction(d, weightMap, computedScores))
+                .map(d -> computeObjectiveFunction(d, weightMap, computedScores, addMostToLeast))
                 .reduce(0.0, Double::sum);
     }
 
@@ -172,7 +174,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         for (PrecinctMove precinctMove : potentialMoves) {
             try {
                 Map<DistrictNode, DistrictNode> changedDistricts = precinctMove.getNewDistricts();
-                double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores);
+                double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores, true);
                 if (potentialScore > bestMoveScore + inputs.getEpsilon()) {
                     bestMove = precinctMove;
                     bestMoveScore = potentialScore;
@@ -188,8 +190,8 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
                                               Map<DistrictNode, DistrictScores> computedScores) {
         try {
             Map<DistrictNode, DistrictNode> changedDistricts = precinctMove.getNewDistricts();
-            double currentScore = computeObjectiveFunction(changedDistricts.keySet(), weightMap, computedScores);
-            double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores);
+            double currentScore = computeObjectiveFunction(changedDistricts.keySet(), weightMap, computedScores, true);
+            double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores, true);
             return potentialScore - currentScore;
         } catch (MismatchedElectionException e) {
             e.printStackTrace();
@@ -258,14 +260,14 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         }
 
         // Compute statistics.
-        inputs.getState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores));
+        inputs.getState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores, false));
         Set<Map.Entry<DistrictNode, DistrictScores>> newDistrictScores = computedScores.entrySet().stream()
                 .filter(e -> inputs.getState().getChildren().contains(e.getKey())).collect(Collectors.toSet());
         Map<String, DistrictScores> newDistrictScoresTransformed = newDistrictScores.stream()
                 .collect(Collectors.toMap(e -> e.getKey().getNumericalId(), e -> e.getValue()));
         StateScores newStateScores = StateScores.fromDistrictScoresAndState(newDistrictScores, inputs.getState());
 
-        inputs.getOriginalState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores));
+        inputs.getOriginalState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores, false));
         Set<Map.Entry<DistrictNode, DistrictScores>> oldDistrictScores = computedScores.entrySet().stream()
                 .filter(e -> inputs.getOriginalState().getChildren().contains(e.getKey())).collect(Collectors.toSet());
         Map<String, DistrictScores> oldDistrictScoresTransformed = oldDistrictScores.stream()
