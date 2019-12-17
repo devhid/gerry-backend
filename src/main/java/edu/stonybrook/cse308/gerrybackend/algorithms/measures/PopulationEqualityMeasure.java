@@ -15,13 +15,13 @@ public interface PopulationEqualityMeasure {
 
         private static DistrictNode getExtremePopulationDistrict(StateNode state, boolean mostPopulated) {
             DistrictNode extremeDistrict = null;
+            int currentExtremePop = (mostPopulated) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
             for (DistrictNode d : state.getChildren()) {
-                int currentMostPop = (extremeDistrict == null) ? 0 : extremeDistrict.getDemographicData().getTotalPopulation();
                 int districtPop = d.getDemographicData().getTotalPopulation();
                 if (mostPopulated) {
-                    extremeDistrict = (districtPop > currentMostPop) ? d : extremeDistrict;
+                    extremeDistrict = (districtPop > currentExtremePop) ? d : extremeDistrict;
                 } else {
-                    extremeDistrict = (districtPop < currentMostPop) ? d : extremeDistrict;
+                    extremeDistrict = (districtPop < currentExtremePop) ? d : extremeDistrict;
                 }
             }
             return extremeDistrict;

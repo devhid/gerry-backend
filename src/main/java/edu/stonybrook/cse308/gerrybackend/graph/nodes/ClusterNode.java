@@ -157,6 +157,7 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
                 polygons.add((Polygon) childGeometry.convexHull());
             }
         }
+        this.childPolygons = polygons;
     }
 
     protected void computeMultiPolygon() throws ParseException {

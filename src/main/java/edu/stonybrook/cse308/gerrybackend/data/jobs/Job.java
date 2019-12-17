@@ -23,10 +23,8 @@ public class Job {
     private StateNode state;
 
     private int phaseOneIteration;
-
-    private int numMajMinDistricts;
-
     private int phaseTwoIteration;
+    private double netOFIncrease;
 
     public Job() { }
 
@@ -35,6 +33,7 @@ public class Job {
         this.state = state;
         this.phaseOneIteration = 1;
         this.phaseTwoIteration = 1;
+        this.netOFIncrease = 0.0;
     }
 
     public int getNextPhaseOneIteration() {
@@ -47,6 +46,11 @@ public class Job {
 
     public StateNodeStatistics getStateNodeStatistics() {
         return StateNodeStatistics.fromStateNode(this.state);
+    }
+
+    public double incrementNetOFIncrease(double increment) {
+        this.netOFIncrease += increment;
+        return this.netOFIncrease;
     }
 
 }

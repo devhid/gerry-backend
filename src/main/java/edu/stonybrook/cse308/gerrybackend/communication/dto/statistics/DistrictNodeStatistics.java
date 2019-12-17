@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.communication.dto.statistics;
 
+import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.DistrictScores;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Incumbent;
@@ -17,6 +18,9 @@ public class DistrictNodeStatistics extends ClusterNodeStatistics {
 
     @Getter
     private Incumbent incumbent;
+
+    @Getter
+    private DistrictScores districtScores;
 
     public DistrictNodeStatistics(String name, DemographicData demographicData, ElectionData electionData,
                                   Set<GerryNodeStatistics> children, Map<Measures, Double> measures, Incumbent incumbent) {

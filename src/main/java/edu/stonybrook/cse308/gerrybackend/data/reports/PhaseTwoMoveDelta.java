@@ -1,12 +1,15 @@
 package edu.stonybrook.cse308.gerrybackend.data.reports;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.DistrictScores;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.StateScores;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,18 +32,22 @@ public class PhaseTwoMoveDelta extends IterativeAlgPhaseDelta {
     @Getter
     private String newDistrictId;
 
+    @Getter
+    private double netOFIncrease;
+
     public PhaseTwoMoveDelta(int iteration, Map<String, DemographicData> newDemographicData,
                              Map<String, ElectionData> newElectionData, String movedPrecinctId, String oldDistrictId,
-                             String newDistrictId) {
+                             String newDistrictId, double netOFIncrease) {
         super(iteration);
         this.newDemographicData = newDemographicData;
         this.newElectionData = newElectionData;
         this.movedPrecinctId = movedPrecinctId;
         this.oldDistrictId = oldDistrictId;
         this.newDistrictId = newDistrictId;
+        this.netOFIncrease = netOFIncrease;
     }
 
-    public static PhaseTwoMoveDelta fromPrecinctMove(PrecinctMove move, int iteration) {
+    public static PhaseTwoMoveDelta fromPrecinctMove(PrecinctMove move, int iteration, double netOFIncrease) {
         DistrictNode oldDistrict = move.getOldDistrict();
         DistrictNode newDistrict = move.getNewDistrict();
         PrecinctNode movedPrecinct = move.getPrecinct();
@@ -51,6 +58,6 @@ public class PhaseTwoMoveDelta extends IterativeAlgPhaseDelta {
         newElectionData.put(oldDistrict.getNumericalId(), oldDistrict.getElectionData());
         newElectionData.put(newDistrict.getNumericalId(), newDistrict.getElectionData());
         return new PhaseTwoMoveDelta(iteration, newDemographicData, newElectionData, movedPrecinct.getName(),
-                oldDistrict.getNumericalId(), newDistrict.getNumericalId());
+                oldDistrict.getNumericalId(), newDistrict.getNumericalId(), netOFIncrease);
     }
 }

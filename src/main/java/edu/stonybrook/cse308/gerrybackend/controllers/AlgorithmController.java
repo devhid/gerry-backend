@@ -137,6 +137,7 @@ public class AlgorithmController {
         state.fillInTransientProperties();
         inputs.setJob(phaseOneJob);
         inputs.setState(state);
+        inputs.setOriginalState(stateService.findOriginalState(inputs.getStateType(), inputs.getElectionType()));
         if (inputs.getEpsilon() == 0.0) {
             inputs.setEpsilon(this.phaseTwoEpsilon);
         }

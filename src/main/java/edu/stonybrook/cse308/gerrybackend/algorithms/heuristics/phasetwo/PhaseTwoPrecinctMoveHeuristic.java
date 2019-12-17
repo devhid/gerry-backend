@@ -13,8 +13,12 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
+import edu.stonybrook.cse308.gerrybackend.utils.GraphUtils;
 import edu.stonybrook.cse308.gerrybackend.utils.MathUtils;
 import edu.stonybrook.cse308.gerrybackend.utils.RandomUtils;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.io.ParseException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -134,8 +138,22 @@ public interface PhaseTwoPrecinctMoveHeuristic {
                 Set<PrecinctNode> adjFromBorderPrecincts = GenericUtils.castSetOfObjects(fromBorderPrecinct.getAdjacentNodes(), PrecinctNode.class);
                 adjFromBorderPrecincts.retainAll(toBorderPrecincts);
                 if (adjFromBorderPrecincts.size() > 0) {
-                    candidateSelections.add(fromBorderPrecinct);
+                    if (!GraphUtils.isBridgePrecinct(from, fromBorderPrecinct)) {
+                        candidateSelections.add(fromBorderPrecinct);
+                    }
+//                    try {
+//                        Geometry multiPolygon = from.getMultiPolygon();
+//                        multiPolygon = multiPolygon.difference(fromBorderPrecinct.getGeometry());
+//                        if (multiPolygon.union().isValid()) {
+//                            candidateSelections.add(fromBorderPrecinct);
+//                        }
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
                 }
+            }
+            if (candidateSelections.size() == 0) {
+                return null;
             }
             selected = RandomUtils.getRandomElement(candidateSelections);
 //            double minPercentPopDiff = Double.MAX_VALUE;

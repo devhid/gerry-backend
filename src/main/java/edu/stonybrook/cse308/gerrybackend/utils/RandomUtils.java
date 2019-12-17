@@ -15,7 +15,11 @@ public class RandomUtils {
         for (int idx = 0; idx < randomIndex; idx++) {
             iter.next();
         }
-        return iter.next();
+        if (iter.hasNext()) {
+            return iter.next();
+        } else {
+            return null;
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package edu.stonybrook.cse308.gerrybackend.communication.dto.statistics;
 
+import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.StateScores;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.Measures;
@@ -15,6 +16,9 @@ public class StateNodeStatistics extends ClusterNodeStatistics {
 
     @Getter
     private String redistrictingLegislation;
+
+    @Getter
+    private StateScores stateScores;
 
     public StateNodeStatistics(String name, DemographicData demographicData, ElectionData electionData,
                                Set<GerryNodeStatistics> children, Map<Measures, Double> measures,

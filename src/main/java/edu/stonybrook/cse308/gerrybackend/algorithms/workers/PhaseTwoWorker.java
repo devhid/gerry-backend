@@ -4,6 +4,8 @@ import edu.stonybrook.cse308.gerrybackend.algorithms.heuristics.phasetwo.PhaseTw
 import edu.stonybrook.cse308.gerrybackend.algorithms.inputs.PhaseTwoInputs;
 import edu.stonybrook.cse308.gerrybackend.algorithms.measures.InputMeasures;
 import edu.stonybrook.cse308.gerrybackend.algorithms.reports.PhaseTwoReport;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.DistrictScores;
+import edu.stonybrook.cse308.gerrybackend.communication.dto.scores.StateScores;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseTwoMoveDelta;
 import edu.stonybrook.cse308.gerrybackend.enums.heuristics.PhaseTwoDepth;
@@ -16,6 +18,7 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 import edu.stonybrook.cse308.gerrybackend.initializers.PhaseTwoReportInitializer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoReport> {
 
@@ -27,7 +30,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * @return a boolean value describing whether the worker should stop
      */
     private static boolean shouldStop(PhaseTwoInputs inputs, Set<PrecinctMove> potentialMoves,
-                                      Map<DistrictNode, Double> computedScores) {
+                                      Map<DistrictNode, DistrictScores> computedScores) {
         if (potentialMoves.size() == 0) {
             return true;
         }
@@ -55,16 +58,15 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     /**
      * Computes the potential PrecinctMoves on a given StateNode graph according to the heuristics specified.
      *
-     * @param state          the current StateNode graph
      * @param inputs        the phase two inputs
      * @return map whose key is a potential move and value is the resulting StateNode graph
      */
-    private static Set<PrecinctMove> computePotentialMoves(StateNode state, PhaseTwoInputs inputs) {
+    private static Set<PrecinctMove> computePotentialMoves(PhaseTwoInputs inputs) {
         Set<PrecinctMove> potentialMoves;
         PhaseTwoDepth depthHeuristic = inputs.getDepthHeuristic();
 
         if (depthHeuristic == PhaseTwoDepth.STANDARD) {
-            potentialMoves = computePotentialMovesStandard(state, inputs);
+            potentialMoves = computePotentialMovesStandard(inputs);
         } else if (depthHeuristic == PhaseTwoDepth.LEVEL) {
 //            potentialMoves = computePotentialMovesLevel(state, moveHeuristic);
             throw new UnsupportedOperationException("Replace this string later!");
@@ -81,14 +83,15 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * Computes the potential PrecinctMove on a given StateNode graph in the standard manner.
      * This computes a single PrecinctMove.
      *
-     * @param state         the current StateNode graph
      * @param inputs        the phase two inputs
      * @return map whose key is a potential move and value is the resulting StateNode graph
      */
-    private static Set<PrecinctMove> computePotentialMovesStandard(StateNode state, PhaseTwoInputs inputs) {
+    private static Set<PrecinctMove> computePotentialMovesStandard(PhaseTwoInputs inputs) {
         Set<PrecinctMove> potentialMoves = new HashSet<>();
         PrecinctMove move = PhaseTwoPrecinctMoveHeuristic.selectPrecinct(inputs);
-        potentialMoves.add(move);
+        if (move != null) {
+            potentialMoves.add(move);
+        }
         return potentialMoves;
     }
 
@@ -124,15 +127,20 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
     }
 
     private static double computeObjectiveFunction(DistrictNode district, Map<MeasureInterface, Double> weightMap,
-                                                   Map<DistrictNode, Double> computedScores) {
+                                                   Map<DistrictNode, DistrictScores> computedScores) {
         if (computedScores.containsKey(district)) {
-            return computedScores.get(district);
+            return computedScores.get(district).getSum();
         }
+        Map<MeasureInterface, Double> scoreMap = new HashMap<>();
         double score = weightMap.keySet()
                 .stream()
-                .map(measure -> InputMeasures.computeScore(measure, district) * weightMap.get(measure))
+                .map(measure -> {
+                    double measureScore = InputMeasures.computeScore(measure, district) * weightMap.get(measure);
+                    scoreMap.put(measure, measureScore);
+                    return measureScore;
+                })
                 .reduce(0.0, Double::sum);
-        computedScores.put(district, score);
+        computedScores.put(district, DistrictScores.fromScoreMap(scoreMap));
         return score;
     }
 
@@ -140,7 +148,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * Computes the objective function score for a collection of DistrictNodes.
      */
     private static double computeObjectiveFunction(Collection<DistrictNode> districts, Map<MeasureInterface, Double> weightMap,
-                                                   Map<DistrictNode, Double> computedScores) {
+                                                   Map<DistrictNode, DistrictScores> computedScores) {
         return districts.stream()
                 .map(d -> computeObjectiveFunction(d, weightMap, computedScores))
                 .reduce(0.0, Double::sum);
@@ -153,7 +161,7 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * @return the best PrecinctMove (one with the highest objective function score)
      */
     private static PrecinctMove selectPrecinctMove(PhaseTwoInputs inputs, Set<PrecinctMove> potentialMoves,
-                                                   Map<DistrictNode, Double> computedScores) {
+                                                   Map<DistrictNode, DistrictScores> computedScores) {
         PrecinctMove bestMove = null;
         double bestMoveScore = Double.MIN_VALUE;
         Map<MeasureInterface, Double> weightMap = inputs.getWeightMap();
@@ -172,6 +180,19 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         return bestMove;
     }
 
+    public static double computeNetOFIncrease(PrecinctMove precinctMove, Map<MeasureInterface, Double> weightMap,
+                                              Map<DistrictNode, DistrictScores> computedScores) {
+        try {
+            Map<DistrictNode, DistrictNode> changedDistricts = precinctMove.getNewDistricts();
+            double currentScore = computeObjectiveFunction(changedDistricts.keySet(), weightMap, computedScores);
+            double potentialScore = computeObjectiveFunction(changedDistricts.values(), weightMap, computedScores);
+            return potentialScore - currentScore;
+        } catch (MismatchedElectionException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
     /**
      * Executes a given PrecinctMove on the given StateNode graph.
      *
@@ -180,14 +201,14 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
      * @param iteration the current iteration
      * @return a PhaseTwoMoveDelta record of the executed PrecinctMove
      */
-    private static PhaseTwoMoveDelta executePrecinctMove(StateNode state, PrecinctMove move, int iteration) {
+    private static PhaseTwoMoveDelta executePrecinctMove(StateNode state, PrecinctMove move, int iteration, double netOFIncrease) {
         PhaseTwoMoveDelta delta = null;
         try {
             // Execute the PrecinctMove object.
             state.executeMove(move);    // throws MismatchedElectionException
 
             // Create a PhaseTwoMoveDelta record of the PrecinctMove.
-            delta = PhaseTwoMoveDelta.fromPrecinctMove(move, iteration);
+            delta = PhaseTwoMoveDelta.fromPrecinctMove(move, iteration, netOFIncrease);
         } catch (MismatchedElectionException e) {
             // should never happen
             e.printStackTrace();
@@ -200,8 +221,8 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
         final Queue<PhaseTwoMoveDelta> deltas = new LinkedList<>();
         final StateNode state = inputs.getState();
         int iteration = inputs.getJob().getNextPhaseTwoIteration();
-        Set<PrecinctMove> potentialMoves = computePotentialMoves(state, inputs);
-        Map<DistrictNode, Double> computedScores = new HashMap<>();
+        Set<PrecinctMove> potentialMoves = computePotentialMoves(inputs);
+        Map<DistrictNode, DistrictScores> computedScores = new HashMap<>();
         boolean stop;
         while (inputs.getNumRetries() != 0) {
             stop = shouldStop(inputs, potentialMoves, computedScores);
@@ -221,15 +242,34 @@ public class PhaseTwoWorker extends AlgPhaseWorker<PhaseTwoInputs, PhaseTwoRepor
                         e.printStackTrace();
                     }
                 }
-                potentialMoves = computePotentialMoves(state, inputs);
+                potentialMoves = computePotentialMoves(inputs);
                 continue;
             }
             PrecinctMove move = selectPrecinctMove(inputs, potentialMoves, computedScores);
-            PhaseTwoMoveDelta iterationDelta = executePrecinctMove(state, move, iteration);
+            double netOFIncrease = inputs.getJob().incrementNetOFIncrease(computeNetOFIncrease(move, inputs.getWeightMap(), computedScores));
+            PhaseTwoMoveDelta iterationDelta = executePrecinctMove(state, move, iteration, netOFIncrease);
             deltas.offer(iterationDelta);
-            return PhaseTwoReportInitializer.initClass(StatusCode.IN_PROGRESS, inputs.getJobId(), deltas);
+            return PhaseTwoReportInitializer.initClass(StatusCode.IN_PROGRESS, inputs.getJobId(), deltas,
+                    null, null, null, null);
         }
-        return PhaseTwoReportInitializer.initClass(StatusCode.SUCCESS, inputs.getJobId(), deltas);
+
+        // Compute statistics.
+        inputs.getState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores));
+        Set<Map.Entry<DistrictNode, DistrictScores>> newDistrictScores = computedScores.entrySet().stream()
+                .filter(e -> inputs.getState().getChildren().contains(e.getKey())).collect(Collectors.toSet());
+        Map<String, DistrictScores> newDistrictScoresTransformed = newDistrictScores.stream()
+                .collect(Collectors.toMap(e -> e.getKey().getNumericalId(), e -> e.getValue()));
+        StateScores newStateScores = StateScores.fromDistrictScoresAndState(newDistrictScores, inputs.getState());
+
+        inputs.getOriginalState().getChildren().forEach(d -> computeObjectiveFunction(d, inputs.getWeightMap(), computedScores));
+        Set<Map.Entry<DistrictNode, DistrictScores>> oldDistrictScores = computedScores.entrySet().stream()
+                .filter(e -> inputs.getState().getChildren().contains(e.getKey())).collect(Collectors.toSet());
+        Map<String, DistrictScores> oldDistrictScoresTransformed = oldDistrictScores.stream()
+                .collect(Collectors.toMap(e -> e.getKey().getNumericalId(), e -> e.getValue()));
+        StateScores oldStateScores = StateScores.fromDistrictScoresAndState(oldDistrictScores, inputs.getOriginalState());
+
+        return PhaseTwoReportInitializer.initClass(StatusCode.SUCCESS, inputs.getJobId(), deltas,
+                newDistrictScoresTransformed, newStateScores, oldDistrictScoresTransformed, oldStateScores);
     }
 
 }
