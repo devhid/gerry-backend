@@ -10,7 +10,7 @@ public class GraphUtils {
 
     public static boolean isBridgePrecinct(DistrictNode district, PrecinctNode precinct) {
         Set<PrecinctNode> connectedPrecincts = new HashSet<>();
-        Set<PrecinctNode> otherPrecincts = district.getChildren();
+        Set<PrecinctNode> otherPrecincts = new HashSet<>(district.getChildren());
         otherPrecincts.remove(precinct);
         PrecinctNode currPrecinct = RandomUtils.getRandomElement(otherPrecincts);
         Queue<PrecinctNode> toVisit = new LinkedList<>();
