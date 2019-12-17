@@ -71,7 +71,7 @@ public class Joinability {
                     .nodeType(NodeType.USER)
                     .build();
             try {
-                potentialMerge.addBorderPrecinct(p2);
+                potentialMerge.addBorderPrecinct(p2, false);
                 return CompactnessMeasure.computeCompactnessScore(Compactness.CONVEX_HULL, potentialMerge);
             } catch (MismatchedElectionException e) {
                 e.printStackTrace();

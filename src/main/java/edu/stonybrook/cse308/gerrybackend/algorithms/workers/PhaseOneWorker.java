@@ -265,7 +265,7 @@ public class PhaseOneWorker extends AlgPhaseWorker<PhaseOneInputs, PhaseOneRepor
             try {
                 DistrictNode d1 = pair.getItem1();
                 DistrictNode d2 = pair.getItem2();
-                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, remnantDistricts);
+                DistrictNode newDistrict = DistrictNode.combine(d1, d2, true, true, remnantDistricts);
                 if (newDistrict.getDemographicData().getTotalPopulation() == 0){
                     System.out.println("woah");
                 }

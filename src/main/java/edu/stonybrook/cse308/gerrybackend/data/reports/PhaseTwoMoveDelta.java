@@ -46,11 +46,11 @@ public class PhaseTwoMoveDelta extends IterativeAlgPhaseDelta {
         PrecinctNode movedPrecinct = move.getPrecinct();
         Map<String, DemographicData> newDemographicData = new HashMap<>();
         Map<String, ElectionData> newElectionData = new HashMap<>();
-        newDemographicData.put(oldDistrict.getId(), oldDistrict.getDemographicData());
-        newDemographicData.put(newDistrict.getId(), newDistrict.getDemographicData());
-        newElectionData.put(oldDistrict.getId(), oldDistrict.getElectionData());
-        newElectionData.put(newDistrict.getId(), newDistrict.getElectionData());
-        return new PhaseTwoMoveDelta(iteration, newDemographicData, newElectionData, movedPrecinct.getId(),
-                oldDistrict.getId(), newDistrict.getId());
+        newDemographicData.put(oldDistrict.getNumericalId(), oldDistrict.getDemographicData());
+        newDemographicData.put(newDistrict.getNumericalId(), newDistrict.getDemographicData());
+        newElectionData.put(oldDistrict.getNumericalId(), oldDistrict.getElectionData());
+        newElectionData.put(newDistrict.getNumericalId(), newDistrict.getElectionData());
+        return new PhaseTwoMoveDelta(iteration, newDemographicData, newElectionData, movedPrecinct.getName(),
+                oldDistrict.getNumericalId(), newDistrict.getNumericalId());
     }
 }

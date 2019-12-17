@@ -209,12 +209,13 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     public void executeMove(PrecinctMove move) throws MismatchedElectionException {
         DistrictNode oldDistrict = move.getOldDistrict();
         DistrictNode newDistrict = move.getNewDistrict();
-        oldDistrict.removeBorderPrecinct(move.getPrecinct());
-        newDistrict.addBorderPrecinct(move.getPrecinct());
+        oldDistrict.removeBorderPrecinct(move.getPrecinct(), true);
+        newDistrict.addBorderPrecinct(move.getPrecinct(), true);
     }
 
     public StateNode copyAndExecuteMove(PrecinctMove move) throws MismatchedElectionException {
-        Map<DistrictNode, DistrictNode> newDistricts = move.computeNewDistricts();
+        // NOTE: the StateNode produced by this method needs to have its DistrictEdges fixed later.
+        Map<DistrictNode, DistrictNode> newDistricts = move.getNewDistricts();
         StateNode newState = StateNode.builder()
                 .id(UUID.randomUUID().toString())
                 .name(this.name)

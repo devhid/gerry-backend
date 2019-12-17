@@ -68,11 +68,21 @@ public class PhaseTwoInputs extends AlgPhaseInputs {
     @JsonIgnore
     public Set<MeasureWeight> getWeights() {
         Set<MeasureWeight> weights = new HashSet<>();
-        weights.add(this.compactnessWeight);
-        weights.add(this.competitivenessWeight);
-        weights.add(this.fairnessWeight);
-        weights.add(this.popEqualityWeight);
-        weights.add(this.popHomogeneityWeight);
+        if (this.compactnessWeight.getWeight() > 0.0) {
+            weights.add(this.compactnessWeight);
+        }
+        if (this.competitivenessWeight.getWeight() > 0.0) {
+            weights.add(this.competitivenessWeight);
+        }
+        if (this.fairnessWeight.getWeight() > 0.0) {
+            weights.add(this.fairnessWeight);
+        }
+        if (this.popEqualityWeight.getWeight() > 0.0) {
+            weights.add(this.popEqualityWeight);
+        }
+        if (this.popHomogeneityWeight.getWeight() > 0.0) {
+            weights.add(this.popHomogeneityWeight);
+        }
         return weights;
     }
 

@@ -30,8 +30,8 @@ public abstract class Heuristics {
         PhaseOneStopHeuristic.filterLastIterationPairs(heuristic, pairs, numAllowedMerges);
     }
 
-    public static PrecinctMove selectPrecinct(PhaseTwoPrecinctMove heuristic, StateNode state, PhaseTwoInputs inputs) {
-        return PhaseTwoPrecinctMoveHeuristic.selectPrecinct(heuristic, state, inputs);
+    public static PrecinctMove selectPrecinct(PhaseTwoInputs inputs) {
+        return PhaseTwoPrecinctMoveHeuristic.selectPrecinct(inputs);
     }
 
 }
