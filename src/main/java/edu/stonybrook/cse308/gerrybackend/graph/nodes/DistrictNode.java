@@ -13,6 +13,7 @@ import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.locationtech.jts.io.ParseException;
 import org.mapstruct.Named;
 
 import javax.persistence.*;
@@ -163,7 +164,11 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
                 e.printStackTrace();
             }
         });
-        this.markGeometriesStale();
+        try {
+            this.addPolygon(precinct.getGeometry());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         this.markEdgeJoinabilityStale();
     }
 
@@ -224,7 +229,11 @@ public class DistrictNode extends ClusterNode<DistrictEdge, PrecinctNode> {
             }
         });
         this.adjacentEdges.removeAll(oldEdges);
-        this.markGeometriesStale();
+        try {
+            this.removePolygon(precinct.getGeometry());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         this.markEdgeJoinabilityStale();
     }
 

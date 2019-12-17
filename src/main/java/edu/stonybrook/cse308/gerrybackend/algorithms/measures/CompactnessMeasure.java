@@ -38,7 +38,7 @@ public interface CompactnessMeasure {
 
     class Reock {
         static double computeCompactnessScore(DistrictNode district) {
-            MultiPolygon shape = district.getMultiPolygon();
+            Geometry shape = district.getMultiPolygon();
             Geometry boundingCircle = district.getBoundingCircle();
             return shape.getArea() / boundingCircle.getArea();
         }
@@ -46,7 +46,7 @@ public interface CompactnessMeasure {
 
     class ConvexHull {
         static double computeCompactnessScore(DistrictNode district) {
-            MultiPolygon shape = district.getMultiPolygon();
+            Geometry shape = district.getMultiPolygon();
             Geometry convexHull = district.getConvexHull();
             return shape.getArea() / convexHull.getArea();
         }

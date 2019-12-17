@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
-import edu.stonybrook.cse308.gerrybackend.enums.converters.MeasuresConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.converters.NodeTypeConverter;
 import edu.stonybrook.cse308.gerrybackend.enums.measures.Measures;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
@@ -60,7 +59,11 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
 
     @Transient
     @JsonIgnore
-    protected MultiPolygon multiPolygon;
+    protected Set<Polygon> childPolygons;
+
+    @Transient
+    @JsonIgnore
+    protected Geometry multiPolygon;
 
     @Transient
     @JsonIgnore
@@ -144,8 +147,8 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         return this.getMultiPolygon();
     }
 
-    protected void computeMultiPolygon() throws ParseException {
-        List<Polygon> polygons = new ArrayList<>();
+    protected void computeChildPolygons() throws ParseException {
+        Set<Polygon> polygons = new HashSet<>();
         for (C child : this.children) {
             Geometry childGeometry = child.getGeometry();
             if (childGeometry instanceof Polygon) {
@@ -154,6 +157,10 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
                 polygons.add((Polygon) childGeometry.convexHull());
             }
         }
+    }
+
+    protected void computeMultiPolygon() throws ParseException {
+        Set<Polygon> polygons = this.getChildPolygons();
         Polygon[] polygonsArr = new Polygon[polygons.size()];
         polygonsArr = polygons.toArray(polygonsArr);
         this.multiPolygon = new MultiPolygon(polygonsArr, new GeometryFactory());
@@ -173,7 +180,18 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
         this.boundingCircle = new MinimumBoundingCircle(this.multiPolygon).getCircle();
     }
 
-    public MultiPolygon getMultiPolygon() {
+    protected Set<Polygon> getChildPolygons() {
+        try {
+            if (this.childPolygons == null) {
+                this.computeChildPolygons();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return this.childPolygons;
+    }
+
+    public Geometry getMultiPolygon() {
         try {
             if (this.multiPolygon == null) {
                 this.computeMultiPolygon();
@@ -204,6 +222,28 @@ public abstract class ClusterNode<E extends GerryEdge, C extends GerryNode> exte
             e.printStackTrace();
         }
         return this.boundingCircle;
+    }
+
+    public void removePolygon(Geometry polygon) {
+        if (this.childPolygons != null) {
+            this.childPolygons.remove(polygon);
+        }
+        if (this.multiPolygon != null || this.boundingCircle != null || this.convexHull != null) {
+            this.multiPolygon = this.multiPolygon.difference(polygon);
+            this.boundingCircle = null;
+            this.convexHull = null;
+        }
+    }
+
+    public void addPolygon(Geometry polygon) {
+        if (this.childPolygons != null) {
+            this.childPolygons.add((Polygon) polygon);
+        }
+        if (this.multiPolygon != null || this.boundingCircle != null || this.convexHull != null) {
+            this.multiPolygon = this.multiPolygon.union(polygon);
+            this.boundingCircle = null;
+            this.convexHull = null;
+        }
     }
 
     protected void markGeometriesStale() {
