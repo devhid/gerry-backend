@@ -5,20 +5,14 @@ import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
 public enum DemographicType implements IntEnumInterface {
-    NH_WHITE(0, "nonhispanic_white"),
-    H_WHITE(1, "hispanic_white"),
-    NH_BLACK(2, "nonhispanic_black"),
-    H_BLACK(3, "hispanic_black"),
-    NH_ASIAN(4, "nonhispanic_asian"),
-    H_ASIAN(5, "hispanic_asian"),
-    HISPANIC(6, "hispanic"),
-    NH_PACIFIC_ISLANDER(7, "nonhispanic_pacific_islander"),
-    H_PACIFIC_ISLANDER(8, "hispanic_pacific_islander"),
-    NH_NATIVE_AMERICAN(9, "nonhispanic_native_american"),
-    H_NATIVE_AMERICAN(10, "hispanic_native_american"),
-    BIRACIAL(11, "biracial"),
-    OTHER(12, "other"),
-    ALL(13, "all");
+    NH_WHITE(0, "pop_white_nh"),
+    NH_BLACK(1, "pop_black_nh"),
+    NH_ASIAN(2, "pop_asian_nh"),
+    HISPANIC(3, "pop_hispanic"),
+    NH_PACIFIC_ISLANDER(4, "pop_nhpi_nh"),
+    NH_NATIVE_AMERICAN(5, "pop_amin_nh"),
+    NH_TWO_OR_MORE(6, "pop_2more_nh"),
+    NH_OTHER(7, "pop_other_nh");
 
     @Getter
     private final int value;

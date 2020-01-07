@@ -7,20 +7,27 @@ import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
 import edu.stonybrook.cse308.gerrybackend.enums.types.ElectionType;
 import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
+import edu.stonybrook.cse308.gerrybackend.utils.GenericUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @MappedSuperclass
-@JsonIgnoreProperties({"adjacentNodes", "electionType"})
+@JsonIgnoreProperties({"adjacentEdgesCopy", "adjacentNodes", "electionType", "populationDensity"})
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -34,7 +41,7 @@ import java.util.UUID;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )
-public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
+public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> implements Persistable {
 
     @Getter
     @Id
@@ -47,24 +54,27 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
 
     @Getter
     @NotNull
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "node_demo_id")
+    @Embedded
     protected DemographicData demographicData;
 
     @Getter
     @NotNull
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "node_election_id")
+    @Embedded
     protected ElectionData electionData;
 
     @Getter
-    @ManyToMany(cascade = CascadeType.ALL)     // one node has many edges, an edge has 2 (many) nodes
+    @Fetch(FetchMode.JOIN)
+    @BatchSize(size = 500)
+    @ManyToMany(    // one node has many edges, an edge has 2 (many) nodes
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
+    )
     protected Set<E> adjacentEdges;
 
     @Lob
-    @Column(name = "geometry", columnDefinition = "CLOB")
-    @JsonProperty(value = "geometry", defaultValue = "{}")
-    protected String geometryJson;
+    @Column(name = "geojson", columnDefinition = "LONGTEXT")
+    @JsonProperty(value = "geojson", defaultValue = "{}")
+    protected String geoJson;
 
     @Getter
     @Setter
@@ -76,24 +86,33 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     @JsonIgnore
     private Geometry geometry;
 
+    @Setter
+    @Transient
+    private boolean isNew = false;
+
     protected GerryNode() {
         this.id = UUID.randomUUID().toString();
         this.name = "";
         this.demographicData = new DemographicData();
         this.electionData = new ElectionData();
         this.adjacentEdges = new HashSet<>();
-        this.geometryJson = null;
+        this.geoJson = null;
     }
 
     protected GerryNode(String id, String name,
                         DemographicData demographicData, ElectionData electionData,
-                        Set<E> adjacentEdges, String geometryJson) {
+                        Set<E> adjacentEdges, String geoJson) {
         this.id = id;
         this.name = name;
         this.demographicData = demographicData;
         this.electionData = electionData;
         this.adjacentEdges = adjacentEdges;
-        this.geometryJson = geometryJson;
+        this.geoJson = geoJson;
+    }
+
+    public Set<E> getAdjacentEdgesCopy() {
+        Set newEdges = this.adjacentEdges.stream().map(GerryEdge::copy).collect(Collectors.toSet());
+        return (Set<E>) newEdges;
     }
 
     public Set<GerryNode> getAdjacentNodes() {
@@ -103,6 +122,24 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
             adjNodes.add(adjNode);
         }
         return adjNodes;
+    }
+
+    public boolean isAdjacentTo(GerryNode other) {
+        Set<E> edges = new HashSet<>(this.adjacentEdges);
+        edges.retainAll(other.adjacentEdges);
+        return (edges.size() > 0);
+    }
+
+
+    public GerryEdge getEdge(GerryNode adjacentNode) {
+        for (GerryEdge edge : this.getAdjacentEdges()) {
+            if (edge.contains(adjacentNode)) {
+                return edge;
+            }
+        }
+
+        // Should never happen unless the input node is not actually adjacent to the 'this' node.
+        throw new IllegalArgumentException("Replace string with text later!");
     }
 
     public void addEdge(E edge) throws InvalidEdgeException {
@@ -128,19 +165,44 @@ public abstract class GerryNode<E extends GerryEdge, P extends ClusterNode> {
     }
 
     @JsonRawValue
-    public String getGeometryJson() {
-        return this.geometryJson;
+    public String getGeoJson() {
+        return this.geoJson;
     }
 
-    public void setGeometryJson(JsonNode node) {
-        this.geometryJson = node.toString();
+    public void setGeoJson(JsonNode node) {
+        this.geoJson = node.toString();
     }
 
     public Geometry getGeometry() throws ParseException {
         if (this.geometry == null) {
             GeoJsonReader reader = new GeoJsonReader();
-            this.geometry = reader.read(this.geometryJson);
+            this.geometry = reader.read(this.geoJson);
         }
         return this.geometry;
+    }
+
+    public double getPopulationDensity() {
+        if (this.geometry != null && this.geometry.getArea() != 0) {
+            return this.demographicData.getTotalPopulation() / this.geometry.getArea();
+        }
+        return -1.0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GerryNode)) return false;
+        GerryNode<?, ?> gerryNode = (GerryNode<?, ?>) o;
+        return id.equals(gerryNode.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
     }
 }

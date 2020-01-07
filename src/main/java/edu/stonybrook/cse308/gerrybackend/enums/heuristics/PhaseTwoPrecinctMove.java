@@ -5,7 +5,9 @@ import edu.stonybrook.cse308.gerrybackend.enums.IntEnumInterface;
 import lombok.Getter;
 
 public enum PhaseTwoPrecinctMove implements IntEnumInterface {
-    RANDOM(0, "random");
+    RANDOM(0, "random"),
+    MAJ_MIN(1, "maj_min"),
+    POP_NORMALIZER(2, "population_normalizer");
 
     @Getter
     private final int value;

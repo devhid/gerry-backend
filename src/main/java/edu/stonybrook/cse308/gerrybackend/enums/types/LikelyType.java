@@ -27,4 +27,8 @@ public enum LikelyType implements IntEnumInterface {
         return this.value >= other.value;
     }
 
+    public boolean isGreaterThan(LikelyType other) {
+        return this.value > other.value;
+    }
+
 }

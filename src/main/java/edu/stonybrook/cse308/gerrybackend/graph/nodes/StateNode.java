@@ -5,25 +5,50 @@ import edu.stonybrook.cse308.gerrybackend.data.algorithm.CandidatePairs;
 import edu.stonybrook.cse308.gerrybackend.data.algorithm.PrecinctMove;
 import edu.stonybrook.cse308.gerrybackend.data.graph.DemographicData;
 import edu.stonybrook.cse308.gerrybackend.data.graph.ElectionData;
+import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.data.reports.PhaseOneMergeDelta;
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.NodeType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.StateType;
-import edu.stonybrook.cse308.gerrybackend.exceptions.InvalidEdgeException;
+import edu.stonybrook.cse308.gerrybackend.exceptions.MismatchedElectionException;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.DistrictEdge;
+import edu.stonybrook.cse308.gerrybackend.graph.edges.GerryEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.PrecinctEdge;
 import edu.stonybrook.cse308.gerrybackend.graph.edges.StateEdge;
-import edu.stonybrook.cse308.gerrybackend.utils.MapUtils;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@NamedEntityGraph(
+        name = "state-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("id"),
+                @NamedAttributeNode("nodeType"),
+                @NamedAttributeNode("demographicData"),
+                @NamedAttributeNode("electionData"),
+                @NamedAttributeNode(value = "children", subgraph = "children-subgraph"),
+                @NamedAttributeNode("counties")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "children-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("id"),
+                                @NamedAttributeNode("nodeType"),
+                                @NamedAttributeNode("demographicData"),
+                                @NamedAttributeNode("electionData"),
+                                @NamedAttributeNode("adjacentEdges"),
+                                @NamedAttributeNode("children"),
+                                @NamedAttributeNode("counties")
+                        }
+                )
+        }
+)
 @Entity
 public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
@@ -32,8 +57,13 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
 
     @Getter
     @Lob
-    @Column(name = "redistricting_legislation", columnDefinition = "CLOB")
+    @Column(name = "redistricting_legislation", columnDefinition = "TEXT")
     private String redistrictingLegislation;
+
+    @Transient
+    @Setter
+    @JsonIgnore
+    private Map<DistrictNode, DistrictNode> proposedNewDistricts;
 
     public StateNode() {
         super();
@@ -45,19 +75,27 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
     @Builder
     public StateNode(String id, String name, NodeType nodeType, DemographicData demographicData,
                      ElectionData electionData, String geography, Set<DistrictNode> districts, Set<String> counties,
-                     StateType stateType) {
+                     StateType stateType, String redistrictingLegislation) {
         super(id, name, nodeType, demographicData, electionData, null, geography, districts, counties, null);
         this.stateType = stateType;
+        this.redistrictingLegislation = redistrictingLegislation;
     }
 
     @Override
-    protected void loadAllCounties() {
+    protected void aggregateCounties() {
+        this.children.forEach(DistrictNode::aggregateCounties);
         this.counties = this.children.stream().flatMap(d -> d.getCounties().stream()).collect(Collectors.toSet());
     }
 
     public void remapDistrictReferences(Map<DistrictNode, DistrictNode> changedDistricts) {
         this.children = this.children.stream()
                 .map(d -> changedDistricts.getOrDefault(d, d))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<DistrictNode> getProposedDistricts() {
+        return this.children.stream()
+                .map(d -> this.proposedNewDistricts.getOrDefault(d, d))
                 .collect(Collectors.toSet());
     }
 
@@ -78,10 +116,11 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * As parent references are not stored in the DB, these wil have to be populated afterwards.
      * Make sure to call this method after deserialization of a StateNode.
      */
-    private void fillInParentReferences() {
-        if (this.nodeType != NodeType.USER) {
-            return;
-        }
+    public void fillInParentReferences() {
+//         TODO: is this check needed?
+//        if (this.nodeType != NodeType.USER) {
+//            return;
+//        }
         Set<DistrictNode> districts = this.getChildren();
         districts.forEach(d -> {
             d.setParent(this);
@@ -91,25 +130,45 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         });
     }
 
-    private void createPrecinctEdge(String id, PrecinctNode p1, PrecinctNode p2) {
-        PrecinctEdge edge = new PrecinctEdge(id, p1, p2);
-        try {
-            p1.addEdge(edge);
-            p2.addEdge(edge);
-        } catch (InvalidEdgeException e) {
-            // should never happen
-            e.printStackTrace();
+    public static void fillAdjacentNodes(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                         Set<? extends GerryNode> nodes) {
+        for (GerryNode node : nodes) {
+            Set<GerryEdge> nodeEdges = node.getAdjacentEdges();
+            for (GerryEdge nodeEdge : nodeEdges) {
+                if (!edgeMap.containsKey(nodeEdge.getId())) {
+                    UnorderedPair<GerryNode> edgeNodes = new UnorderedPair<>();
+                    edgeNodes.add(node);
+                    edgeMap.put(nodeEdge.getId(), edgeNodes);
+                } else {
+                    edgeMap.get(nodeEdge.getId()).add(node);
+                }
+            }
         }
     }
 
-    private void createDistrictEdge(String id, DistrictNode d1, DistrictNode d2) {
-        DistrictEdge edge = new DistrictEdge(id, d1, d2);
-        try {
-            d1.addEdge(edge);
-            d2.addEdge(edge);
-        } catch (InvalidEdgeException e) {
-            // should never happen
-            e.printStackTrace();
+    public static void fillDistrictEdgeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                                  Set<DistrictNode> nodes) {
+        for (DistrictNode n : nodes) {
+            for (DistrictEdge e : n.getAdjacentEdges()) {
+                if (e.size() == 0) {
+                    UnorderedPair<GerryNode> pair = edgeMap.get(e.getId());
+                    e.add((DistrictNode) pair.getItem1());
+                    e.add((DistrictNode) pair.getItem2());
+                }
+            }
+        }
+    }
+
+    public static void fillPrecinctEdgeReferences(Map<String, UnorderedPair<GerryNode>> edgeMap,
+                                                  Set<PrecinctNode> nodes) {
+        for (PrecinctNode n : nodes) {
+            for (PrecinctEdge e : n.getAdjacentEdges()) {
+                if (e.size() == 0) {
+                    UnorderedPair<GerryNode> pair = edgeMap.get(e.getId());
+                    e.add((PrecinctNode) pair.getItem1());
+                    e.add((PrecinctNode) pair.getItem2());
+                }
+            }
         }
     }
 
@@ -119,33 +178,21 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
      * As edge node references are NOT stored in the DB, these will have to be populated afterwards.
      * Make sure to call this method after deserialization of a StateNode.
      */
-    private void fillInEdgeNodeReferences() {
-        Map<String, UnorderedPair<GerryNode>> edgeMap = new HashMap<>();
+    public void fillInEdgeNodeReferences() {
+        final Map<String, UnorderedPair<GerryNode>> edgeMap = new HashMap<>();
 
         // Load all districts & precincts.
-        Set<DistrictNode> districts = this.children;
-        Set<PrecinctNode> precincts = new HashSet<>();
+        final Set<DistrictNode> districts = this.children;
+        final Set<PrecinctNode> precincts = new HashSet<>();
         districts.forEach(d -> precincts.addAll(d.getChildren()));
 
-        // Load all edges.
-        MapUtils.populateEdgeNodeReferences(edgeMap, districts);
-        MapUtils.populateEdgeNodeReferences(edgeMap, precincts);
+        // Find all pairs of adjacent nodes.
+        StateNode.fillAdjacentNodes(edgeMap, districts);
+        StateNode.fillAdjacentNodes(edgeMap, precincts);
 
-        districts.forEach(GerryNode::clearEdges);
-        precincts.forEach(PrecinctNode::clearEdges);
-
-        // Update all node references in the edges.
-        edgeMap.forEach((edgeId, edgeNodes) -> {
-            if (edgeNodes.getItem1() instanceof PrecinctNode) {
-                PrecinctNode p1 = (PrecinctNode) edgeNodes.getItem1();
-                PrecinctNode p2 = (PrecinctNode) edgeNodes.getItem2();
-                createPrecinctEdge(edgeId, p1, p2);
-            } else if (edgeNodes.getItem2() instanceof DistrictNode) {
-                DistrictNode d1 = (DistrictNode) edgeNodes.getItem1();
-                DistrictNode d2 = (DistrictNode) edgeNodes.getItem2();
-                createDistrictEdge(edgeId, d1, d2);
-            }
-        });
+        // Fill all edge references.
+        StateNode.fillDistrictEdgeReferences(edgeMap, districts);
+        StateNode.fillPrecinctEdgeReferences(edgeMap, precincts);
     }
 
     @JsonIgnore
@@ -167,13 +214,16 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
         return allPrecincts.stream().collect(Collectors.toMap(Function.identity(), GerryNode::getParent));
     }
 
-    public PhaseOneMergeDelta executeDistrictMerge(CandidatePairs pairs) {
-        // TODO: fill in
-        return null;
+    public void executeMove(PrecinctMove move) throws MismatchedElectionException {
+        DistrictNode oldDistrict = move.getOldDistrict();
+        DistrictNode newDistrict = move.getNewDistrict();
+        oldDistrict.removeBorderPrecinct(move.getPrecinct(), true);
+        newDistrict.addBorderPrecinct(move.getPrecinct(), true);
     }
 
-    public StateNode copyAndExecuteMove(PrecinctMove move) {
-        Map<DistrictNode, DistrictNode> newDistricts = move.computeNewDistricts();
+    public StateNode copyAndExecuteMove(PrecinctMove move) throws MismatchedElectionException {
+        // NOTE: the StateNode produced by this method needs to have its DistrictEdges fixed later.
+        Map<DistrictNode, DistrictNode> newDistricts = move.getNewDistricts();
         StateNode newState = StateNode.builder()
                 .id(UUID.randomUUID().toString())
                 .name(this.name)
@@ -187,6 +237,16 @@ public class StateNode extends ClusterNode<StateEdge, DistrictNode> {
                 .collect(Collectors.toSet());
         newState.children.forEach(d -> d.setParent(newState));
         return newState;
+    }
+
+    public int getNumMajMinDistricts(Set<DemographicType> demoTypes) {
+        int numMajMinDistricts = 0;
+        for (DistrictNode d : this.children) {
+            if (d.getDemographicData().constitutesMajority(demoTypes)) {
+                numMajMinDistricts++;
+            }
+        }
+        return numMajMinDistricts;
     }
 
 

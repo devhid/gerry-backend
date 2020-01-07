@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import javax.persistence.Convert;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class Incumbent {
@@ -14,6 +15,7 @@ public class Incumbent {
     private String name;
 
     @Getter
+    @NotNull
     @Convert(converter = PoliticalPartyConverter.class)
     private PoliticalParty party;
 

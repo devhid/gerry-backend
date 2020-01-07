@@ -34,7 +34,7 @@
     2. The second step refines the initial set of districts using simulated annealing. 
   * In both phases of the process, the solution goal will be to generate the maximum number of majority-minority congressional districts, while adhering to constraints and objectives specified by the user (e.g., district compactness).
 ### 4. Objective Function
-  * You will measure the quality of each interim and final round of districting through the use of an objective function. 
+  * You will measureInterface the quality of each interim and final round of districting through the use of an objective function. 
   *  The objective function will include terms (e.g., Polsby-Popper compactness) whose values are normalized so each term equally contributes to the function value. 
   * Each term will also have a weight that will enable the user to adjust the relative importance of that term.
 

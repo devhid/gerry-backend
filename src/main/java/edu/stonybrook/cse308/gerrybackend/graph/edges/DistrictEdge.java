@@ -1,12 +1,16 @@
 package edu.stonybrook.cse308.gerrybackend.graph.edges;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
+import edu.stonybrook.cse308.gerrybackend.serializers.DistrictEdgeJsonDeserializer;
 
 import javax.persistence.Entity;
+import java.util.UUID;
 
 @Entity
 @JsonIgnoreProperties({"item1", "item2"})
+@JsonDeserialize(using = DistrictEdgeJsonDeserializer.class)
 public class DistrictEdge extends GerryEdge<DistrictNode> {
 
     public DistrictEdge() {

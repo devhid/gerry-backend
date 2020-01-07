@@ -1,9 +1,8 @@
 package edu.stonybrook.cse308.gerrybackend.data.reports;
 
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
-import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,34 +10,30 @@ import java.util.Set;
 public class PrecinctBlocSummary {
 
     @Getter
-    @Setter
     private int votingBlocCount;
 
     @Getter
-    @Setter
-    private PoliticalParty partyType;
-
-    @Getter
-    @Setter
     private double meanPartyPercentage;
 
     private double totalPartyPercentage;
 
     @Getter
-    @Setter
     private DemographicType demographicType;
 
     @Getter
-    @Setter
     private double meanDemographicPercentage;
 
     private double totalDemographicPercentage;
 
+    @Getter
+    private Set<String> precinctNames;
+
+    @Getter
     private Set<String> counties;
 
-    public PrecinctBlocSummary(final PoliticalParty partyType, final DemographicType demographicType) {
-        this.partyType = partyType;
+    public PrecinctBlocSummary(final DemographicType demographicType) {
         this.demographicType = demographicType;
+        this.precinctNames = new HashSet<>();
         this.counties = new HashSet<>();
     }
 
@@ -56,7 +51,9 @@ public class PrecinctBlocSummary {
         this.votingBlocCount++;
     }
 
-    public void addCounty(String county){
-        this.counties.add(county);
+    public void addPrecinct(PrecinctNode precinct) {
+        this.precinctNames.add(precinct.getName());
+        this.counties.add(precinct.getCounty());
     }
+
 }

@@ -3,9 +3,6 @@ package edu.stonybrook.cse308.gerrybackend.data.reports;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import lombok.Getter;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 public class DemoBloc {
 
     @Getter
@@ -16,7 +13,7 @@ public class DemoBloc {
 
     @Getter
     private int totalPop;
-    
+
     public DemoBloc(DemographicType demographicType, int demographicPopulation, int totalPop) {
         this.demographicType = demographicType;
         this.demographicPopulation = demographicPopulation;

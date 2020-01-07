@@ -6,26 +6,26 @@ import edu.stonybrook.cse308.gerrybackend.graph.nodes.StateNode;
 
 public abstract class InputMeasures {
 
-    static double computeScore(MeasureEnumInterface measure, DistrictNode district) {
-        if (measure instanceof CompactnessEnum) {
-            return CompactnessMeasure.computeCompactnessScore((CompactnessEnum) measure, district);
-        } else if (measure instanceof PoliticalCompetitivenessEnum) {
-            return PoliticalCompetitivenessMeasure.computeCompetitivenessScore((PoliticalCompetitivenessEnum) measure, district);
-        } else if (measure instanceof PoliticalFairnessEnum) {
-            return PoliticalFairnessMeasure.computeFairnessScore((PoliticalFairnessEnum) measure, district);
-        } else if (measure instanceof PopulationEqualityEnum) {
-            return PopulationEqualityMeasure.computePopulationEqualityScore((PopulationEqualityEnum) measure, district);
-        } else if (measure instanceof PopulationHomogeneityEnum) {
-            return PopulationHomogeneityMeasure.computePopulationHomogeneityScore((PopulationHomogeneityEnum) measure, district);
+    public static double computeScore(MeasureInterface measureInterface, DistrictNode district) {
+        if (measureInterface instanceof Compactness) {
+            return CompactnessMeasure.computeCompactnessScore((Compactness) measureInterface, district);
+        } else if (measureInterface instanceof PoliticalCompetitiveness) {
+            return PoliticalCompetitivenessMeasure.computeCompetitivenessScore((PoliticalCompetitiveness) measureInterface, district);
+        } else if (measureInterface instanceof PoliticalFairness) {
+            return PoliticalFairnessMeasure.computeFairnessScore((PoliticalFairness) measureInterface, district);
+        } else if (measureInterface instanceof PopulationEquality) {
+            return PopulationEqualityMeasure.computePopulationEqualityScore((PopulationEquality) measureInterface, district);
+        } else if (measureInterface instanceof PopulationHomogeneity) {
+            return PopulationHomogeneityMeasure.computePopulationHomogeneityScore((PopulationHomogeneity) measureInterface, district);
         }
         throw new IllegalArgumentException("Replace this string later!");
     }
 
-    static double computeScore(MeasureEnumInterface measure, StateNode state) {
-        if (measure instanceof PopulationEqualityEnum) {
-            return PopulationEqualityMeasure.computePopulationEqualityScore((PopulationEqualityEnum) measure, state);
-        } else if (measure instanceof PoliticalFairnessEnum) {
-            return PoliticalFairnessMeasure.computeFairnessScore((PoliticalFairnessEnum) measure, state);
+    public static double computeScore(MeasureInterface measureInterface, StateNode state) {
+        if (measureInterface instanceof PopulationEquality) {
+            return PopulationEqualityMeasure.computePopulationEqualityScore((PopulationEquality) measureInterface, state);
+        } else if (measureInterface instanceof PoliticalFairness) {
+            return PoliticalFairnessMeasure.computeFairnessScore((PoliticalFairness) measureInterface, state);
         }
         throw new IllegalArgumentException("Replace this string later!");
     }

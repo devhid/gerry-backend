@@ -2,12 +2,16 @@ package edu.stonybrook.cse308.gerrybackend.graph.edges;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import edu.stonybrook.cse308.gerrybackend.data.graph.Joinability;
-import edu.stonybrook.cse308.gerrybackend.data.structures.UnorderedPair;
+import edu.stonybrook.cse308.gerrybackend.data.pairs.UnorderedPair;
 import edu.stonybrook.cse308.gerrybackend.enums.types.DemographicType;
 import edu.stonybrook.cse308.gerrybackend.enums.types.PoliticalParty;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.DistrictNode;
 import edu.stonybrook.cse308.gerrybackend.graph.nodes.GerryNode;
+import edu.stonybrook.cse308.gerrybackend.graph.nodes.PrecinctNode;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -15,7 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @MappedSuperclass
-public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
+public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> implements Persistable {
 
     @Getter
     @Id
@@ -23,12 +27,16 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
     @JsonValue
     protected String id;
 
-    @Embedded
+    @Transient
     private Joinability joinability;
 
     @Value("${gerry.hashcode.multiplier}")
     @Transient
     private int hashCodeMultiplier;
+
+    @Setter
+    @Transient
+    private boolean isNew = false;
 
     protected GerryEdge() {
         this.id = UUID.randomUUID().toString();
@@ -42,15 +50,46 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         this.id = id;
         this.add(node1);
         this.add(node2);
-        this.computeNewJoinability();
+//        this.computeNewJoinability();
+    }
+
+    public void clearJoinability() {
+        this.joinability = null;
     }
 
     public void computeNewJoinability() {
         this.joinability = new Joinability(this.item1, this.item2);
     }
 
-    public double getJoinabilityValue(PoliticalParty party, Set<DemographicType> demoTypes) {
-        return this.joinability.getValue(party, demoTypes);
+    public Joinability getJoinability() {
+        if (this.joinability == null) {
+            this.computeNewJoinability();
+        }
+        return this.joinability;
+    }
+
+//    public double getJoinabilityValue(Set<PoliticalParty> parties, Set<DemographicType> demoTypes) {
+//        if (this.joinability == null) {
+//            this.computeNewJoinability();
+//        }
+//        return this.joinability.getValue(parties, demoTypes);
+//    }
+//
+//    public double getJoinabilityValueWithoutMinority(Set<PoliticalParty> parties) {
+//        if (this.joinability == null) {
+//            this.computeNewJoinability();
+//        }
+//        return this.joinability.getValueWithoutMinority(parties);
+//    }
+
+    public GerryEdge copy() {
+        if (this instanceof PrecinctEdge) {
+            return new PrecinctEdge(UUID.randomUUID().toString(), (PrecinctNode) this.getItem1(), (PrecinctNode) this.getItem2());
+        } else if (this instanceof DistrictEdge) {
+            return new DistrictEdge(UUID.randomUUID().toString(), (DistrictNode) this.getItem1(), (DistrictNode) this.getItem2());
+        }
+        // should never happen
+        throw new IllegalArgumentException("Replace this string later!");
     }
 
     @Override
@@ -59,10 +98,16 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         if (!returnVal) {
             return false;
         }
-        if (this.size() == 2) {
-            this.computeNewJoinability();
-        }
         return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        boolean removed = super.remove(o);
+        if (removed) {
+            this.joinability = null;
+        }
+        return removed;
     }
 
     @Override
@@ -70,9 +115,6 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
         boolean returnVal = super.addAll(c);
         if (!returnVal) {
             return false;
-        }
-        if (this.size() == 2) {
-            this.computeNewJoinability();
         }
         return true;
     }
@@ -103,6 +145,10 @@ public abstract class GerryEdge<N extends GerryNode> extends UnorderedPair<N> {
     @Override
     public int hashCode() {
         return hashCodeMultiplier * super.hashCode() + this.id.hashCode();
+    }
+
+    public boolean isNew() {
+        return this.isNew;
     }
 
 }
